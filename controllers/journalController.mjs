@@ -1,4 +1,4 @@
-import JournalEntry from '../models/JournalEntry.mjs';
+import JournalEntry from '../models/journalEntry.mjs';
 import natural from 'natural';
 import mongoose from 'mongoose';
 import { SpeechClient } from '@google-cloud/speech';
