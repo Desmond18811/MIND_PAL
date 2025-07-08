@@ -7,5 +7,11 @@ export const {
     NODE_ENV,
     DB_URI,
     JWT_SECRET,
-    JWT_EXPIRES_IN
+    JWT_EXPIRES_IN,
+    EMAIL_USER,
+    EMAIL_PASS,
+    EMAIL_HOST,
+    EMAIL_PORT,
+    EMAIL_SECURE,
+    EMAIL_FROM,
 } = process.env
