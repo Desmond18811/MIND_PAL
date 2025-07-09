@@ -5,23 +5,19 @@ import { updateScore } from './palScoreController.mjs';
 import { scrapeNAMIArticles, getNAMIArticleContent } from '../scrappers/namiScraper.mjs';
 import { scrapeCDCArticles, getCDCArticleContent } from '../scrappers/cdcScraper.mjs';
 
-
 const tokenizer = new natural.WordTokenizer();
 const stemmer = natural.PorterStemmer;
 
-// Fetch and store resources from external APIs
 export const fetchResources = async (req, res) => {
     try {
         const { category, limit = 10 } = req.query;
 
-        // Fetch from multiple sources in parallel
         const [newsApiResults, namiResults, cdcResults] = await Promise.all([
             fetchNewsApiResources(category, limit),
             fetchNAMICDCResources('nami'),
             fetchNAMICDCResources('cdc')
         ]);
 
-        // Process and store resources
         const savedResources = await Promise.all([
             ...newsApiResults.map(processAndSaveResource),
             ...namiResults.map(processAndSaveResource),
@@ -37,46 +33,17 @@ export const fetchResources = async (req, res) => {
     }
 };
 
-async function fetchNAMICDCResources(source) {
-    try {
-        const scraper = source === 'nami' ? {
-            scraper: scrapeNAMIArticles,
-            contentFetcher: getNAMIArticleContent
-        } : {
-            scraper: scrapeCDCArticles,
-            contentFetcher: getCDCArticleContent
-        };
-
-        const articles = await scraper.scraper();
-        const enhancedArticles = await Promise.all(
-            articles.map(async article => ({
-                ...article,
-                content: await scraper.contentFetcher(article.url),
-                source
-            }))
-        );
-
-        return enhancedArticles;
-    } catch (error) {
-        console.error(`Error fetching ${source} resources:`, error.message);
-        return [];
-    }
-}
-
-// Get recommended resources based on user profile
 export const getRecommendedResources = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { categories, preferredTypes, difficulty } = req.body;
+        const { categories, preferredTypes, difficulty } = req.query; // Changed from req.body to req.query
 
-        // In a real app, we'd get these from user profile
         const userPreferences = {
-            categories: categories || ['stress', 'mindfulness'],
-            preferredTypes: preferredTypes || ['article', 'video'],
+            categories: categories ? categories.split(',') : ['stress', 'mindfulness'], // Handle comma-separated categories
+            preferredTypes: preferredTypes ? preferredTypes.split(',') : ['article', 'video'],
             difficulty: difficulty || 'intermediate'
         };
 
-        // Get resources matching preferences
         const query = {
             categories: { $in: userPreferences.categories },
             type: { $in: userPreferences.preferredTypes },
@@ -89,7 +56,6 @@ export const getRecommendedResources = async (req, res) => {
             .limit(10)
             .lean();
 
-        // If not enough, fallback to broader query
         if (resources.length < 5) {
             const fallbackResources = await Resource.find({
                 isVerified: true
@@ -107,12 +73,15 @@ export const getRecommendedResources = async (req, res) => {
     }
 };
 
-// Rate a resource
 export const rateResource = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
         const { rating, feedback } = req.body;
+
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ error: 'Rating is required and must be between 1 and 5' });
+        }
 
         const resource = await Resource.findOneAndUpdate(
             { _id: id },
@@ -128,11 +97,14 @@ export const rateResource = async (req, res) => {
             { new: true }
         );
 
-        // Update Pal score for engaging with resources
+        if (!resource) {
+            return res.status(404).json({ error: 'Resource not found' });
+        }
+
         await updateScore(userId, {
-            type: 'resource-engagement',
+            type: 'check-in', // Use valid enum value
             _id: id,
-            ratingValue: rating
+            moodImprovement: rating >= 4 // High rating as positive engagement
         });
 
         res.json(resource);
@@ -141,10 +113,13 @@ export const rateResource = async (req, res) => {
     }
 };
 
-// Search resources
 export const searchResources = async (req, res) => {
     try {
         const { query, category, type } = req.query;
+
+        if (!query) {
+            return res.status(400).json({ error: 'Search query is required' });
+        }
 
         const searchQuery = {
             $text: { $search: query }
@@ -166,7 +141,6 @@ export const searchResources = async (req, res) => {
     }
 };
 
-// Helper functions
 async function fetchNewsApiResources(category, limit) {
     const apiKey = process.env.NEWS_API_KEY;
     const query = `mental health ${category || ''}`;
@@ -222,19 +196,16 @@ async function fetchContextualWebResources(category, limit) {
 }
 
 async function processAndSaveResource(resourceData) {
-    // Check if already exists
     const existing = await Resource.findOne({ url: resourceData.url });
     if (existing) {
         existing.lastFetched = new Date();
         return existing.save();
     }
 
-    // Analyze content for categories
     const categories = await analyzeContentForCategories(resourceData.content || resourceData.summary);
 
-    // Estimate reading time
     const wordCount = resourceData.content ? resourceData.content.split(/\s+/).length : 0;
-    const readingTime = Math.ceil(wordCount / 200); // Average reading speed
+    const readingTime = Math.ceil(wordCount / 200);
 
     const resource = new Resource({
         ...resourceData,
@@ -252,7 +223,6 @@ async function analyzeContentForCategories(text) {
     const tokens = tokenizer.tokenize(text.toLowerCase());
     const stems = tokens.map(token => stemmer.stem(token));
 
-    // Simple keyword matching (would be enhanced in production)
     const categoryKeywords = {
         anxiety: ['anxiety', 'worry', 'panic', 'fear'],
         depression: ['depress', 'sad', 'hopeless', 'melancholy'],
