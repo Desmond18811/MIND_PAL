@@ -65,15 +65,49 @@ export const getGoals = async (req, res) => {
         sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
         const goals = await Goal.find(query)
-            .sort(sortOptions)
-            .populate('linkedHabits', 'title streak')
-            .populate('journalReflections', 'title createdAt');
+            .sort(sortOptions);
+        // Note: Add .populate('linkedHabits', 'title streak') and .populate('journalReflections', 'title createdAt')
+        // if Habit and JournalEntry models are implemented and registered.
 
         res.json(goals);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+// export const getGoals = async (req, res) => {
+//     try {
+//         const { status, category, sortBy = 'targetDate', sortOrder = 'asc' } = req.query;
+//         const userId = req.user._id;
+//
+//         let query = { userId };
+//
+//         if (status === 'active') {
+//             query.completed = false;
+//             query.targetDate = { $gte: new Date() };
+//         } else if (status === 'completed') {
+//             query.completed = true;
+//         } else if (status === 'overdue') {
+//             query.completed = false;
+//             query.targetDate = { $lt: new Date() };
+//         }
+//
+//         if (category) {
+//             query.category = category;
+//         }
+//
+//         const sortOptions = {};
+//         sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+//
+//         const goals = await Goal.find(query)
+//             .sort(sortOptions)
+//             .populate('linkedHabits', 'title streak')
+//             .populate('journalReflections', 'title createdAt');
+//
+//         res.json(goals);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 // Update a goal
 export const updateGoal = async (req, res) => {
