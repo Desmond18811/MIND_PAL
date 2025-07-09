@@ -41,10 +41,10 @@ export const createStressEntry = async (req, res) => {
 
         // Update Pal score based on stress management
         await updateScore(userId, {
-            type: 'stress-tracked',
+            type: 'check-in', // Use valid enum value from PalScore schema
             _id: entry[0]._id,
-            stressLevel,
-            usedCopingMethods: copingMethods.length > 0
+            moodImprovement: moodAfter > moodBefore, // Map to check-in logic
+            stressLevel // Include for context
         });
 
         await session.commitTransaction();
