@@ -1,6 +1,6 @@
 import Goal from '../models/Goal.mjs';
 import mongoose from 'mongoose';
-import { updateScore } from './palScoreController.mjs'
+import {updateScore} from './palScoreController.mjs'
 
 // Create a new goal
 export const createGoal = async (req, res) => {
