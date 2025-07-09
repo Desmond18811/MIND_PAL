@@ -102,7 +102,6 @@ export const getStressEntries = async (req, res) => {
     }
 };
 
-// Get stress statistics and analytics
 export const getStressStats = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -110,7 +109,7 @@ export const getStressStats = async (req, res) => {
 
         const dateRange = getDateRange(period);
         const matchStage = {
-            userId: mongoose.Types.ObjectId(userId),
+            userId, // Use ObjectId directly
             date: { $gte: dateRange.start, $lte: dateRange.end }
         };
 
@@ -118,7 +117,6 @@ export const getStressStats = async (req, res) => {
             { $match: matchStage },
             {
                 $facet: {
-                    // Basic statistics
                     overview: [
                         {
                             $group: {
@@ -135,12 +133,10 @@ export const getStressStats = async (req, res) => {
                             }
                         }
                     ],
-                    // Stress level distribution
                     levelDistribution: [
                         { $group: { _id: '$stressLevel', count: { $sum: 1 } } },
                         { $sort: { _id: 1 } }
                     ],
-                    // Top stressors
                     topStressors: [
                         { $unwind: '$stressors' },
                         {
@@ -153,7 +149,6 @@ export const getStressStats = async (req, res) => {
                         { $sort: { count: -1 } },
                         { $limit: 5 }
                     ],
-                    // Effective coping methods
                     effectiveCopingMethods: [
                         { $unwind: '$copingMethods' },
                         {
@@ -171,7 +166,6 @@ export const getStressStats = async (req, res) => {
                         { $sort: { avgEffectiveness: -1 } },
                         { $limit: 5 }
                     ],
-                    // Time patterns
                     timePatterns: [
                         {
                             $group: {
@@ -181,7 +175,6 @@ export const getStressStats = async (req, res) => {
                             }
                         }
                     ],
-                    // Location patterns
                     locationPatterns: [
                         {
                             $group: {
