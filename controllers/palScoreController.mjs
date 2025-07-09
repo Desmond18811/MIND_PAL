@@ -12,6 +12,7 @@ export const updateScore = async (userId, activity) => {
         // Calculate score impact based on activity type
         let impact = 0;
         let notes = '';
+        let activityTypeForHistory = activity.type; // Default
 
         switch (activity.type) {
             case 'journal':
@@ -27,6 +28,7 @@ export const updateScore = async (userId, activity) => {
                 impact = activity.difficulty === 'hard' ? 8 :
                     activity.difficulty === 'medium' ? 5 : 3;
                 notes = `${activity.type === 'goal-set' ? 'Goal set' : 'Goal completed'}: ${activity.title || 'Untitled'}`;
+                activityTypeForHistory = 'goal'; // Map to schema's enum value
                 break;
             case 'chat':
                 impact = 2;
@@ -65,7 +67,7 @@ export const updateScore = async (userId, activity) => {
         // Add to history
         palScore.history.push({
             score: newScore,
-            activityType: activity.type,
+            activityType: activityTypeForHistory, // Use mapped activity type
             activityId: activity._id,
             notes,
             impact
@@ -78,7 +80,7 @@ export const updateScore = async (userId, activity) => {
         await session.commitTransaction();
         session.endSession();
 
-        console.log('PalScore updated successfully:', { userId, newScore });
+        console.log('PalScore updated successfully:', { userId, newScore, activityType: activityTypeForHistory });
         return palScore;
     } catch (error) {
         await session.abortTransaction();
@@ -229,26 +231,22 @@ export const getScoreInsights = async (req, res) => {
 
 
 
-
-
-
-
-
-
 // import PalScore from '../models/PalScore.mjs';
 // import mongoose from 'mongoose';
 //
-// // Update Freud Score based on user activity
+// // Update PalScore based on user activity
 // export const updateScore = async (userId, activity) => {
 //     const session = await mongoose.startSession();
 //     session.startTransaction();
 //
 //     try {
-//         // Calculate score impact based on an activity type
+//         console.log('updateScore called with:', { userId, activity });
+//
+//         // Calculate score impact based on activity type
 //         let impact = 0;
 //         let notes = '';
 //
-//         switch(activity.type) {
+//         switch (activity.type) {
 //             case 'journal':
 //                 impact = activity.wordCount > 300 ? 5 : 3;
 //                 notes = `Journal entry: ${activity.wordCount} words`;
@@ -257,19 +255,20 @@ export const getScoreInsights = async (req, res) => {
 //                 impact = Math.min(10, Math.floor(activity.duration / 5));
 //                 notes = `Meditation: ${activity.duration} minutes`;
 //                 break;
-//             case 'goal':
+//             case 'goal-set':
+//             case 'goal-completed':
 //                 impact = activity.difficulty === 'hard' ? 8 :
 //                     activity.difficulty === 'medium' ? 5 : 3;
-//                 notes = `Goal completed: ${activity.title}`;
+//                 notes = `${activity.type === 'goal-set' ? 'Goal set' : 'Goal completed'}: ${activity.title || 'Untitled'}`;
 //                 break;
 //             case 'chat':
-//                 impact = 2; // Base impact for chatting
+//                 impact = 2;
 //                 if (activity.sentimentScore > 0.7) impact += 3;
 //                 notes = `Chat with Serenity: ${activity.messageCount} messages`;
 //                 break;
 //             case 'suggestion':
 //                 impact = activity.impact || 5;
-//                 notes = `Completed suggestion: ${activity.title}`;
+//                 notes = `Completed suggestion: ${activity.title || 'Untitled'}`;
 //                 break;
 //             case 'check-in':
 //                 impact = activity.moodImprovement ? 4 : 2;
@@ -277,6 +276,7 @@ export const getScoreInsights = async (req, res) => {
 //                 break;
 //             default:
 //                 impact = 3;
+//                 notes = `Unknown activity: ${activity.type}`;
 //         }
 //
 //         // Cap the impact
@@ -286,6 +286,7 @@ export const getScoreInsights = async (req, res) => {
 //         let palScore = await PalScore.findOne({ userId }).session(session);
 //
 //         if (!palScore) {
+//             console.log('Creating new PalScore for userId:', userId);
 //             palScore = new PalScore({ userId, currentScore: 50 });
 //         }
 //
@@ -310,16 +311,17 @@ export const getScoreInsights = async (req, res) => {
 //         await session.commitTransaction();
 //         session.endSession();
 //
+//         console.log('PalScore updated successfully:', { userId, newScore });
 //         return palScore;
 //     } catch (error) {
 //         await session.abortTransaction();
 //         session.endSession();
-//         console.error('Error updating Freud score:', error);
+//         console.error('Error updating PalScore:', error);
 //         throw error;
 //     }
 // };
 //
-// // Get current pal score and trends
+// // Get current PalScore and trends
 // export const getPalScore = async (req, res) => {
 //     try {
 //         const userId = req.user._id;
@@ -346,7 +348,7 @@ export const getScoreInsights = async (req, res) => {
 //     }
 // };
 //
-// // Get Pal score history with filters
+// // Get PalScore history with filters
 // export const getScoreHistory = async (req, res) => {
 //     try {
 //         const userId = req.user._id;
@@ -381,7 +383,7 @@ export const getScoreInsights = async (req, res) => {
 //     }
 // };
 //
-// // Get Freud score insights and analytics
+// // Get PalScore insights and analytics
 // export const getScoreInsights = async (req, res) => {
 //     try {
 //         const userId = req.user._id;
