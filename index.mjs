@@ -51,6 +51,7 @@ const aj = arcjet({
       // Block all bots except the following
       allow: [
         "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc
+         "PostmanRuntime"
         // Uncomment to allow these other common bot categories
         //"CATEGORY:MONITOR", // Uptime monitoring services
         //"CATEGORY:PREVIEW", // Link previews e.g. Slack, Discord
