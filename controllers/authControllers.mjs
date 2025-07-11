@@ -145,7 +145,7 @@ export const resetPassword = async (req, res) => {
 
         // Check OTP
         if (user.resetPasswordOTP !== otp ||
-            user.resetPasswordExpires < Date.now()) {
+            user.resetPasswordExpires > Date.now()) {
             return res.status(400).json({ error: 'Invalid or expired OTP' });
         }
 
