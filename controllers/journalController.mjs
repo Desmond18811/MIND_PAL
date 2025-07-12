@@ -4,7 +4,7 @@ import { SpeechClient } from '@google-cloud/speech';
 import { Storage } from '@google-cloud/storage';
 import { updateScore } from './palScoreController.mjs';
 import User from '../models/User.mjs';
-import { analyzeContent } from '../utils/contentAnalysis.mjs';
+import { analyzeContent } from '../utils/ContentAnalysis.mjs';
 
 // Initialize Google Cloud clients
 const speechClient = new SpeechClient();
