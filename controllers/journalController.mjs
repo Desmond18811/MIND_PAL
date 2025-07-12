@@ -1,22 +1,135 @@
 import JournalEntry from '../models/journalEntry.mjs';
-import natural from 'natural';
 import mongoose from 'mongoose';
 import { SpeechClient } from '@google-cloud/speech';
 import { Storage } from '@google-cloud/storage';
 import { updateScore } from './palScoreController.mjs';
+import User from '../models/User.mjs';
+import { analyzeContent } from '../utils/contentAnalysis.mjs';
 
-// Initialize NLP tools
-const analyzer = new natural.SentimentAnalyzer("English", natural.PorterStemmer, "afinn");
-const stemmer = natural.PorterStemmer;
-const tokenizer = new natural.WordTokenizer();
-
-// Google Cloud setup for voice processing
+// Initialize Google Cloud clients
 const speechClient = new SpeechClient();
 const storage = new Storage();
-const BUCKET_NAME = 'your-audio-bucket';
+const BUCKET_NAME = process.env.GCS_BUCKET_NAME || 'your-audio-bucket';
 
-// Create journal entry (supports both text and voice)
-export const createJournalEntry = async (req, res) => {
+// Helper function for date ranges
+function getDateRange(period) {
+    const now = new Date();
+    const ranges = {
+        'day': { start: new Date(now.setDate(now.getDate() - 1)), end: new Date() },
+        'week': { start: new Date(now.setDate(now.getDate() - 7)), end: new Date() },
+        'month': { start: new Date(now.setMonth(now.getMonth() - 1)), end: new Date() },
+        'year': { start: new Date(now.setFullYear(now.getFullYear() - 1)), end: new Date() }
+    };
+    return ranges[period] || ranges.month;
+}
+
+// Audio transcription function
+async function transcribeAudio(audioRef) {
+    try {
+        const gcsUri = `gs://${BUCKET_NAME}/${audioRef}`;
+        const config = {
+            encoding: 'LINEAR16',
+            sampleRateHertz: 16000,
+            languageCode: 'en-US',
+            enableAutomaticPunctuation: true
+        };
+
+        const audio = { uri: gcsUri };
+        const [operation] = await speechClient.longRunningRecognize({ config, audio });
+        const [response] = await operation.promise();
+
+        return {
+            content: response.results.map(result => result.alternatives[0].transcript).join('\n'),
+            confidence: response.results[0].alternatives[0].confidence
+        };
+    } catch (error) {
+        console.error('Audio transcription failed:', error);
+        throw new Error('Failed to transcribe audio');
+    }
+}
+
+// Update user journal insights
+async function updateUserJournalInsights(userId, { sentiment, moodChange, wordCount, tags }) {
+    await User.findByIdAndUpdate(userId, {
+        $inc: {
+            'insights.totalJournalEntries': 1,
+            'insights.totalWordsWritten': wordCount,
+            'insights.positiveSentimentCount': sentiment > 0 ? 1 : 0,
+            'insights.negativeSentimentCount': sentiment < 0 ? 1 : 0
+        },
+        $push: {
+            'insights.recentMoodChanges': { $each: [moodChange], $slice: -100 },
+            'insights.usedTags': { $each: tags || [] }
+        },
+        $set: {
+            'insights.lastJournalDate': new Date()
+        }
+    });
+}
+
+// Calculate journal streak
+async function calculateJournalStreak(userId) {
+    const entries = await JournalEntry.find({ userId })
+        .sort({ date: -1 })
+        .limit(30);
+
+    if (entries.length === 0) return 0;
+
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let currentDate = new Date(entries[0].date);
+    currentDate.setHours(0, 0, 0, 0);
+
+    if (currentDate.getTime() === today.getTime()) {
+        streak++;
+    } else {
+        return 0;
+    }
+
+    for (let i = 1; i < entries.length; i++) {
+        const prevDate = new Date(entries[i].date);
+        prevDate.setHours(0, 0, 0, 0);
+
+        const dayDiff = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
+
+        if (dayDiff === 1) {
+            streak++;
+            currentDate = prevDate;
+        } else if (dayDiff > 1) {
+            break;
+        }
+    }
+
+    return streak;
+}
+
+// Calculate mood correlation
+function calculateMoodCorrelation(entries) {
+    const validEntries = entries.filter(e => e.moodAfter && e.sentimentScore);
+    if (validEntries.length < 2) return null;
+
+    const moodMean = validEntries.reduce((sum, e) => sum + e.moodAfter, 0) / validEntries.length;
+    const sentimentMean = validEntries.reduce((sum, e) => sum + e.sentimentScore, 0) / validEntries.length;
+
+    let covariance = 0;
+    let moodVariance = 0;
+    let sentimentVariance = 0;
+
+    validEntries.forEach(e => {
+        const moodDiff = e.moodAfter - moodMean;
+        const sentimentDiff = e.sentimentScore - sentimentMean;
+        covariance += moodDiff * sentimentDiff;
+        moodVariance += moodDiff * moodDiff;
+        sentimentVariance += sentimentDiff * sentimentDiff;
+    });
+
+    return covariance / Math.sqrt(moodVariance * sentimentVariance);
+}
+
+// Create journal entry
+export async function createJournalEntry(req, res) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -24,244 +137,189 @@ export const createJournalEntry = async (req, res) => {
         const { title, moodBefore, moodAfter, tags, musicPlayed, images, audioRef } = req.body;
         const userId = req.user._id;
 
-        let content = req.body.content;
-        let isVoiceEntry = false;
-
-        // Process voice recording if provided
-        if (audioRef) {
-            isVoiceEntry = true;
-            content = await transcribeAudio(audioRef);
+        if (!moodBefore || !req.body.content) {
+            throw new Error('Missing required fields: content and moodBefore are required');
         }
 
-        // Analyze sentiment and extract keywords
-        const { sentimentScore, keywords } = await analyzeContent(content);
+        let content = req.body.content;
+        let isVoiceEntry = false;
+        let transcriptionConfidence = null;
 
-        const entry = await JournalEntry.create([{
+        if (audioRef) {
+            isVoiceEntry = true;
+            const transcriptionResult = await transcribeAudio(audioRef);
+            content = transcriptionResult.content;
+            transcriptionConfidence = transcriptionResult.confidence;
+        }
+
+        const { sentimentScore, keywords } = await analyzeContent(content);
+        const wordCount = content.split(/\s+/).length;
+
+        const [entry] = await JournalEntry.create([{
             userId,
-            title,
+            title: title || 'Untitled Entry',
             content,
-            moodBefore,
-            moodAfter,
-            tags,
+            moodBefore: parseInt(moodBefore),
+            moodAfter: moodAfter ? parseInt(moodAfter) : null,
+            tags: tags || [],
             musicPlayed,
-            images,
+            images: images || [],
             sentimentScore,
             isVoiceEntry,
-            keywords
+            transcriptionConfidence,
+            keywords,
+            wordCount
         }], { session });
 
-        // Update user insights
         await updateUserJournalInsights(userId, {
             sentiment: sentimentScore,
-            moodChange: moodAfter - moodBefore,
-            wordCount: content.split(/\s+/).length,
+            moodChange: moodAfter ? (moodAfter - moodBefore) : 0,
+            wordCount,
             tags
         });
 
-        // Update Freud score
         await updateScore(userId, {
             type: 'journal',
-            _id: entry[0]._id,
-            wordCount: entry[0].wordCount,
-            moodImprovement: moodAfter > moodBefore,
+            entryId: entry._id,
+            wordCount,
+            moodImprovement: moodAfter ? (moodAfter > moodBefore) : null,
             sentimentScore
         });
 
         await session.commitTransaction();
         session.endSession();
 
-        res.status(201).json(entry[0]);
+        res.status(201).json({
+            status: 'success',
+            data: {
+                ...entry.toObject(),
+                moodImprovement: moodAfter ? (moodAfter - moodBefore) : null
+            }
+        });
+
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
-        res.status(500).json({ error: error.message });
-    }
-};
 
-// Enhanced journal analytics
-export const getJournalAnalytics = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { period = 'month' } = req.query;
-
-        const dateRange = getDateRange(period);
-        const entries = await JournalEntry.find({
-            userId,
-            createdAt: { $gte: dateRange.start, $lte: dateRange.end }
+        console.error('Journal creation error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to create journal entry',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
-
-        // Sentiment analysis
-        const sentimentData = entries.map(entry => ({
-            date: entry.createdAt,
-            score: entry.sentimentScore,
-            type: entry.isVoiceEntry ? 'voice' : 'text'
-        }));
-
-        // Mood correlation
-        const moodCorrelation = calculateMoodCorrelation(entries);
-
-        // Writing habits
-        const writingHabits = analyzeWritingHabits(entries);
-
-        res.json({
-            stats: {
-                totalEntries: entries.length,
-                voiceEntries: entries.filter(e => e.isVoiceEntry).length,
-                averageWordCount: entries.reduce((sum, e) => sum + e.wordCount, 0) / entries.length,
-                mostUsedTags: getMostUsedTags(entries),
-                streak: await calculateJournalStreak(userId)
-            },
-            sentimentData,
-            moodCorrelation,
-            writingHabits
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
     }
-};
-
-// Helper functions
-async function transcribeAudio(audioRef) {
-    const gcsUri = `gs://${BUCKET_NAME}/${audioRef}`;
-    const config = {
-        encoding: 'LINEAR16',
-        sampleRateHertz: 16000,
-        languageCode: 'en-US',
-    };
-    const audio = { uri: gcsUri };
-    const [response] = await speechClient.recognize({ config, audio });
-    return response.results.map(result => result.alternatives[0].transcript).join('\n');
 }
 
-async function analyzeContent(content) {
-    const tokens = tokenizer.tokenize(content);
-    const stems = tokens.map(token => stemmer.stem(token));
-    const sentimentScore = analyzer.getSentiment(stems);
-
-    // Simple keyword extraction (could be enhanced with TF-IDF)
-    const keywords = [...new Set(stems)]
-        .filter(term => term.length > 3)
-        .slice(0, 5);
-
-    return { sentimentScore, keywords };
-}
-
-function calculateMoodCorrelation(entries) {
-    // Analyze correlation between journal sentiment and mood
-    const data = entries.filter(e => e.moodAfter && e.sentimentScore)
-        .map(e => ({
-            mood: e.moodAfter,
-            sentiment: e.sentimentScore
-        }));
-
-    // Simple correlation calculation
-    if (data.length < 2) return null;
-
-    const moodMean = data.reduce((sum, d) => sum + d.mood, 0) / data.length;
-    const sentimentMean = data.reduce((sum, d) => sum + d.sentiment, 0) / data.length;
-
-    let numerator = 0;
-    let moodDenominator = 0;
-    let sentimentDenominator = 0;
-
-    for (const d of data) {
-        numerator += (d.mood - moodMean) * (d.sentiment - sentimentMean);
-        moodDenominator += Math.pow(d.mood - moodMean, 2);
-        sentimentDenominator += Math.pow(d.sentiment - sentimentMean, 2);
-    }
-
-    return numerator / Math.sqrt(moodDenominator * sentimentDenominator);
-}
-
-
-
-// Get a specific journal entry with skipped day information
-export const getJournalEntry = async (req, res) => {
+// Get journal entry
+export async function getJournalEntry(req, res) {
     try {
         const { id } = req.params;
         const userId = req.user._id;
 
-        // Get the requested entry
-        const entry = await JournalEntry.findOne({
-            _id: id,
-            userId
-        });
-
+        const entry = await JournalEntry.findOne({ _id: id, userId });
         if (!entry) {
-            return res.status(404).json({ error: 'Journal entry not found' });
+            return res.status(404).json({
+                status: 'error',
+                message: 'Journal entry not found'
+            });
         }
 
-        // Get surrounding dates to identify skipped days
-        const adjacentEntries = await JournalEntry.find({
+        // Get context entries
+        const startDate = new Date(entry.createdAt);
+        startDate.setDate(startDate.getDate() - 3);
+        const endDate = new Date(entry.createdAt);
+        endDate.setDate(endDate.getDate() + 3);
+
+        const contextEntries = await JournalEntry.find({
             userId,
-            date: {
-                $gte: new Date(new Date(entry.date).setDate(entry.date.getDate() - 3)),
-                $lte: new Date(new Date(entry.date).setDate(entry.date.getDate() + 3))
-            }
-        }).sort({ date: 1 });
-
-        // Identify skipped days in this period
-        const skippedDays = [];
-        for (let i = 1; i < adjacentEntries.length; i++) {
-            const prevDate = adjacentEntries[i-1].date;
-            const currentDate = adjacentEntries[i].date;
-            const dayDiff = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
-
-            if (dayDiff > 1) {
-                // Add all missing days between entries
-                for (let d = 1; d < dayDiff; d++) {
-                    const skippedDate = new Date(prevDate);
-                    skippedDate.setDate(skippedDate.getDate() + d);
-                    skippedDays.push({
-                        date: skippedDate,
-                        reason: 'not_written', // Could be enhanced with more context
-                        streakImpact: true
-                    });
-                }
-            }
-        }
-
-        // Check if today is being skipped
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const lastEntry = await JournalEntry.findOne({ userId })
-            .sort({ date: -1 });
-
-        if (lastEntry && lastEntry.date < today) {
-            const lastEntryDate = new Date(lastEntry.date);
-            lastEntryDate.setHours(0, 0, 0, 0);
-
-            const daysSinceLastEntry = (today - lastEntryDate) / (1000 * 60 * 60 * 24);
-            if (daysSinceLastEntry >= 1) {
-                for (let d = 1; d <= daysSinceLastEntry; d++) {
-                    const skippedDate = new Date(lastEntryDate);
-                    skippedDate.setDate(skippedDate.getDate() + d);
-                    skippedDays.push({
-                        date: skippedDate,
-                        reason: 'not_written',
-                        streakImpact: true,
-                        isToday: skippedDate.toDateString() === today.toDateString()
-                    });
-                }
-            }
-        }
+            createdAt: { $gte: startDate, $lte: endDate },
+            _id: { $ne: entry._id }
+        }).sort({ createdAt: 1 });
 
         res.json({
-            entry,
-            context: {
-                adjacentEntries: adjacentEntries.map(e => ({
-                    id: e._id,
-                    date: e.date,
-                    title: e.title,
-                    preview: e.content.substring(0, 50) + '...',
-                    moodAfter: e.moodAfter
-                })),
-                skippedDays,
-                streakStatus: await calculateJournalStreak(userId)
+            status: 'success',
+            data: {
+                entry,
+                context: {
+                    entries: contextEntries,
+                    streak: await calculateJournalStreak(userId)
+                }
             }
         });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Get entry error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to get journal entry',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
-};
+}
+
+// Get journal analytics
+export async function getJournalAnalytics(req, res) {
+    try {
+        const userId = req.user._id;
+        const { period = 'month' } = req.query;
+        const dateRange = getDateRange(period);
+
+        const entries = await JournalEntry.find({
+            userId,
+            createdAt: { $gte: dateRange.start, $lte: dateRange.end }
+        }).sort({ createdAt: 1 });
+
+        // Sentiment timeline
+        const sentimentTimeline = entries.map(entry => ({
+            date: entry.createdAt,
+            score: entry.sentimentScore,
+            moodBefore: entry.moodBefore,
+            moodAfter: entry.moodAfter,
+            wordCount: entry.wordCount
+        }));
+
+        // Tag frequency
+        const tagFrequency = entries.reduce((acc, entry) => {
+            entry.tags.forEach(tag => {
+                acc[tag] = (acc[tag] || 0) + 1;
+            });
+            return acc;
+        }, {});
+
+        // Writing habits
+        const writingHabits = {
+            byDayOfWeek: Array(7).fill(0),
+            byHour: Array(24).fill(0)
+        };
+
+        entries.forEach(entry => {
+            const day = entry.createdAt.getDay();
+            const hour = entry.createdAt.getHours();
+            writingHabits.byDayOfWeek[day]++;
+            writingHabits.byHour[hour]++;
+        });
+
+        res.json({
+            status: 'success',
+            data: {
+                period,
+                totalEntries: entries.length,
+                averageSentiment: entries.reduce((sum, e) => sum + e.sentimentScore, 0) / entries.length || 0,
+                averageWordCount: entries.reduce((sum, e) => sum + e.wordCount, 0) / entries.length || 0,
+                moodCorrelation: calculateMoodCorrelation(entries),
+                tagFrequency,
+                sentimentTimeline,
+                writingHabits,
+                currentStreak: await calculateJournalStreak(userId)
+            }
+        });
+
+    } catch (error) {
+        console.error('Analytics error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to get analytics',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+}

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { analyzeContent } from '../utils/contentAnalysis.mjs';
 
 const journalEntrySchema = new mongoose.Schema({
     userId: {
