@@ -4,7 +4,8 @@ import { SpeechClient } from '@google-cloud/speech';
 import { Storage } from '@google-cloud/storage';
 import { updateScore } from './palScoreController.mjs';
 import User from '../models/User.mjs';
-import { analyzeContent } from '../utils/ContentAnalysis.mjs';
+import {analyzeContent} from "../utils/ContentAnalysis.mjs";
+
 
 // Initialize Google Cloud clients
 const speechClient = new SpeechClient();
@@ -151,6 +152,7 @@ export async function createJournalEntry(req, res) {
             content = transcriptionResult.content;
             transcriptionConfidence = transcriptionResult.confidence;
         }
+
 
         const { sentimentScore, keywords } = await analyzeContent(content);
         const wordCount = content.split(/\s+/).length;
