@@ -14,17 +14,17 @@ export const register = async (req, res) => {
     try {
         const { email, password, username } = req.body;
 
-        // Check if user exists
+        // Check if a user exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: 'Email already exists' });
         }
 
-        // Create new user
+        // Create a new user
         const user = new User({ email, password, username });
         await user.save();
 
-        // Send welcome email
+        // Sends welcome email
         await sendWelcomeEmail(email, username);
 
         // Generate token
@@ -54,7 +54,7 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Check if user exists
+        // Check if a user exists
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ error: 'Invalid credentials' });
@@ -97,89 +97,12 @@ export const login = async (req, res) => {
     }
 };
 
-// Forgot password (send OTP)
-// export const forgotPassword = async (req, res) => {
-//     try {
-//         const { email } = req.body;
-//
-//         // Check if user exists
-//         const user = await User.findOne({ email });
-//         if (!user) {
-//             return res.status(400).json({ error: 'User not found' });
-//         }
-//
-//         // Generate a secret for OTP
-//         const secret = speakeasy.generateSecret().base32;
-//
-//         // Generate OTP
-//         const otp = speakeasy.totp({
-//             secret: secret,
-//             encoding: 'base32',
-//             digits: 6,
-//             step: 900 // 15 minutes in seconds
-//         });
-//
-//         // Save OTP and secret to user
-//         user.resetPasswordOTP = otp;
-//         user.resetPasswordSecret = secret; // Store the secret
-//         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
-//         await user.save();
-//
-//         // Send OTP email
-//         await sendOTPEmail(email, otp);
-//
-//         res.json({
-//             message: 'OTP sent to your email',
-//             userId: user._id // Send userId for OTP verification
-//         });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// };
-
-// Verify OTP and reset password
-// export const resetPassword = async (req, res) => {
-//     try {
-//         const { userId, otp, newPassword } = req.body;
-//
-//         // Find user
-//         const user = await User.findById(userId);
-//         if (!user) {
-//             return res.status(400).json({ error: 'User not found' });
-//         }
-//
-//         // Verify OTP using the stored secret
-//         const isValidOTP = speakeasy.totp.verify({
-//             secret: user.resetPasswordSecret,
-//             encoding: 'base32',
-//             token: otp,
-//             window: 1, // Allow a small time window for clock drift
-//             step: 900 // Match the step used in generation
-//         });
-//
-//         // Check OTP validity and expiration
-//         if (!isValidOTP || user.resetPasswordExpires < Date.now()) {
-//             return res.status(400).json({ error: 'Invalid or expired OTP' });
-//         }
-//
-//         // Update password and clear OTP fields
-//         user.password = newPassword;
-//         user.resetPasswordOTP = undefined;
-//         user.resetPasswordSecret = undefined; // Clear the secret
-//         user.resetPasswordExpires = undefined;
-//         await user.save();
-//
-//         res.json({ message: 'Password reset successfully' });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// };
 
 export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
 
-        // Check if user exists
+        // Check if a user exists
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ error: 'User not found' });
@@ -191,7 +114,7 @@ export const forgotPassword = async (req, res) => {
             name: `Password Reset (${user.email})`
         }).base32;
 
-        // Generate OTP with current timestamp
+        // Generate OTP with a current timestamp
         const otp = speakeasy.totp({
             secret: secret,
             encoding: 'base32',
@@ -200,7 +123,7 @@ export const forgotPassword = async (req, res) => {
             window: 0
         });
 
-        // Save OTP and secret to user with additional metadata
+        // Save OTP and secret to a user with additional metadata
         user.resetPasswordOTP = otp;
         user.resetPasswordSecret = secret;
         user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 minutes

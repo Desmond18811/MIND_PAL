@@ -1,6 +1,7 @@
 import MeditationContent from '../models/MeditationContent.mjs';
 import MeditationSession from '../models/MeditationSession.mjs';
 import MusicTrack from '../models/MusicTrack.mjs';
+import { updateScore } from '../controllers/palScoreController.mjs'
 
 import mongoose from 'mongoose';
 
@@ -87,7 +88,7 @@ export const endSession = async (req, res) => {
         }
 
         // Update Pal score based on session
-        await updatePalScore(userId, {
+        await  updateScore(userId, {
             type: 'meditation',
             duration: meditationSession.duration,
             moodImprovement: moodAfter > meditationSession.moodBefore
