@@ -349,11 +349,7 @@ export async function streamAudio(req, res) {
 // Get journal analytics
 export async function getJournalAnalytics(req, res, next) {
     try {
-        const { id } = req.params;
-
-        if (id === 'stats') {
-            return next();
-        }
+        const userId =req.user._id
         const { period = 'month' } = req.query;
         const dateRange = getDateRange(period);
 
