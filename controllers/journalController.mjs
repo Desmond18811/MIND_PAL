@@ -282,12 +282,6 @@ export async function createJournalEntry(req, res) {
 export async function getJournalEntry(req, res) {
     try {
         const { id } = req.params;
-
-        // Skip if this is a stats request
-        if (id === 'stats') {
-            return next();
-        }
-
         const userId = req.user._id;
         const entry = await JournalEntry.findOne({ _id: id, userId });
 
