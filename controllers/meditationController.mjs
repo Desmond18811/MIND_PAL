@@ -87,10 +87,15 @@ export const endSession = async (req, res) => {
             return res.status(404).json({ error: 'Session not found' });
         }
 
+        // Calculate duration in minutes
+        const duration = meditationSession.endTime && meditationSession.startTime
+            ? Math.round((meditationSession.endTime - meditationSession.startTime) / (1000 * 60))
+            : 0;
+
         // Update Pal score based on session
-        await  updateScore(userId, {
+        await updateScore(userId, {
             type: 'meditation',
-            duration: meditationSession.duration,
+            duration: duration,
             moodImprovement: moodAfter > meditationSession.moodBefore
         });
 
@@ -104,7 +109,6 @@ export const endSession = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
 // Progress Tracking
 export const getUserProgress = async (req, res) => {
     try {
