@@ -1,16 +1,105 @@
 import JournalEntry from '../models/journalEntry.mjs';
 import mongoose from 'mongoose';
-import { SpeechClient } from '@google-cloud/speech';
-import { Storage } from '@google-cloud/storage';
+import { GridFSBucket } from 'mongodb';
+import multer from 'multer';
 import { updateScore } from './palScoreController.mjs';
 import User from '../models/User.mjs';
 import { analyzeContent } from "../utils/contentAnalysis.mjs";
+import { MongoClient } from 'mongodb';
 
+// Initialize MongoDB GridFS
+const client = new MongoClient(process.env.MONGO_URI);
+let gfsBucket;
 
-// Initialize Google Cloud clients
-const speechClient = new SpeechClient();
-const storage = new Storage();
-const BUCKET_NAME = process.env.GCS_BUCKET_NAME || 'your-audio-bucket';
+client.connect().then(() => {
+    gfsBucket = new GridFSBucket(client.db(), { bucketName: 'audio' });
+});
+
+// Configure Multer for file uploads
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('audio/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only audio files are allowed!'), false);
+        }
+    }
+});
+
+// Audio upload handler
+export const handleAudioUpload = (req, res, next) => {
+    upload.single('audio')(req, res, async (err) => {
+        if (err) return next(err);
+        if (!req.file) return next();
+
+        try {
+            const fileName = `audio_${req.user._id}_${Date.now()}`;
+            const uploadStream = gfsBucket.openUploadStream(fileName, {
+                contentType: req.file.mimetype
+            });
+
+            uploadStream.end(req.file.buffer);
+
+            uploadStream.on('finish', () => {
+                req.body.audioRef = fileName;
+                req.body.isVoiceEntry = true;
+                next();
+            });
+
+            uploadStream.on('error', (error) => {
+                throw new Error('Audio upload failed');
+            });
+        } catch (error) {
+            next(error);
+        }
+    });
+};
+
+// Mock transcription for development
+async function mockTranscribe() {
+    return {
+        content: "This is a mock transcription of your audio journal entry.",
+        confidence: 0.85
+    };
+}
+
+// Audio transcription function
+async function transcribeAudio(audioRef) {
+    try {
+        if (process.env.NODE_ENV === 'development') {
+            return await mockTranscribe();
+        }
+
+        const audioStream = gfsBucket.openDownloadStreamByName(audioRef);
+        const audioChunks = [];
+
+        for await (const chunk of audioStream) {
+            audioChunks.push(chunk);
+        }
+
+        const audioBuffer = Buffer.concat(audioChunks);
+
+        // Implement your preferred transcription service here
+        // Example: self-hosted Whisper.cpp
+        const response = await fetch('http://localhost:3000/transcribe', {
+            method: 'POST',
+            body: audioBuffer,
+            headers: {
+                'Content-Type': 'audio/wav'
+            }
+        });
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('Audio transcription failed:', error);
+        throw new Error('Failed to transcribe audio');
+    }
+}
 
 // Helper function for date ranges
 function getDateRange(period) {
@@ -22,31 +111,6 @@ function getDateRange(period) {
         'year': { start: new Date(now.setFullYear(now.getFullYear() - 1)), end: new Date() }
     };
     return ranges[period] || ranges.month;
-}
-
-// Audio transcription function
-async function transcribeAudio(audioRef) {
-    try {
-        const gcsUri = `gs://${BUCKET_NAME}/${audioRef}`;
-        const config = {
-            encoding: 'LINEAR16',
-            sampleRateHertz: 16000,
-            languageCode: 'en-US',
-            enableAutomaticPunctuation: true
-        };
-
-        const audio = { uri: gcsUri };
-        const [operation] = await speechClient.longRunningRecognize({ config, audio });
-        const [response] = await operation.promise();
-
-        return {
-            content: response.results.map(result => result.alternatives[0].transcript).join('\n'),
-            confidence: response.results[0].alternatives[0].confidence
-        };
-    } catch (error) {
-        console.error('Audio transcription failed:', error);
-        throw new Error('Failed to transcribe audio');
-    }
 }
 
 // Update user journal insights
@@ -135,31 +199,31 @@ export async function createJournalEntry(req, res) {
     session.startTransaction();
 
     try {
-        const { title, moodBefore, moodAfter, tags, musicPlayed, images, audioRef } = req.body;
+        const { title, moodBefore, moodAfter, tags, musicPlayed, images } = req.body;
         const userId = req.user._id;
 
-        if (!moodBefore || !req.body.content) {
-            throw new Error('Missing required fields: content and moodBefore are required');
+        if (!moodBefore) {
+            throw new Error('Missing required field: moodBefore');
         }
 
-        let content = req.body.content;
-        let isVoiceEntry = false;
+        let content = req.body.content || "";
+        let isVoiceEntry = !!req.body.audioRef;
         let transcriptionConfidence = null;
 
-        if (audioRef) {
-            isVoiceEntry = true;
-            const transcriptionResult = await transcribeAudio(audioRef);
+        if (isVoiceEntry) {
+            const transcriptionResult = await transcribeAudio(req.body.audioRef);
             content = transcriptionResult.content;
             transcriptionConfidence = transcriptionResult.confidence;
+        } else if (!content) {
+            throw new Error('Either content or audio file is required');
         }
-
 
         const { sentimentScore, keywords } = await analyzeContent(content);
         const wordCount = content.split(/\s+/).length;
 
         const [entry] = await JournalEntry.create([{
             userId,
-            title: title || 'Untitled Entry',
+            title: title || (isVoiceEntry ? 'Voice Entry' : 'Untitled Entry'),
             content,
             moodBefore: parseInt(moodBefore),
             moodAfter: moodAfter ? parseInt(moodAfter) : null,
@@ -170,7 +234,8 @@ export async function createJournalEntry(req, res) {
             isVoiceEntry,
             transcriptionConfidence,
             keywords,
-            wordCount
+            wordCount,
+            audioRef: req.body.audioRef || null
         }], { session });
 
         await updateUserJournalInsights(userId, {
@@ -195,7 +260,8 @@ export async function createJournalEntry(req, res) {
             status: 'success',
             data: {
                 ...entry.toObject(),
-                moodImprovement: moodAfter ? (moodAfter - moodBefore) : null
+                moodImprovement: moodAfter ? (moodAfter - moodBefore) : null,
+                audioUrl: isVoiceEntry ? `/api/journal/${entry._id}/audio` : null
             }
         });
 
@@ -216,9 +282,15 @@ export async function createJournalEntry(req, res) {
 export async function getJournalEntry(req, res) {
     try {
         const { id } = req.params;
-        const userId = req.user._id;
 
+        // Skip if this is a stats request
+        if (id === 'stats') {
+            return next();
+        }
+
+        const userId = req.user._id;
         const entry = await JournalEntry.findOne({ _id: id, userId });
+
         if (!entry) {
             return res.status(404).json({
                 status: 'error',
@@ -226,27 +298,20 @@ export async function getJournalEntry(req, res) {
             });
         }
 
-        // Get context entries
-        const startDate = new Date(entry.createdAt);
-        startDate.setDate(startDate.getDate() - 3);
-        const endDate = new Date(entry.createdAt);
-        endDate.setDate(endDate.getDate() + 3);
+        const responseData = {
+            ...entry.toObject(),
+            context: {
+                streak: await calculateJournalStreak(userId)
+            }
+        };
 
-        const contextEntries = await JournalEntry.find({
-            userId,
-            createdAt: { $gte: startDate, $lte: endDate },
-            _id: { $ne: entry._id }
-        }).sort({ createdAt: 1 });
+        if (entry.isVoiceEntry && entry.audioRef) {
+            responseData.audioUrl = `/api/journal/${entry._id}/audio`;
+        }
 
         res.json({
             status: 'success',
-            data: {
-                entry,
-                context: {
-                    entries: contextEntries,
-                    streak: await calculateJournalStreak(userId)
-                }
-            }
+            data: responseData
         });
 
     } catch (error) {
@@ -254,6 +319,34 @@ export async function getJournalEntry(req, res) {
         res.status(500).json({
             status: 'error',
             message: 'Failed to get journal entry',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+}
+
+// Stream audio file
+export async function streamAudio(req, res) {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+
+        const entry = await JournalEntry.findOne({ _id: id, userId });
+        if (!entry || !entry.audioRef) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Audio not found'
+            });
+        }
+
+        res.set('Content-Type', 'audio/mpeg');
+        const downloadStream = gfsBucket.openDownloadStreamByName(entry.audioRef);
+        downloadStream.pipe(res);
+
+    } catch (error) {
+        console.error('Audio stream error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to stream audio',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
@@ -277,7 +370,8 @@ export async function getJournalAnalytics(req, res) {
             score: entry.sentimentScore,
             moodBefore: entry.moodBefore,
             moodAfter: entry.moodAfter,
-            wordCount: entry.wordCount
+            wordCount: entry.wordCount,
+            type: entry.isVoiceEntry ? 'voice' : 'text'
         }));
 
         // Tag frequency
@@ -291,7 +385,8 @@ export async function getJournalAnalytics(req, res) {
         // Writing habits
         const writingHabits = {
             byDayOfWeek: Array(7).fill(0),
-            byHour: Array(24).fill(0)
+            byHour: Array(24).fill(0),
+            byType: { text: 0, voice: 0 }
         };
 
         entries.forEach(entry => {
@@ -299,6 +394,7 @@ export async function getJournalAnalytics(req, res) {
             const hour = entry.createdAt.getHours();
             writingHabits.byDayOfWeek[day]++;
             writingHabits.byHour[hour]++;
+            writingHabits.byType[entry.isVoiceEntry ? 'voice' : 'text']++;
         });
 
         res.json({
