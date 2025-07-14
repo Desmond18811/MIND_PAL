@@ -2,22 +2,26 @@ import express from 'express';
 import {
     createJournalEntry,
     getJournalEntry,
-    getJournalAnalytics
+    getJournalAnalytics,
+    streamAudio,
+    handleAudioUpload
 } from '../controllers/journalController.mjs';
 import authenticate from '../middleware/auth.mjs';
 
 const router = express.Router();
-
-// Apply authentication to all journal routes
 router.use(authenticate);
 
-// POST /api/journal - Create new journal entry
-router.post('/', createJournalEntry);
+// Journal entries
+router.route('/')
+    .post(handleAudioUpload, createJournalEntry);
 
-// GET /api/journal/:id - Get specific journal entry
-router.get('/:id', getJournalEntry);
+// Specific journal entry and audio
+router.route('/:id')
+    .get(getJournalEntry);
 
-// GET /api/journal/stats?period=month - Get journal analytics
+router.get('/:id/audio', streamAudio);
+
+// Analytics (must come after /:id route)
 router.get('/stats', getJournalAnalytics);
 
 export default router;
