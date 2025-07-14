@@ -8,7 +8,7 @@ import { analyzeContent } from "../utils/contentAnalysis.mjs";
 import { MongoClient } from 'mongodb';
 
 // Initialize MongoDB GridFS
-const client = new MongoClient(process.env.MONGO_URI);
+const client = new MongoClient(process.env.DB_URI);
 let gfsBucket;
 
 client.connect().then(() => {

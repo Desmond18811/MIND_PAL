@@ -1,3 +1,4 @@
+
 import natural from 'natural';
 
 const analyzer = new natural.SentimentAnalyzer("English", natural.PorterStemmer, "afinn");
