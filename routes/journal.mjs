@@ -15,13 +15,13 @@ router.use(authenticate);
 router.route('/')
     .post(handleAudioUpload, createJournalEntry);
 
+// Analytics (must come before /:id route)
+router.get('/stats', getJournalAnalytics);
+
 // Specific journal entry and audio
 router.route('/:id')
     .get(getJournalEntry);
 
 router.get('/:id/audio', streamAudio);
-
-// Analytics (must come after /:id route)
-router.get('/stats', getJournalAnalytics);
 
 export default router;
