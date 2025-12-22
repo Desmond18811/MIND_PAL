@@ -43,6 +43,11 @@ export const updateScore = async (userId, activity) => {
                 impact = activity.moodImprovement ? 4 : 2;
                 notes = `Daily check-in: Mood ${activity.moodImprovement ? 'improved' : 'stable'}`;
                 break;
+            case 'therapy-session':
+                impact = activity.moodImprovement ? 8 : 5;
+                notes = `Therapy session: ${activity.duration} minutes`;
+                activityTypeForHistory = 'therapy';
+                break;
             default:
                 impact = 3;
                 notes = `Unknown activity: ${activity.type}`;

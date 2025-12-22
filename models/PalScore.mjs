@@ -23,7 +23,7 @@ const palScoreSchema = new mongoose.Schema({
         },
         activityType: {
             type: String,
-            enum: ['journal', 'meditation', 'goal', 'chat', 'suggestion', 'check-in'],
+            enum: ['journal', 'meditation', 'goal', 'chat', 'suggestion', 'check-in', 'therapy'],
             required: true
         },
         activityId: mongoose.Schema.Types.ObjectId,
@@ -42,7 +42,7 @@ const palScoreSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Update trends before saving
-palScoreSchema.pre('save', function(next) {
+palScoreSchema.pre('save', function (next) {
     if (this.history.length > 0) {
         const now = new Date();
         const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));

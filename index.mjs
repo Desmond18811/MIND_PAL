@@ -22,6 +22,8 @@ import chatbotRoutes from './routes/chatbot.mjs';
 import helpRoutes from './routes/help.mjs';
 import assessmentRoutes from './routes/assessmentRoutes.mjs';
 import profileRoutes from './routes/profile.mjs';
+import therapistRoutes from './routes/therapistRoutes.mjs';
+import appointmentRoutes from './routes/appointmentRoutes.mjs';
 import arcjet, { shield, detectBot, tokenBucket } from "@arcjet/node";
 import { isSpoofedBot } from "@arcjet/inspect";
 
@@ -51,7 +53,7 @@ const aj = arcjet({
       // Block all bots except the following
       allow: [
         "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc
-         "PostmanRuntime"
+        "PostmanRuntime"
         // Uncomment to allow these other common bot categories
         //"CATEGORY:MONITOR", // Uptime monitoring services
         //"CATEGORY:PREVIEW", // Link previews e.g. Slack, Discord
@@ -160,6 +162,8 @@ app.use('/api/search', searchRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/help', helpRoutes);
+app.use('/api/therapists', therapistRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // 404 Handler
 app.use((req, res) => {
