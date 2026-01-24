@@ -1,75 +1,79 @@
+/**
+ * Resource Model - Mindful Content (Articles, Audio, Video)
+ */
+
 import mongoose from 'mongoose';
 
 const resourceSchema = new mongoose.Schema({
     title: {
         type: String,
+        required: true,
+        trim: true
+    },
+
+    description: {
+        type: String,
+        maxLength: 1000
+    },
+
+    // Type of resource
+    type: {
+        type: String,
+        enum: ['article', 'audio', 'video', 'podcast', 'book'],
         required: true
     },
-    source: {
-        type: String,
-        required: true,
-        enum: ['newsapi', 'contextualweb', 'jstor', 'healthyplace', 'cdc', 'nami', 'custom']
-    },
+
+    // External URL
     url: {
         type: String,
         required: true,
-        validate: {
-            validator: v => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(v),
-            message: props => `${props.value} is not a valid URL!`
+        unique: true // Prevent duplicates
+    },
+
+    // Image/Thumbnail
+    imageUrl: String,
+
+    // Source information
+    source: {
+        name: String, // e.g., 'NAMI', 'Mindful.org', 'YouTube'
+        scrapedAt: {
+            type: Date,
+            default: Date.now
         }
     },
-    content: String,
-    summary: String,
-    categories: [{
-        type: String,
-        enum: ['anxiety', 'depression', 'stress', 'mindfulness', 'sleep', 'relationships', 'trauma', 'productivity']
-    }],
-    type: {
-        type: String,
-        enum: ['article', 'video', 'podcast', 'research', 'tool', 'exercise'],
-        default: 'article'
-    },
-    readingTime: Number, // in minutes
-    difficulty: {
-        type: String,
-        enum: ['beginner', 'intermediate', 'advanced'],
-        default: 'intermediate'
-    },
+
+    // Content details
+    duration: String, // For audio/video (e.g., "10 min")
+    author: String,
     publishedAt: Date,
-    lastFetched: {
-        type: Date,
-        default: Date.now
+
+    // Categorization
+    tags: [String],
+    category: {
+        type: String,
+        enum: ['anxiety', 'depression', 'sleep', 'mindfulness', 'relationships', 'general'],
+        default: 'general'
     },
-    metadata: mongoose.Schema.Types.Mixed,
-    userRatings: [{
-        userId: mongoose.Schema.Types.ObjectId,
-        rating: {
-            type: Number,
-            min: 1,
-            max: 5
-        },
-        feedback: String
-    }],
-    averageRating: Number,
-    isVerified: {
+
+    // Stats
+    views: {
+        type: Number,
+        default: 0
+    },
+    likes: {
+        type: Number,
+        default: 0
+    },
+
+    isActive: {
         type: Boolean,
-        default: false
+        default: true
     }
-}, {
-    timestamps: true,
-    toJSON: { virtuals: true }
-});
 
-// Calculate average rating before saving
-resourceSchema.pre('save', function(next) {
-    if (this.userRatings && this.userRatings.length > 0) {
-        const sum = this.userRatings.reduce((total, rating) => total + rating.rating, 0);
-        this.averageRating = sum / this.userRatings.length;
-    }
-    next();
-});
+}, { timestamps: true });
 
-// Text index for search
-resourceSchema.index({ title: 'text', content: 'text', summary: 'text' });
+// Text index for searching
+resourceSchema.index({ title: 'text', description: 'text', tags: 'text' });
+resourceSchema.index({ category: 1, type: 1 });
 
 export default mongoose.model('Resource', resourceSchema);

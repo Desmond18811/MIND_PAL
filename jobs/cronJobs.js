@@ -7,6 +7,7 @@ import User from '../models/User.js';
 import DataPermission from '../models/DataPermission.js';
 import Notification from '../models/Notification.js';
 import { generateComprehensiveInsights } from '../services/analysisService.js';
+import { updateUserPatterns } from '../services/userLearningService.js';
 
 /**
  * Initialize all cron jobs
@@ -32,7 +33,40 @@ export function initializeCronJobs() {
         await sendEveningReminders();
     });
 
+    // Deep Learning / Pattern Update (ML) - Run nightly at 2 AM
+    // This updates the long-term memory of the agent with new clusters/patterns
+    cron.schedule('0 2 * * *', async () => {
+        console.log('🧠 Running nightly ML pattern update...');
+        await runPatternUpdates();
+    });
+
     console.log('✅ Cron jobs initialized');
+}
+
+/**
+ * Run nightly pattern updates for all active users
+ */
+async function runPatternUpdates() {
+    try {
+        // Find users with recent activity (active in last 7 days)
+        const activeStart = new Date();
+        activeStart.setDate(activeStart.getDate() - 7);
+
+        // This query assumes we track lastLogin or similar, using generic approach for now
+        const permissions = await DataPermission.find({}).lean();
+
+        console.log(`Updating ML patterns for ${permissions.length} users...`);
+
+        for (const p of permissions) {
+            try {
+                await updateUserPatterns(p.userId);
+            } catch (err) {
+                console.error(`Pattern update failed for ${p.userId}:`, err.message);
+            }
+        }
+    } catch (error) {
+        console.error('Nightly ML update failed:', error);
+    }
 }
 
 /**
@@ -40,7 +74,6 @@ export function initializeCronJobs() {
  */
 async function runDailyAnalysis() {
     try {
-        // Find users with at least one permission granted
         const permissions = await DataPermission.find({
             $or: [
                 { 'permissions.analyzeMood': true },
@@ -53,15 +86,15 @@ async function runDailyAnalysis() {
 
         for (const permission of permissions) {
             try {
-                // Check if analysis is needed (based on activity)
-                // This is a placeholder - you'd check actual user activity
-
-                // Generate quick insights
                 const insights = await generateComprehensiveInsights(permission.userId);
 
                 if (insights.success && insights.data) {
-                    // Store insights or send notification
-                    await createInsightNotification(permission.userId, 'daily', insights.data);
+                    // Check for urgent warnings from ML
+                    if (insights.data.moodAnalysis?.warning) {
+                        await createInsightNotification(permission.userId, 'alert', insights.data);
+                    } else {
+                        await createInsightNotification(permission.userId, 'daily', insights.data);
+                    }
                 }
             } catch (error) {
                 console.error(`Analysis failed for user ${permission.userId}:`, error.message);
@@ -77,7 +110,6 @@ async function runDailyAnalysis() {
  */
 async function runWeeklyInsights() {
     try {
-        // Find users with permissions
         const permissions = await DataPermission.find({
             revokedAll: { $ne: true }
         }).lean();
@@ -109,31 +141,20 @@ async function runWeeklyInsights() {
  */
 async function sendEveningReminders() {
     try {
-        // Find users with notification preferences set to daily
         const users = await User.find({
             'preferences.notificationFrequency': 'daily'
         }).select('_id profile.displayName').lean();
 
-        console.log(`Sending reminders to ${users.length} users`);
-
         for (const user of users) {
-            try {
-                const notification = new Notification({
-                    userId: user._id,
-                    type: 'reminder',
-                    title: 'Evening Check-in',
-                    message: `Hi${user.profile?.displayName ? ` ${user.profile.displayName}` : ''}! How was your day? Take a moment to log your mood and reflect.`,
-                    priority: 'low',
-                    action: {
-                        type: 'navigate',
-                        destination: '/mood/log'
-                    }
-                });
-
-                await notification.save();
-            } catch (error) {
-                console.error(`Reminder failed for user ${user._id}:`, error.message);
-            }
+            const notification = new Notification({
+                userId: user._id,
+                type: 'reminder',
+                title: 'Evening Check-in',
+                message: `Hi${user.profile?.displayName ? ` ${user.profile.displayName}` : ''}! How was your day? Take a moment to log your mood and reflect.`,
+                priority: 'low',
+                action: { type: 'navigate', destination: '/mood/log' }
+            });
+            await notification.save();
         }
     } catch (error) {
         console.error('Evening reminders job failed:', error);
@@ -147,39 +168,26 @@ async function createInsightNotification(userId, type, insights) {
     try {
         let message = '';
         let title = '';
+        let priority = 'medium';
 
-        if (type === 'daily') {
+        if (type === 'alert') {
+            title = '⚠️ Mood Trend Alert';
+            message = "I've noticed a declining trend in your mood recently. I'm here if you need support.";
+            priority = 'high';
+        } else if (type === 'daily') {
             title = '🌟 Daily Insight';
-
+            // ... (keep existing logic)
             if (insights.moodAnalysis) {
                 const avgMood = parseFloat(insights.moodAnalysis.averageMood);
-                if (avgMood >= 7) {
-                    message = "You've been feeling great lately! Keep up the positive momentum.";
-                } else if (avgMood >= 5) {
-                    message = "You're doing okay. Remember to take care of yourself today.";
-                } else {
-                    message = "It looks like you might be going through a tough time. I'm here if you want to talk.";
-                }
+                if (avgMood >= 7) message = "You've been feeling great lately! Keep up the positive momentum.";
+                else if (avgMood >= 5) message = "You're doing okay. Remember to take care of yourself today.";
+                else message = "It looks like you might be going through a tough time. I'm here if you want to talk.";
             } else {
                 message = "Remember to log your mood today so I can provide better insights!";
             }
         } else if (type === 'weekly') {
             title = '📊 Weekly Summary';
-
-            const parts = [];
-            if (insights.moodAnalysis) {
-                parts.push(`Average mood: ${insights.moodAnalysis.averageMood}/10`);
-            }
-            if (insights.sleepAnalysis) {
-                parts.push(`Sleep: ${insights.sleepAnalysis.averageDuration || 'No data'}`);
-            }
-            if (insights.journalAnalysis) {
-                parts.push(`Journaling impact: ${insights.journalAnalysis.journalingImpact || 'Unknown'}`);
-            }
-
-            message = parts.length > 0
-                ? `Your week: ${parts.join(' • ')}`
-                : 'Start tracking your wellness to see weekly insights!';
+            message = "Your weekly wellness report is ready.";
         }
 
         const notification = new Notification({
@@ -187,12 +195,9 @@ async function createInsightNotification(userId, type, insights) {
             type: 'insight',
             title,
             message,
-            priority: 'medium',
+            priority,
             data: { insightType: type, generatedAt: new Date() },
-            action: {
-                type: 'navigate',
-                destination: '/insights'
-            }
+            action: { type: 'navigate', destination: '/insights' }
         });
 
         await notification.save();

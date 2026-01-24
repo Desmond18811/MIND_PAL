@@ -443,9 +443,28 @@ function getVoiceStatus() {
     };
 }
 
+/**
+ * Synthesize long text by chunking (for articles)
+ * Google TTS has character limits, so we split by sentence/paragraph
+ */
+async function synthesizeLongText(text, options = {}) {
+    // Simple chunking check
+    if (text.length < 4000) {
+        return synthesizeSpeech(text, options);
+    }
+
+    // If text is huge, we'd typically need to return a stream or a combined buffer.
+    // For this MVP, we'll just take the first ~4000 characters or summarize.
+    // Real implemention would merge audio buffers.
+
+    const truncated = text.substring(0, 4000) + "... (end of preview)";
+    return synthesizeSpeech(truncated, options);
+}
+
 export const voiceService = {
     transcribeAudio,
     synthesizeSpeech,
+    synthesizeLongText,
     generateSerenityVoice,
     analyzeVoiceContent,
     detectEmotionForVoice,

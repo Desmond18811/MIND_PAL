@@ -18,7 +18,7 @@ import utilityRoutes from './routes/utilityRoutes.js';
 import resourcesRoutes from './routes/resourcesRoutes.js';
 import sleepRoutes from './routes/sleepRoutes.js';
 import searchRoutes from './routes/search.js';
-import communityRoutes from './routes/community.js';
+import communityRoutes from './routes/communityRoutes.js';
 import moodRoutes from './routes/mood.js';
 import journalRoutes from './routes/journal.js';
 import chatbotRoutes from './routes/chatbot.js';
@@ -217,8 +217,10 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   await connectToDatabase();
 
-  // Initialize Socket.io handlers for Serenity
+  // Initialize background services
   initializeSocketHandlers(io);
+  initializeCronJobs();
+  initializeScraperService();
 
   // Start server with Socket.io support
   server.listen(PORT, () => {
