@@ -6,6 +6,7 @@
 import { createSerenityAgent } from '../agents/SerenityAgent.js';
 import ChatSession from '../models/ChatSession.js';
 import DataPermission from '../models/DataPermission.js';
+import { voiceService } from '../services/voiceService.js';
 import jwt from 'jsonwebtoken';
 
 // Store active agent connections
@@ -50,9 +51,11 @@ export function initializeSocketHandlers(io) {
             // Join user to their personal room
             socket.join(`user:${socket.userId}`);
 
-            // Send welcome event
+            // Send welcome event with agent status
+            const status = agent.getStatus();
             socket.emit('serenity:connected', {
-                message: 'Serenity is ready to chat with you',
+                message: status.userName ? `Welcome back, ${status.userName}!` : 'Serenity is ready to chat',
+                status,
                 timestamp: new Date()
             });
 
@@ -67,7 +70,7 @@ export function initializeSocketHandlers(io) {
          * Handle incoming chat message
          */
         socket.on('chat:message', async (data) => {
-            const { message, sessionId, type = 'text' } = data;
+            const { message, sessionId, type = 'text', generateVoice = false } = data;
             const agent = activeAgents.get(socket.userId);
 
             if (!agent) {
@@ -82,33 +85,21 @@ export function initializeSocketHandlers(io) {
             socket.emit('serenity:typing', { isTyping: true });
 
             try {
-                // Get or create session
-                let session;
-                if (sessionId) {
-                    session = await ChatSession.findById(sessionId);
-                }
-
-                if (!session) {
-                    session = new ChatSession({
-                        userId: socket.userId,
-                        sessionType: type,
-                        messages: []
-                    });
-                    await session.save();
-                }
-
-                // Handle message through agent
-                const response = await agent.handleMessage(message, session._id, type);
+                // Handle message through agent with voice option
+                const response = await agent.handleMessage(message, sessionId, type, { generateVoice });
 
                 // Stop typing indicator
                 socket.emit('serenity:typing', { isTyping: false });
 
                 // Send response
                 socket.emit('chat:response', {
-                    sessionId: response.sessionId || session._id,
+                    sessionId: response.sessionId,
                     message: response.response,
                     sentiment: response.sentiment,
-                    timestamp: response.timestamp || new Date()
+                    audio: response.audio, // Audio data if voice was requested
+                    topics: response.topics,
+                    timestamp: response.timestamp || new Date(),
+                    provider: response.provider
                 });
 
             } catch (error) {
@@ -196,22 +187,48 @@ export function initializeSocketHandlers(io) {
          * End voice recording and process
          */
         socket.on('voice:end', async (data) => {
-            const { audioData, sessionId } = data;
+            const { audioData, sessionId, language = 'en-US' } = data;
             const agent = activeAgents.get(socket.userId);
+
+            if (!audioData) {
+                return socket.emit('serenity:error', { message: 'No audio data received' });
+            }
 
             socket.emit('serenity:typing', { isTyping: true });
 
             try {
-                // Voice processing would happen here via voiceService
-                // For now, emit a placeholder response
-                socket.emit('voice:transcribed', {
-                    transcript: '[Voice transcription will appear here]',
-                    timestamp: new Date()
-                });
+                // Convert base64 to buffer
+                const buffer = Buffer.from(audioData, 'base64');
+
+                // Transcribe audio
+                const transcription = await voiceService.transcribeAudio(buffer, { languageCode: language });
+
+                if (!transcription.success) {
+                    throw new Error('Transcription failed');
+                }
+
+                // Process transcribed text through agent
+                const response = await agent.handleMessage(
+                    transcription.text,
+                    sessionId,
+                    'voice',
+                    { generateVoice: true } // Always generate voice response for voice input
+                );
 
                 socket.emit('serenity:typing', { isTyping: false });
 
+                // Send back transcription and audio response
+                socket.emit('voice:response', {
+                    sessionId: response.sessionId,
+                    transcription: transcription.text,
+                    message: response.response, // Text response
+                    audio: response.audio,      // Audio response
+                    sentiment: response.sentiment,
+                    timestamp: new Date()
+                });
+
             } catch (error) {
+                console.error('Voice processing error:', error);
                 socket.emit('serenity:typing', { isTyping: false });
                 socket.emit('serenity:error', { message: 'Voice processing failed' });
             }
@@ -258,7 +275,7 @@ export function initializeSocketHandlers(io) {
 
                 await permission.save();
 
-                // Update agent permissions
+                // Update agent permissions and refresh context
                 if (agent) {
                     await agent.updatePermissions({ [dataType]: granted });
                 }
@@ -269,12 +286,15 @@ export function initializeSocketHandlers(io) {
                     timestamp: new Date()
                 });
 
-                // If permission granted, offer insights
+                // If permission granted, offer insights immediately
                 if (granted) {
-                    socket.emit('chat:response', {
-                        message: `Thank you for trusting me! I can now use your ${dataType.replace('analyze', '').toLowerCase()} data to provide better insights. Would you like me to analyze it now?`,
-                        timestamp: new Date()
-                    });
+                    const insights = await agent.generateUserInsights();
+                    if (insights.success && insights.insights) {
+                        socket.emit('chat:response', {
+                            message: `Thank you for trusting me! I've analyzed your data. ${insights.insights.overallMood}`,
+                            timestamp: new Date()
+                        });
+                    }
                 }
 
             } catch (error) {

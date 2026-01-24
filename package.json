@@ -7,7 +7,12 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": ["mental-health", "ai", "chatbot", "wellness"],
+  "keywords": [
+    "mental-health",
+    "ai",
+    "chatbot",
+    "wellness"
+  ],
   "author": "",
   "license": "ISC",
   "type": "module",
@@ -17,6 +22,8 @@
     "@google-cloud/speech": "^7.2.0",
     "@google-cloud/storage": "^7.16.0",
     "@google-cloud/text-to-speech": "^5.0.0",
+    "@google/generative-ai": "^0.24.1",
+    "@huggingface/inference": "^4.13.10",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "cheerio": "^1.1.0",
