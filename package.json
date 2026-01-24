@@ -1,13 +1,13 @@
 {
-  "name": "mind-pal-test",
+  "name": "mindpal-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.mjs",
+  "description": "MindPal Mental Health App Backend with Serenity AI Agent",
+  "main": "index.js",
   "scripts": {
-    "start": "node index.mjs",
-    "dev": "nodemon index.mjs"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
+  "keywords": ["mental-health", "ai", "chatbot", "wellness"],
   "author": "",
   "license": "ISC",
   "type": "module",
@@ -16,6 +16,7 @@
     "@arcjet/node": "^1.0.0-beta.8",
     "@google-cloud/speech": "^7.2.0",
     "@google-cloud/storage": "^7.16.0",
+    "@google-cloud/text-to-speech": "^5.0.0",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "cheerio": "^1.1.0",
@@ -28,11 +29,15 @@
     "mongoose": "^8.16.0",
     "multer": "^2.0.1",
     "natural": "^8.1.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^7.0.3",
+    "openai": "^4.77.0",
     "sentiment": "^5.0.2",
+    "socket.io": "^4.8.1",
     "speakeasy": "^2.0.0",
     "stemmer": "^2.0.1",
-    "tokenizer": "^0.1.0"
+    "tokenizer": "^0.1.0",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
