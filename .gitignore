@@ -61,3 +61,4 @@ example.env
 
 # next.js build output
 .next
+app/node_modules/
