@@ -1,13 +1,25 @@
 /**
  * Voice Service - Enhanced Speech-to-Text and Text-to-Speech for Serenity
- * Includes voice personality, emotion-aware synthesis, and multiple provider fallback
+ * Primary TTS: ElevenLabs (soft female voice - Rachel)
+ * Fallback TTS: Google Cloud
+ * STT: Google Cloud Speech-to-Text
  */
 
 import { analyzeTextSentiment, prepareForVoice } from '../agents/aiAdapter.js';
+import axios from 'axios';
 
 // Voice personality configuration for Serenity
 const SERENITY_VOICE_CONFIG = {
-    // Google Cloud voices
+    // ElevenLabs voices (Primary TTS)
+    elevenlabs: {
+        // Rachel - calm, professional female voice
+        primary: process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM',
+        // Bella - soft, youthful female voice (alternative)
+        alternative: 'EXAVITQu4vr4xnSDxMaL',
+        stability: 0.75,      // Higher = more consistent
+        similarityBoost: 0.85 // Higher = closer to original voice
+    },
+    // Google Cloud voices (Fallback TTS)
     google: {
         primary: 'en-US-Neural2-F',     // Warm female voice
         alternative: 'en-US-Studio-O',   // Studio quality female
@@ -21,7 +33,7 @@ const SERENITY_VOICE_CONFIG = {
         energetic: 1.05,
         default: 0.95
     },
-    // Pitch adjustments
+    // Pitch adjustments (Google only)
     pitchByEmotion: {
         calm: -1,
         encouraging: 0,
@@ -31,11 +43,13 @@ const SERENITY_VOICE_CONFIG = {
     }
 };
 
-// Check for Google Cloud credentials
+// Provider availability flags
+const hasElevenLabsKey = !!process.env.ELEVENLABS_API_KEY;
 const hasGoogleCredentials = process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GOOGLE_CLOUD_PROJECT;
 
-let speechClient = null;
-let ttsClient = null;
+let speechClient = null;  // Google STT
+let ttsClient = null;     // Google TTS (fallback)
+let elevenLabsAvailable = hasElevenLabsKey;
 
 // Initialize Google Cloud clients if credentials available
 async function initGoogleClients() {
@@ -52,9 +66,16 @@ async function initGoogleClients() {
             return false;
         }
     } else {
-        console.warn('⚠️ Google Cloud credentials not found. Voice services will use mock responses.');
+        console.warn('⚠️ Google Cloud credentials not found. STT will use mock responses.');
         return false;
     }
+}
+
+// Log ElevenLabs status
+if (hasElevenLabsKey) {
+    console.log('🔊 ElevenLabs TTS initialized (Rachel voice)');
+} else {
+    console.warn('⚠️ ElevenLabs API key not found. Will use Google TTS or mock.');
 }
 
 // Initialize on module load
@@ -181,18 +202,36 @@ async function generateSerenityVoice(text, options = {}) {
 
 /**
  * Convert text to speech audio
+ * Primary: ElevenLabs (Rachel voice - soft female)
+ * Fallback: Google Cloud TTS
  * @param {string} text - Text to synthesize
  * @param {Object} options - Synthesis options
  * @returns {Object} Audio content result
  */
 async function synthesizeSpeech(text, options = {}) {
     const {
-        voice = SERENITY_VOICE_CONFIG.google.primary,
+        voice = SERENITY_VOICE_CONFIG.elevenlabs.primary,
         speakingRate = 0.95,
         pitch = -1
     } = options;
 
-    // Use Google Cloud if available
+    // Try ElevenLabs first (primary TTS)
+    if (elevenLabsAvailable) {
+        try {
+            const result = await synthesizeWithElevenLabs(text, {
+                voiceId: voice,
+                stability: SERENITY_VOICE_CONFIG.elevenlabs.stability,
+                similarityBoost: SERENITY_VOICE_CONFIG.elevenlabs.similarityBoost
+            });
+            if (result.success) {
+                return result;
+            }
+        } catch (error) {
+            console.warn('ElevenLabs TTS failed, trying Google fallback:', error.message);
+        }
+    }
+
+    // Fallback to Google Cloud TTS
     if (ttsClient) {
         try {
             // Use SSML for better emotional expression
@@ -202,7 +241,7 @@ async function synthesizeSpeech(text, options = {}) {
                 input: { ssml: ssmlText },
                 voice: {
                     languageCode: 'en-US',
-                    name: voice
+                    name: SERENITY_VOICE_CONFIG.google.primary
                 },
                 audioConfig: {
                     audioEncoding: 'MP3',
@@ -218,7 +257,8 @@ async function synthesizeSpeech(text, options = {}) {
                 success: true,
                 audioContent: response.audioContent.toString('base64'),
                 contentType: 'audio/mp3',
-                duration: estimateDuration(text, speakingRate)
+                duration: estimateDuration(text, speakingRate),
+                provider: 'google'
             };
         } catch (error) {
             console.error('Google TTS error:', error.message);
@@ -240,7 +280,8 @@ async function synthesizeSpeech(text, options = {}) {
                 return {
                     success: true,
                     audioContent: fallbackResponse.audioContent.toString('base64'),
-                    contentType: 'audio/mp3'
+                    contentType: 'audio/mp3',
+                    provider: 'google-fallback'
                 };
             } catch (fallbackError) {
                 console.error('Fallback TTS also failed:', fallbackError.message);
@@ -251,6 +292,65 @@ async function synthesizeSpeech(text, options = {}) {
 
     // Mock synthesis for testing
     return getMockSynthesis(text);
+}
+
+/**
+ * Synthesize speech using ElevenLabs API
+ * Uses Rachel voice - calm, professional female voice
+ * @param {string} text - Text to synthesize
+ * @param {Object} options - Voice options
+ * @returns {Object} Audio content result
+ */
+async function synthesizeWithElevenLabs(text, options = {}) {
+    const {
+        voiceId = SERENITY_VOICE_CONFIG.elevenlabs.primary,
+        stability = 0.75,
+        similarityBoost = 0.85
+    } = options;
+
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    if (!apiKey) {
+        return { success: false, error: 'ElevenLabs API key not configured' };
+    }
+
+    try {
+        const response = await axios({
+            method: 'POST',
+            url: `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+            headers: {
+                'Accept': 'audio/mpeg',
+                'Content-Type': 'application/json',
+                'xi-api-key': apiKey
+            },
+            data: {
+                text: text,
+                model_id: 'eleven_monolingual_v1',
+                voice_settings: {
+                    stability: stability,
+                    similarity_boost: similarityBoost,
+                    style: 0.5,           // Natural style
+                    use_speaker_boost: true
+                }
+            },
+            responseType: 'arraybuffer'
+        });
+
+        const audioContent = Buffer.from(response.data).toString('base64');
+
+        return {
+            success: true,
+            audioContent,
+            contentType: 'audio/mpeg',
+            duration: estimateDuration(text),
+            provider: 'elevenlabs'
+        };
+    } catch (error) {
+        console.error('ElevenLabs API error:', error.response?.data || error.message);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
 }
 
 /**

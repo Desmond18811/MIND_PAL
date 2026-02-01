@@ -15,10 +15,11 @@ const AI_PROVIDERS = {
 };
 
 // Provider priority for automatic failover
+// Hugging Face is primary, with OpenAI and Gemini as fallbacks
 const PROVIDER_PRIORITY = [
+    AI_PROVIDERS.HUGGINGFACE,
     AI_PROVIDERS.OPENAI,
-    AI_PROVIDERS.GEMINI,
-    AI_PROVIDERS.HUGGINGFACE
+    AI_PROVIDERS.GEMINI
 ];
 
 // Initialize clients
