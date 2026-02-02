@@ -4,7 +4,7 @@
  */
 
 import mongoose from 'mongoose';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { SleepSession } from '../models/Sleep.js';
 import MoodEntry from '../models/MoodEntry.js';
 import ChatSession from '../models/ChatSession.js';
