@@ -3,33 +3,16 @@ import {
     View,
     Text,
     TouchableOpacity,
-    StyleSheet,
     StatusBar,
     ScrollView,
-    Dimensions,
-    Image,
     Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-
-const colors = {
-    primaryGreen: '#8EBA6B',
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    textLight: '#FFFFFF',
-    placeholderText: '#A0A0A0',
-    lightGray: '#E0E0E0',
-    orange: '#FF8C42',
-    purple: '#9B8BB4',
-};
+import "../global.css";
 
 const AISuggestionsScreen = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState('all');
-    const [sorted, setSorted] = useState(false);
     const fadeAnim = React.useRef(new Animated.Value(0)).current;
     const slideAnim = React.useRef(new Animated.Value(50)).current;
 
@@ -55,7 +38,7 @@ const AISuggestionsScreen = ({ navigation }) => {
             icon: '🧘',
             description: 'Breathing, Body ...',
             time: '~10min',
-            color: colors.primaryGreen,
+            color: '#8EBA6B',
         },
         {
             id: 2,
@@ -63,7 +46,7 @@ const AISuggestionsScreen = ({ navigation }) => {
             icon: '🏃',
             description: 'Jogging, Running, Swimming',
             time: '~30min',
-            color: colors.orange,
+            color: '#FF8C42',
         },
         {
             id: 3,
@@ -71,7 +54,7 @@ const AISuggestionsScreen = ({ navigation }) => {
             icon: '👥',
             description: 'Hangout, Shopping',
             time: '~1hr',
-            color: colors.purple,
+            color: '#9B8BB4',
         },
         {
             id: 4,
@@ -79,7 +62,7 @@ const AISuggestionsScreen = ({ navigation }) => {
             icon: '👨‍⚕️',
             description: 'Psychiatrist, Doctor',
             time: '~30min',
-            color: colors.darkBrown,
+            color: '#6D482F',
         },
     ];
 
@@ -89,48 +72,50 @@ const AISuggestionsScreen = ({ navigation }) => {
     ];
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.lightBeige} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View className="flex-row items-center justify-between px-5 py-4">
                 <TouchableOpacity
-                    style={styles.backButton}
+                    className="w-10 h-10 rounded-full bg-white justify-center items-center shadow-sm"
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="chevron-back" size={24} color={colors.darkBrown} />
+                    <Ionicons name="chevron-back" size={24} color="#6D482F" />
                 </TouchableOpacity>
                 <View>
-                    <Text style={styles.headerTitle}>AI Score Suggestions</Text>
-                    <View style={styles.aiLabel}>
-                        <Text style={styles.aiLabelEmoji}>🤖</Text>
-                        <Text style={styles.aiLabelText}>92 Total</Text>
-                        <View style={styles.gptBadge}>
-                            <Text style={styles.gptBadgeText}>GPT-5</Text>
+                    <Text className="text-lg font-bold text-dark-brown text-center">AI Score Suggestions</Text>
+                    <View className="flex-row items-center justify-center mt-1 gap-1">
+                        <Text className="text-xs">🤖</Text>
+                        <Text className="text-xs text-placeholder">92 Total</Text>
+                        <View className="bg-primary-green px-2 py-0.5 rounded-xl">
+                            <Text className="text-white text-[10px] font-semibold">GPT-5</Text>
                         </View>
                     </View>
                 </View>
-                <View style={{ width: 40 }} />
+                <View className="w-10" />
             </View>
 
             {/* Tabs */}
-            <View style={styles.tabsContainer}>
+            <View className="flex-row px-5 mb-5 gap-2.5">
                 {tabs.map((tab) => (
                     <TouchableOpacity
                         key={tab.id}
-                        style={[styles.tab, activeTab === tab.id && styles.activeTab]}
+                        className={`flex-1 py-3 rounded-3xl items-center ${activeTab === tab.id ? 'bg-dark-brown' : 'bg-white'
+                            }`}
                         onPress={() => setActiveTab(tab.id)}
                     >
-                        <Text style={[styles.tabText, activeTab === tab.id && styles.activeTabText]}>
+                        <Text className={`text-sm font-semibold ${activeTab === tab.id ? 'text-white' : 'text-text-dark'
+                            }`}>
                             {tab.label}
                         </Text>
                     </TouchableOpacity>
                 ))}
             </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
                 {/* Suggestions List */}
-                {suggestions.map((suggestion, index) => (
+                {suggestions.map((suggestion) => (
                     <Animated.View
                         key={suggestion.id}
                         style={{
@@ -139,28 +124,34 @@ const AISuggestionsScreen = ({ navigation }) => {
                         }}
                     >
                         <TouchableOpacity
-                            style={styles.suggestionCard}
+                            className="flex-row items-center bg-white rounded-2xl p-4 mb-3 shadow-sm"
                             onPress={() => navigation.navigate('MindfulnessActivities', { suggestion })}
                         >
-                            <View style={[styles.suggestionIcon, { backgroundColor: suggestion.color + '20' }]}>
-                                <Text style={styles.suggestionEmoji}>{suggestion.icon}</Text>
+                            <View
+                                className="w-12 h-12 rounded-full justify-center items-center mr-4"
+                                style={{ backgroundColor: suggestion.color + '20' }}
+                            >
+                                <Text className="text-2xl">{suggestion.icon}</Text>
                             </View>
-                            <View style={styles.suggestionContent}>
-                                <Text style={styles.suggestionCategory}>{suggestion.category}</Text>
-                                <Text style={styles.suggestionDescription}>{suggestion.description}</Text>
+                            <View className="flex-1">
+                                <Text className="text-base font-semibold text-dark-brown mb-1">{suggestion.category}</Text>
+                                <Text className="text-sm text-placeholder">{suggestion.description}</Text>
                             </View>
-                            <View style={styles.suggestionTime}>
-                                <Text style={styles.timeText}>{suggestion.time}</Text>
-                                <Ionicons name="chevron-forward" size={20} color={colors.placeholderText} />
+                            <View className="flex-row items-center gap-1">
+                                <Text className="text-xs text-placeholder">{suggestion.time}</Text>
+                                <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
                             </View>
                         </TouchableOpacity>
                     </Animated.View>
                 ))}
 
                 {/* Score Impact Info */}
-                <Animated.View style={[styles.infoCard, { opacity: fadeAnim }]}>
-                    <Ionicons name="information-circle" size={24} color={colors.primaryGreen} />
-                    <Text style={styles.infoText}>
+                <Animated.View
+                    className="flex-row items-center bg-green-100 rounded-2xl p-4 mt-2 mb-8 gap-3"
+                    style={{ opacity: fadeAnim }}
+                >
+                    <Ionicons name="information-circle" size={24} color="#8EBA6B" />
+                    <Text className="flex-1 text-sm text-text-dark leading-5">
                         Completing AI suggestions can improve your Pal Score by +5 points each!
                     </Text>
                 </Animated.View>
@@ -168,153 +159,5 @@ const AISuggestionsScreen = ({ navigation }) => {
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-        textAlign: 'center',
-    },
-    aiLabel: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 5,
-        gap: 5,
-    },
-    aiLabelEmoji: {
-        fontSize: 12,
-    },
-    aiLabelText: {
-        fontSize: 12,
-        color: colors.placeholderText,
-    },
-    gptBadge: {
-        backgroundColor: colors.primaryGreen,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 10,
-    },
-    gptBadgeText: {
-        color: colors.textLight,
-        fontSize: 10,
-        fontWeight: '600',
-    },
-    tabsContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: 20,
-        marginBottom: 20,
-        gap: 10,
-    },
-    tab: {
-        flex: 1,
-        paddingVertical: 12,
-        borderRadius: 25,
-        backgroundColor: colors.textLight,
-        alignItems: 'center',
-    },
-    activeTab: {
-        backgroundColor: colors.darkBrown,
-    },
-    tabText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.textDark,
-    },
-    activeTabText: {
-        color: colors.textLight,
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    suggestionCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.textLight,
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    suggestionIcon: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 15,
-    },
-    suggestionEmoji: {
-        fontSize: 24,
-    },
-    suggestionContent: {
-        flex: 1,
-    },
-    suggestionCategory: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.darkBrown,
-        marginBottom: 4,
-    },
-    suggestionDescription: {
-        fontSize: 13,
-        color: colors.placeholderText,
-    },
-    suggestionTime: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-    },
-    timeText: {
-        fontSize: 12,
-        color: colors.placeholderText,
-    },
-    infoCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#E8F5E8',
-        borderRadius: 15,
-        padding: 15,
-        marginTop: 10,
-        marginBottom: 30,
-        gap: 12,
-    },
-    infoText: {
-        flex: 1,
-        fontSize: 14,
-        color: colors.textDark,
-        lineHeight: 20,
-    },
-});
 
 export default AISuggestionsScreen;

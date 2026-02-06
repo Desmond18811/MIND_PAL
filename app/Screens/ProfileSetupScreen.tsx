@@ -4,28 +4,12 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
     StatusBar,
-    Image,
     ScrollView,
-    Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width, height } = Dimensions.get('window');
-
-const colors = {
-    primaryGreen: '#8EBA6B',
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    textLight: '#FFFFFF',
-    borderColor: '#8DC63F',
-    placeholderText: '#A0A0A0',
-    lightGray: '#E0E0E0',
-    orange: '#FF8C42',
-};
+import "../global.css";
 
 const ProfileSetupScreen = ({ navigation, route }) => {
     const [nickname, setNickname] = useState('');
@@ -44,7 +28,6 @@ const ProfileSetupScreen = ({ navigation, route }) => {
         if (!nickname.trim() || !selectedGender) {
             return;
         }
-        // Navigate to next screen (PasswordSetup)
         navigation.navigate('PasswordSetup', {
             ...route.params,
             nickname: nickname.trim(),
@@ -56,71 +39,70 @@ const ProfileSetupScreen = ({ navigation, route }) => {
     const canContinue = nickname.trim().length > 0 && selectedGender;
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.lightBeige} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View className="flex-row items-center px-5 py-4">
                 <TouchableOpacity
-                    style={styles.backButton}
+                    className="w-10 h-10 rounded-full bg-white justify-center items-center shadow-sm"
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="chevron-back" size={24} color={colors.darkBrown} />
+                    <Ionicons name="chevron-back" size={24} color="#6D482F" />
                 </TouchableOpacity>
-                <View style={styles.stepIndicator}>
-                    <Text style={styles.stepText}>Profile Setup</Text>
-                    <Text style={styles.stepNumber}>Step 1/6</Text>
+                <View className="flex-1 items-center">
+                    <Text className="text-base font-semibold text-dark-brown">Profile Setup</Text>
+                    <Text className="text-xs text-placeholder mt-0.5">Step 1/6</Text>
                 </View>
             </View>
 
             {/* Illustration */}
-            <View style={styles.illustrationContainer}>
-                <View style={styles.illustrationPlaceholder}>
-                    <Text style={styles.illustrationEmoji}>👤</Text>
-                    <View style={styles.circleDecoration} />
+            <View className="items-center py-5">
+                <View className="w-[150px] h-[150px] rounded-full bg-primary-green justify-center items-center relative">
+                    <Text className="text-6xl">👤</Text>
+                    <View className="absolute w-[170px] h-[170px] rounded-full border-2 border-dashed border-[#FF8C42]" />
                 </View>
             </View>
 
             <ScrollView
-                style={styles.content}
+                className="flex-1 px-5"
                 showsVerticalScrollIndicator={false}
             >
                 {/* Title */}
-                <Text style={styles.title}>Individual Details</Text>
-                <Text style={styles.subtitle}>Please fill the form below</Text>
-                <Text style={styles.subtitle}>to continue to freud.ai</Text>
+                <Text className="text-3xl font-bold text-dark-brown text-center mb-1">Individual Details</Text>
+                <Text className="text-base text-placeholder text-center">Please fill the form below</Text>
+                <Text className="text-base text-placeholder text-center">to continue to freud.ai</Text>
 
                 {/* Avatar Selection */}
-                <View style={styles.avatarSection}>
-                    <Text style={styles.sectionLabel}>Select Avatar</Text>
+                <View className="mt-6">
+                    <Text className="text-sm font-semibold text-dark-brown mb-2">Select Avatar</Text>
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        style={styles.avatarList}
                     >
                         {avatarEmojis.map((emoji, index) => (
                             <TouchableOpacity
                                 key={index}
-                                style={[
-                                    styles.avatarOption,
-                                    selectedAvatar === index && styles.avatarSelected,
-                                ]}
+                                className={`w-12 h-12 rounded-full bg-white justify-center items-center mr-2 border-2 ${selectedAvatar === index
+                                    ? 'border-primary-green bg-green-50'
+                                    : 'border-transparent'
+                                    }`}
                                 onPress={() => setSelectedAvatar(index)}
                             >
-                                <Text style={styles.avatarEmoji}>{emoji}</Text>
+                                <Text className="text-2xl">{emoji}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
                 </View>
 
                 {/* Nickname Input */}
-                <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Nickname</Text>
-                    <View style={styles.inputContainer}>
+                <View className="mt-5">
+                    <Text className="text-base font-semibold text-dark-brown mb-2">Nickname</Text>
+                    <View className="bg-white rounded-2xl border-2 border-[#8DC63F] px-4">
                         <TextInput
-                            style={styles.textInput}
+                            className="py-4 text-base text-text-dark"
                             placeholder="Enter your nickname..."
-                            placeholderTextColor={colors.placeholderText}
+                            placeholderTextColor="#A0A0A0"
                             value={nickname}
                             onChangeText={setNickname}
                             autoCapitalize="words"
@@ -129,30 +111,30 @@ const ProfileSetupScreen = ({ navigation, route }) => {
                 </View>
 
                 {/* Gender Selection */}
-                <View style={styles.genderSection}>
-                    <Text style={styles.inputLabel}>Gender</Text>
-                    <View style={styles.genderOptions}>
+                <View className="mt-5">
+                    <Text className="text-base font-semibold text-dark-brown mb-2">Gender</Text>
+                    <View className="flex-row flex-wrap gap-2">
                         {genderOptions.map((option) => (
                             <TouchableOpacity
                                 key={option.id}
-                                style={[
-                                    styles.genderOption,
-                                    selectedGender === option.id && styles.genderSelected,
-                                ]}
+                                className={`flex-row items-center px-4 py-3 rounded-3xl bg-white border ${selectedGender === option.id
+                                    ? 'border-primary-green bg-green-50'
+                                    : 'border-light-gray'
+                                    }`}
                                 onPress={() => setSelectedGender(option.id)}
                             >
-                                <View style={[
-                                    styles.radioOuter,
-                                    selectedGender === option.id && styles.radioOuterSelected,
-                                ]}>
+                                <View className={`w-5 h-5 rounded-full border-2 justify-center items-center mr-2 ${selectedGender === option.id
+                                    ? 'border-primary-green'
+                                    : 'border-light-gray'
+                                    }`}>
                                     {selectedGender === option.id && (
-                                        <View style={styles.radioInner} />
+                                        <View className="w-2.5 h-2.5 rounded-full bg-primary-green" />
                                     )}
                                 </View>
-                                <Text style={[
-                                    styles.genderLabel,
-                                    selectedGender === option.id && styles.genderLabelSelected,
-                                ]}>
+                                <Text className={`text-sm ${selectedGender === option.id
+                                    ? 'text-dark-brown font-semibold'
+                                    : 'text-text-dark'
+                                    }`}>
                                     {option.label}
                                 </Text>
                             </TouchableOpacity>
@@ -162,219 +144,17 @@ const ProfileSetupScreen = ({ navigation, route }) => {
 
                 {/* Continue Button */}
                 <TouchableOpacity
-                    style={[
-                        styles.continueButton,
-                        !canContinue && styles.continueButtonDisabled,
-                    ]}
+                    className={`bg-dark-brown flex-row items-center justify-center py-5 rounded-3xl mt-8 mb-8 gap-2.5 ${!canContinue ? 'opacity-50' : ''
+                        }`}
                     onPress={handleContinue}
                     disabled={!canContinue}
                 >
-                    <Text style={styles.continueButtonText}>Continue</Text>
-                    <Ionicons name="arrow-forward" size={20} color={colors.textLight} />
+                    <Text className="text-white text-lg font-bold">Continue</Text>
+                    <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    stepIndicator: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    stepText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.darkBrown,
-    },
-    stepNumber: {
-        fontSize: 12,
-        color: colors.placeholderText,
-        marginTop: 2,
-    },
-    illustrationContainer: {
-        alignItems: 'center',
-        paddingVertical: 20,
-    },
-    illustrationPlaceholder: {
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        backgroundColor: colors.primaryGreen,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-    },
-    illustrationEmoji: {
-        fontSize: 60,
-    },
-    circleDecoration: {
-        position: 'absolute',
-        width: 170,
-        height: 170,
-        borderRadius: 85,
-        borderWidth: 2,
-        borderColor: colors.orange,
-        borderStyle: 'dashed',
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-        textAlign: 'center',
-        marginBottom: 5,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: colors.placeholderText,
-        textAlign: 'center',
-    },
-    avatarSection: {
-        marginTop: 25,
-    },
-    sectionLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.darkBrown,
-        marginBottom: 10,
-    },
-    avatarList: {
-        flexDirection: 'row',
-    },
-    avatarOption: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 10,
-        borderWidth: 2,
-        borderColor: 'transparent',
-    },
-    avatarSelected: {
-        borderColor: colors.primaryGreen,
-        backgroundColor: '#E8F5E8',
-    },
-    avatarEmoji: {
-        fontSize: 24,
-    },
-    inputSection: {
-        marginTop: 20,
-    },
-    inputLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.darkBrown,
-        marginBottom: 10,
-    },
-    inputContainer: {
-        backgroundColor: colors.textLight,
-        borderRadius: 15,
-        borderWidth: 2,
-        borderColor: colors.borderColor,
-        paddingHorizontal: 15,
-    },
-    textInput: {
-        paddingVertical: 15,
-        fontSize: 16,
-        color: colors.textDark,
-    },
-    genderSection: {
-        marginTop: 20,
-    },
-    genderOptions: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 10,
-    },
-    genderOption: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 15,
-        paddingVertical: 12,
-        borderRadius: 25,
-        backgroundColor: colors.textLight,
-        borderWidth: 1,
-        borderColor: colors.lightGray,
-    },
-    genderSelected: {
-        borderColor: colors.primaryGreen,
-        backgroundColor: '#E8F5E8',
-    },
-    radioOuter: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        borderWidth: 2,
-        borderColor: colors.lightGray,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 8,
-    },
-    radioOuterSelected: {
-        borderColor: colors.primaryGreen,
-    },
-    radioInner: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: colors.primaryGreen,
-    },
-    genderLabel: {
-        fontSize: 14,
-        color: colors.textDark,
-    },
-    genderLabelSelected: {
-        color: colors.darkBrown,
-        fontWeight: '600',
-    },
-    continueButton: {
-        backgroundColor: colors.darkBrown,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 18,
-        borderRadius: 25,
-        marginTop: 30,
-        marginBottom: 30,
-        gap: 10,
-    },
-    continueButtonDisabled: {
-        opacity: 0.5,
-    },
-    continueButtonText: {
-        color: colors.textLight,
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-});
 
 export default ProfileSetupScreen;

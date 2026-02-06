@@ -2,28 +2,16 @@ import React from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   StatusBar,
   Image,
-  Dimensions,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const { width, height } = Dimensions.get('window');
-
-// Define metricCardBase outside of StyleSheet.create
-const metricCardBase = {
-  width: 150,
-  borderRadius: 15,
-  padding: 15,
-  marginRight: 15,
-  alignItems: 'center',
-};
+import "../global.css";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -46,221 +34,220 @@ const HomeScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
       <StatusBar barStyle="light-content" backgroundColor="#8B7355" />
 
       {/* Header */}
-      <View style={styles.headerContainer}>
-
-
-        <View style={styles.headerContent}>
-          <View style={styles.profileSection}>
+      <View className="bg-[#8B7355] px-5 pb-4">
+        <View className="flex-row justify-between items-center mt-2">
+          <View className="flex-row items-center">
             <Image
               source={require('../assets/profile1.png')}
-              style={styles.profileImage}
+              className="w-12 h-12 rounded-full mr-4"
             />
-            <View style={styles.profileText}>
-              <Text style={styles.greeting}>Hi, Shinomiya!</Text>
-              <View style={styles.profileBadges}>
-                <Text style={styles.badgePro}>Pro</Text>
-                <Text style={styles.badgeScore}>80%</Text>
-                <Text style={styles.badgeEmotion}>😊 Happy</Text>
+            <View>
+              <Text className="text-white text-lg font-bold">Hi, Shinomiya!</Text>
+              <View className="flex-row items-center gap-2">
+                <Text className="text-white text-xs bg-white/20 px-2 py-0.5 rounded-lg">Pro</Text>
+                <Text className="text-white text-xs">80%</Text>
+                <Text className="text-white text-xs">😊 Happy</Text>
               </View>
             </View>
           </View>
-
-          <TouchableOpacity style={styles.notificationIcon}>
+          <TouchableOpacity className="p-1">
             <Ionicons name="notifications-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-          <Text style={styles.searchPlaceholder}>Search anything...</Text>
+        <View className="bg-white flex-row items-center rounded-2xl px-4 py-2.5 mt-4">
+          <Ionicons name="search" size={20} color="#666" style={{ marginRight: 10 }} />
+          <Text className="text-[#666]">Search anything...</Text>
         </View>
       </View>
 
       <Animated.ScrollView
-        style={[styles.scrollContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
+        className="flex-1"
+        style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
         showsVerticalScrollIndicator={false}
       >
         {/* Mental Health Metrics */}
-        <Text style={styles.sectionTitle}>Mental Health Metrics</Text>
+        <Text className="text-lg text-[#503623] px-5 mt-5 mb-4">Mental Health Metrics</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.metricsScrollView}
+          className="px-5"
         >
           {/* Pal Score Card */}
           <TouchableOpacity
-            style={styles.metricCardGreen}
+            className="w-[150px] rounded-2xl p-4 mr-4 bg-[#A8D5A8] items-center justify-between"
             onPress={() => navigation.navigate('FreudScore')}
           >
-            <View style={styles.metricHeader}>
+            <View className="flex-row items-center self-start mb-2">
               <Ionicons name="analytics" size={20} color="white" />
-              <Text style={styles.metricCardTitle}>Pal Score</Text>
+              <Text className="text-white text-base font-bold ml-2">Pal Score</Text>
             </View>
-            <View style={styles.circularProgressContainer}>
-              <View style={styles.circularProgress}>
-                <Text style={styles.circularProgressText}>80</Text>
+            <View className="w-20 h-20 rounded-full bg-white/20 justify-center items-center my-2">
+              <View className="w-16 h-16 rounded-full bg-white/30 justify-center items-center">
+                <Text className="text-white text-2xl font-bold">80</Text>
               </View>
             </View>
-            <View style={styles.metricBottomText}>
-              <Text style={styles.metricCardSubtitle}>Healthy Mind</Text>
-              <Text style={styles.metricCardDescription}>Above average</Text>
+            <View className="self-stretch mt-auto">
+              <Text className="text-white text-sm font-semibold">Healthy Mind</Text>
+              <Text className="text-white/80 text-xs mt-1">Above average</Text>
             </View>
           </TouchableOpacity>
 
           {/* Mood Card */}
           <TouchableOpacity
-            style={styles.metricCardOrange}
+            className="w-[150px] rounded-2xl p-4 mr-4 bg-[#FF8C42] items-center justify-between"
             onPress={() => navigation.navigate('FreudScore')}
           >
-            <View style={styles.metricHeader}>
+            <View className="flex-row items-center self-start mb-2">
               <Ionicons name="happy" size={20} color="white" />
-              <Text style={styles.metricCardTitle}>Mood</Text>
+              <Text className="text-white text-base font-bold ml-2">Mood</Text>
             </View>
-            <Ionicons name="sad" size={40} color="white" style={styles.moodIcon} />
-            <View style={styles.metricBottomText}>
-              <Text style={styles.metricCardSubtitle}>Currently Sad</Text>
-              <Text style={styles.metricCardDescription}>Improving</Text>
+            <Ionicons name="sad" size={40} color="white" style={{ marginVertical: 10 }} />
+            <View className="self-stretch mt-auto">
+              <Text className="text-white text-sm font-semibold">Currently Sad</Text>
+              <Text className="text-white/80 text-xs mt-1">Improving</Text>
             </View>
           </TouchableOpacity>
 
           {/* Goals Card */}
-          <View style={styles.metricCardBlue}>
-            <View style={styles.metricHeader}>
+          <View className="w-[150px] rounded-2xl p-4 mr-4 bg-[#87CEEB] items-center justify-between">
+            <View className="flex-row items-center self-start mb-2">
               <Ionicons name="flag" size={20} color="white" />
-              <Text style={styles.metricCardTitle}>Goals</Text>
+              <Text className="text-white text-base font-bold ml-2">Goals</Text>
             </View>
-            <View style={styles.goalsContainer}>
+            <View className="flex-row justify-around w-full my-2">
               <Ionicons name="checkmark-circle" size={24} color="white" />
               <Ionicons name="checkmark-circle" size={24} color="white" />
               <Ionicons name="checkmark-circle" size={24} color="white" />
             </View>
-            <View style={styles.metricBottomText}>
-              <Text style={styles.metricCardSubtitle}>3 Completed</Text>
-              <Text style={styles.metricCardDescription}>2 remaining</Text>
+            <View className="self-stretch mt-auto">
+              <Text className="text-white text-sm font-semibold">3 Completed</Text>
+              <Text className="text-white/80 text-xs mt-1">2 remaining</Text>
             </View>
           </View>
 
           {/* Meditate Card */}
-          <View style={styles.metricCardPurple}>
-            <View style={styles.metricHeader}>
+          <View className="w-[150px] rounded-2xl p-4 mr-4 bg-[#DDA0DD] items-center justify-between">
+            <View className="flex-row items-center self-start mb-2">
               <Ionicons name="time" size={20} color="white" />
-              <Text style={styles.metricCardTitle}>Meditate</Text>
+              <Text className="text-white text-base font-bold ml-2">Meditate</Text>
             </View>
-            <Ionicons name="timer" size={40} color="white" style={styles.meditateIcon} />
-            <View style={styles.metricBottomText}>
-              <Text style={styles.metricCardSubtitle}>20 mins</Text>
-              <Text style={styles.metricCardDescription}>Daily streak: 7</Text>
+            <Ionicons name="timer" size={40} color="white" style={{ marginVertical: 10 }} />
+            <View className="self-stretch mt-auto">
+              <Text className="text-white text-sm font-semibold">20 mins</Text>
+              <Text className="text-white/80 text-xs mt-1">Daily streak: 7</Text>
             </View>
           </View>
 
           {/* Journal Card */}
-          <View style={styles.metricCardYellow}>
-            <View style={styles.metricHeader}>
+          <View className="w-[150px] rounded-2xl p-4 mr-4 bg-[#FFB347] items-center justify-between">
+            <View className="flex-row items-center self-start mb-2">
               <Ionicons name="book" size={20} color="white" />
-              <Text style={styles.metricCardTitle}>Journal</Text>
+              <Text className="text-white text-base font-bold ml-2">Journal</Text>
             </View>
-            <View style={styles.streakContainer}>
+            <View className="flex-row items-center justify-center my-2">
               <Ionicons name="flame" size={30} color="white" />
-              <Text style={styles.streakText}>64</Text>
+              <Text className="text-white text-2xl font-bold ml-1">64</Text>
             </View>
-            <View style={styles.metricBottomText}>
-              <Text style={styles.metricCardSubtitle}>Day Streak</Text>
-              <Text style={styles.metricCardDescription}>Keep going!</Text>
+            <View className="self-stretch mt-auto">
+              <Text className="text-white text-sm font-semibold">Day Streak</Text>
+              <Text className="text-white/80 text-xs mt-1">Keep going!</Text>
             </View>
           </View>
         </ScrollView>
+
         {/* Mindful Tracker */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Mindful Tracker</Text>
+        <View className="flex-row justify-between items-center px-5 mt-5">
+          <Text className="text-lg text-[#503623]">Mindful Tracker</Text>
           <TouchableOpacity>
-            <Text style={styles.seeAllText}>See All</Text>
+            <Text className="text-[#A8D5A8] text-sm">See All</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.trackerContainer}>
+        <View className="bg-white rounded-2xl mx-5 p-4 shadow-sm">
           {/* Mindful Hours */}
-          <View style={styles.trackerItem}>
-            <View style={[styles.trackerIcon, { backgroundColor: '#A8D5A8' }]}>
+          <View className="flex-row items-center py-3 border-b border-[#F0F0F0]">
+            <View className="w-10 h-10 rounded-full bg-[#A8D5A8] justify-center items-center mr-4">
               <Ionicons name="time-outline" size={20} color="white" />
             </View>
-            <View style={styles.trackerItemContent}>
-              <Text style={styles.trackerItemTitle}>Mindful Hours</Text>
-              <Text style={styles.trackerItemSubtitle}>2.5h/8h Today</Text>
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-[#333]">Mindful Hours</Text>
+              <Text className="text-xs text-[#666] mt-1">2.5h/8h Today</Text>
             </View>
           </View>
 
           {/* Sleep Quality */}
-          <View style={styles.trackerItem}>
-            <View style={[styles.trackerIcon, { backgroundColor: '#87CEEB' }]}>
+          <View className="flex-row items-center py-3 border-b border-[#F0F0F0]">
+            <View className="w-10 h-10 rounded-full bg-[#87CEEB] justify-center items-center mr-4">
               <Ionicons name="bed-outline" size={20} color="white" />
             </View>
-            <View style={styles.trackerItemContent}>
-              <Text style={styles.trackerItemTitle}>Sleep Quality</Text>
-              <Text style={styles.trackerItemSubtitle}>Incomplete (-2h Avg)</Text>
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-[#333]">Sleep Quality</Text>
+              <Text className="text-xs text-[#666] mt-1">Incomplete (-2h Avg)</Text>
             </View>
           </View>
 
           {/* Mindful Journal */}
-          <View style={styles.trackerItem}>
-            <View style={[styles.trackerIcon, { backgroundColor: '#FFB347' }]}>
+          <View className="flex-row items-center py-3 border-b border-[#F0F0F0]">
+            <View className="w-10 h-10 rounded-full bg-[#FFB347] justify-center items-center mr-4">
               <Ionicons name="journal-outline" size={20} color="white" />
             </View>
-            <View style={styles.trackerItemContent}>
-              <Text style={styles.trackerItemTitle}>Mindful Journal</Text>
-              <Text style={styles.trackerItemSubtitle}>64 Day Streak</Text>
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-[#333]">Mindful Journal</Text>
+              <Text className="text-xs text-[#666] mt-1">64 Day Streak</Text>
             </View>
           </View>
 
           {/* Stress Level */}
-          <View style={styles.trackerItem}>
-            <View style={[styles.trackerIcon, { backgroundColor: '#FFA07A' }]}>
+          <View className="flex-row items-center py-3 border-b border-[#F0F0F0]">
+            <View className="w-10 h-10 rounded-full bg-[#FFA07A] justify-center items-center mr-4">
               <Ionicons name="speedometer-outline" size={20} color="white" />
             </View>
-            <View style={styles.trackerItemContent}>
-              <Text style={styles.trackerItemTitle}>Stress Level</Text>
-              <Text style={styles.trackerItemSubtitle}>Level 3 (Normal)</Text>
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-[#333]">Stress Level</Text>
+              <Text className="text-xs text-[#666] mt-1">Level 3 (Normal)</Text>
             </View>
           </View>
 
           {/* Mood Tracker */}
-          <View style={styles.trackerItem}>
-            <View style={[styles.trackerIcon, { backgroundColor: '#DDA0DD' }]}>
+          <View className="flex-row items-center py-3">
+            <View className="w-10 h-10 rounded-full bg-[#DDA0DD] justify-center items-center mr-4">
               <Ionicons name="analytics-outline" size={20} color="white" />
             </View>
-            <View style={styles.trackerItemContent}>
-              <Text style={styles.trackerItemTitle}>Mood Tracker</Text>
-              <Text style={styles.trackerItemSubtitle}>Sad → Happy → Neutral</Text>
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-[#333]">Mood Tracker</Text>
+              <Text className="text-xs text-[#666] mt-1">Sad → Happy → Neutral</Text>
             </View>
           </View>
         </View>
 
         {/* AI Therapy Chatbot */}
-        <View style={styles.chatbotContainer}>
-          <View style={styles.chatbotHeader}>
+        <View className="bg-white rounded-2xl mx-5 mt-5 p-5 items-center">
+          <View className="flex-row items-center justify-between w-full mb-4">
             <Ionicons name="chatbubble-outline" size={24} color="#8B7355" />
-            <Text style={styles.chatbotTitle}>AI Therapy Chatbot</Text>
-            <TouchableOpacity style={styles.chatbotSettings}>
+            <Text className="text-base font-bold text-[#333] flex-1 ml-2">AI Therapy Chatbot</Text>
+            <TouchableOpacity className="p-1">
               <Ionicons name="settings-outline" size={20} color="#8B7355" />
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.chatbotNumber}>2,541</Text>
-          <Text style={styles.chatbotSubtext}>Conversations</Text>
-          <Text style={styles.chatbotDetails}>💬 83 left this month</Text>
+          <Text className="text-2xl font-bold text-[#333] mb-1">2,541</Text>
+          <Text className="text-sm text-[#666] mb-1">Conversations</Text>
+          <Text className="text-xs text-[#666] mb-2">💬 83 left this month</Text>
 
-          <View style={styles.chatbotButtons}>
+          <View className="flex-row items-center mt-2">
             <TouchableOpacity
-              style={styles.chatbotButton}
+              className="bg-[#A8D5A8] py-2 px-4 rounded-2xl mr-2"
               onPress={() => navigation.navigate('AISuggestions')}
             >
-              <Text style={styles.chatbotButtonText}>Go Pro Now!</Text>
+              <Text className="text-white text-xs font-semibold">Go Pro Now!</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.chatbotButtonOrange}
+              className="bg-[#FF8C42] w-10 h-10 rounded-full justify-center items-center"
               onPress={() => navigation.navigate('AISuggestions')}
             >
               <Ionicons name="add" size={20} color="#fff" />
@@ -269,566 +256,77 @@ const HomeScreen = () => {
         </View>
 
         {/* Mindful Resources */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Mindful Resources</Text>
+        <View className="flex-row justify-between items-center px-5 mt-5">
+          <Text className="text-lg text-[#503623]">Mindful Resources</Text>
           <TouchableOpacity onPress={() => navigation.navigate('MindfulnessActivities')}>
-            <Text style={styles.seeAllText}>See All</Text>
+            <Text className="text-[#A8D5A8] text-sm">See All</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.resourcesContainer}
+          className="px-5 mt-2 mb-4"
         >
           <TouchableOpacity
-            style={styles.resourceCard}
+            className="bg-white rounded-2xl p-4 mr-4 w-[250px]"
             onPress={() => navigation.navigate('MindfulnessActivities')}
           >
-            <View style={styles.resourceIconContainer}>
+            <View className="items-center mb-2">
               <Ionicons name="leaf" size={30} color="#A8D5A8" />
             </View>
-            <Text style={styles.resourceTitle}>Mental Health</Text>
-            <Text style={styles.resourceSubtitle}>Will meditation help you get out from the rat race?</Text>
-            <View style={styles.resourceStats}>
-              <Text style={styles.resourceStat}>👍 5,241</Text>
-              <Text style={styles.resourceStat}>💬 987</Text>
-              <Text style={styles.resourceStat}>🔗 22</Text>
+            <Text className="text-sm font-bold text-[#333] text-center mb-1">Mental Health</Text>
+            <Text className="text-xs text-[#666] text-center mb-2">Will meditation help you get out from the rat race?</Text>
+            <View className="flex-row justify-around">
+              <Text className="text-[10px] text-[#666]">👍 5,241</Text>
+              <Text className="text-[10px] text-[#666]">💬 987</Text>
+              <Text className="text-[10px] text-[#666]">🔗 22</Text>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.resourceCard}>
-            <View style={styles.resourceIconContainer}>
+          <TouchableOpacity className="bg-white rounded-2xl p-4 mr-4 w-[250px]">
+            <View className="items-center mb-2">
               <Ionicons name="leaf" size={30} color="#A8D5A8" />
             </View>
-            <Text style={styles.resourceTitle}>Mental Health</Text>
-            <Text style={styles.resourceSubtitle}>Will meditation help you get out from it?</Text>
-            <View style={styles.resourceStats}>
-              <Text style={styles.resourceStat}>👍 5,241</Text>
-              <Text style={styles.resourceStat}>💬 9</Text>
-              <Text style={styles.resourceStat}>🔗 9</Text>
+            <Text className="text-sm font-bold text-[#333] text-center mb-1">Mental Health</Text>
+            <Text className="text-xs text-[#666] text-center mb-2">Will meditation help you get out from it?</Text>
+            <View className="flex-row justify-around">
+              <Text className="text-[10px] text-[#666]">👍 5,241</Text>
+              <Text className="text-[10px] text-[#666]">💬 9</Text>
+              <Text className="text-[10px] text-[#666]">🔗 9</Text>
             </View>
           </TouchableOpacity>
         </ScrollView>
       </Animated.ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
+      <View className="flex-row bg-white py-2 px-5 justify-between items-center border-t border-[#F0F0F0]">
+        <TouchableOpacity className="items-center" onPress={() => navigation.navigate('Home')}>
           <Ionicons name="home" size={24} color="#A8D5A8" />
-          <Text style={styles.navTextActive}>Home</Text>
+          <Text className="text-[10px] text-[#A8D5A8] mt-1">Home</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('AISuggestions')}>
+        <TouchableOpacity className="items-center" onPress={() => navigation.navigate('AISuggestions')}>
           <Ionicons name="chatbubbles-outline" size={24} color="#8B7355" />
-          <Text style={styles.navText}>Chat</Text>
+          <Text className="text-[10px] text-[#8B7355] mt-1">Chat</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItemCenter} onPress={() => navigation.navigate('Assessment')}>
+        <TouchableOpacity className="bg-[#A8D5A8] w-12 h-12 rounded-full justify-center items-center" onPress={() => navigation.navigate('Assessment')}>
           <Ionicons name="add" size={28} color="#fff" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('FreudScore')}>
+        <TouchableOpacity className="items-center" onPress={() => navigation.navigate('FreudScore')}>
           <Ionicons name="analytics-outline" size={24} color="#8B7355" />
-          <Text style={styles.navText}>Analytics</Text>
+          <Text className="text-[10px] text-[#8B7355] mt-1">Analytics</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('ProfileSetup')}>
+        <TouchableOpacity className="items-center" onPress={() => navigation.navigate('ProfileSetup')}>
           <Ionicons name="person-outline" size={24} color="#8B7355" />
-          <Text style={styles.navText}>Profile</Text>
+          <Text className="text-[10px] text-[#8B7355] mt-1">Profile</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3EDE4',
-  },
-  // Header Styles
-  headerContainer: {
-    backgroundColor: '#8B7355',
-    paddingHorizontal: 20,
-    paddingBottom: 15,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 15,
-  },
-  greeting: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  profileBadges: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  badgePro: {
-    color: 'white',
-    fontSize: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  badgeScore: {
-    color: 'white',
-    fontSize: 12,
-  },
-  badgeEmotion: {
-    color: 'white',
-    fontSize: 12,
-  },
-  notificationIcon: {
-    padding: 5,
-  },
-  searchContainer: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginTop: 15,
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchPlaceholder: {
-    color: '#666',
-  },
-
-  // Mental Health Metrics Styles
-  scrollContent: {
-    flex: 1,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'normal',
-    color: '#503623',
-    paddingHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 15,
-  },
-  metricsScrollView: {
-    paddingHorizontal: 20,
-  },
-  metricCardGreen: {
-    ...metricCardBase,
-    backgroundColor: '#A8D5A8',
-    justifyContent: 'space-between', // Add this
-    paddingBottom: 15, // Add this
-  },
-  metricCardOrange: {
-    ...metricCardBase,
-    backgroundColor: '#FF8C42',
-    justifyContent: 'space-between', // Add this
-    paddingBottom: 15, // Add this
-  },
-  metricCardBlue: {
-    ...metricCardBase,
-    backgroundColor: '#87CEEB',
-    justifyContent: 'space-between', // Add this
-    paddingBottom: 15, // Add this
-  },
-  metricCardPurple: {
-    ...metricCardBase,
-    backgroundColor: '#DDA0DD',
-    justifyContent: 'space-between', // Add this
-    paddingBottom: 15, // Add this
-  },
-  metricCardYellow: {
-    ...metricCardBase,
-    backgroundColor: '#FFB347',
-    justifyContent: 'space-between', // Add this
-    paddingBottom: 15, // Add this
-  },
-  metricBottomText: {
-    alignSelf: 'stretch', // Add this
-    marginTop: 'auto', // This pushes the text to the bottom
-  },
-  metricCardTitle: {
-    color: 'white',
-    fontSize: 25,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-  },
-  metricCardSubtitle: {
-    color: 'white',
-    fontSize: 16,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-  },
-  circularProgressContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  circularProgress: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  circularProgressText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  moodBarGraph: {
-    width: 80,
-    height: 40,
-    backgroundColor: 'rgba(255,255,255,(reverse=True)0.2)',
-    marginVertical: 10,
-  },
-  goalsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  goalDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'white',
-    marginHorizontal: 5,
-  },
-  meditateWaveGraph: {
-    width: 80,
-    height: 40,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    marginVertical: 10,
-  },
-  journalStreakContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 10,
-  },
-  journalStreak: {
-    width: 15,
-    height: 15,
-    backgroundColor: 'white',
-    marginHorizontal: 2,
-  },
-
-  // Tracker Styles
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  seeAllText: {
-    color: '#A8D5A8',
-    fontSize: 14,
-  },
-  trackerContainer: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    marginHorizontal: 20,
-    padding: 15,
-  },
-  trackerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    borderRadius: 5
-  },
-  trackerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  trackerItemContent: {
-    flex: 1,
-  },
-  trackerItemTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  trackerItemSubtitle: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 5,
-  },
-  trackerItemValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-
-  // Chatbot Styles
-  chatbotContainer: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    marginHorizontal: 20,
-    marginTop: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  chatbotHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 15,
-  },
-  chatbotTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    marginLeft: 10,
-  },
-  chatbotSettings: {
-    padding: 5,
-  },
-  chatbotNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  chatbotSubtext: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  chatbotDetails: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 10,
-  },
-  chatbotButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  chatbotButton: {
-    backgroundColor: '#A8D5A8',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  chatbotButtonText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  chatbotButtonOrange: {
-    backgroundColor: '#FF8C42',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Resources Styles
-  resourcesContainer: {
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  resourceCard: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 15,
-    marginRight: 15,
-    width: 250,
-  },
-  resourceIconContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  resourceTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  resourceSubtitle: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  resourceStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  resourceStat: {
-    fontSize: 10,
-    color: '#666',
-  },
-
-  // Bottom Navigation Styles
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navItemCenter: {
-    backgroundColor: '#A8D5A8',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  navText: {
-    fontSize: 10,
-    color: '#8B7355',
-    marginTop: 4,
-  },
-  navTextActive: {
-    fontSize: 10,
-    color: '#A8D5A8',
-    marginTop: 4,
-  },
-  metricHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-  },
-  metricCardTitle: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  metricCardSubtitle: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 8,
-  },
-  metricCardDescription: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  moodIcon: {
-    marginVertical: 10,
-    alignSelf: 'center',
-  },
-  meditateIcon: {
-    marginVertical: 10,
-    alignSelf: 'center',
-  },
-  goalsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginVertical: 10,
-  },
-  streakContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-  },
-  streakText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginLeft: 5,
-  },
-  trackerContainer: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    marginHorizontal: 20,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  trackerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  trackerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  trackerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  trackerItemContent: {
-    flex: 1,
-  },
-  trackerItemTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  trackerItemSubtitle: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  trackerItemValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-});
 
 export default HomeScreen;

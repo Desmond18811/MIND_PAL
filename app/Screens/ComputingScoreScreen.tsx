@@ -2,23 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
     View,
     Text,
-    StyleSheet,
     StatusBar,
     Animated,
     Easing,
     Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import "../global.css";
 
 const { width, height } = Dimensions.get('window');
-
-const colors = {
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    placeholderText: '#A0A0A0',
-    primaryGreen: '#8EBA6B',
-};
 
 const ComputingScoreScreen = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
@@ -69,7 +61,7 @@ const ComputingScoreScreen = ({ navigation, route }) => {
         const timer = setTimeout(() => {
             navigation.replace('FreudScoreResult', {
                 ...route.params,
-                score: Math.floor(Math.random() * 50) + 50, // Random score 50-100 for demo
+                score: Math.floor(Math.random() * 50) + 50,
             });
         }, 5500);
 
@@ -94,179 +86,62 @@ const ComputingScoreScreen = ({ navigation, route }) => {
     const currentMessage = progressMessages[Math.floor(progress / 25)];
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.lightBeige} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
 
-            <View style={styles.content}>
+            <View className="flex-1 justify-center items-center px-10">
                 {/* Computing Animation */}
                 <Animated.View
-                    style={[
-                        styles.computingCircle,
-                        { transform: [{ scale: pulseValue }] }
-                    ]}
+                    className="w-[200px] h-[200px] justify-center items-center mb-10"
+                    style={{ transform: [{ scale: pulseValue }] }}
                 >
                     <Animated.View
-                        style={[
-                            styles.spinnerOuter,
-                            { transform: [{ rotate: spin }] }
-                        ]}
+                        className="absolute w-[200px] h-[200px] rounded-full border-4 border-transparent border-t-dark-brown border-r-dark-brown"
+                        style={{ transform: [{ rotate: spin }] }}
                     >
-                        <View style={styles.spinnerDot} />
+                        <View className="absolute top-0 left-1/2 -ml-2 -mt-2 w-4 h-4 rounded-full bg-dark-brown" />
                     </Animated.View>
 
-                    <View style={styles.innerCircle}>
-                        <View style={styles.brainContainer}>
-                            <Text style={styles.brainEmoji}>🧠</Text>
+                    <View className="w-[150px] h-[150px] rounded-full bg-dark-brown justify-center items-center">
+                        <View className="w-20 h-20 rounded-full bg-white/20 justify-center items-center">
+                            <Text className="text-5xl">🧠</Text>
                         </View>
                     </View>
                 </Animated.View>
 
                 {/* Title */}
-                <Text style={styles.title}>Computing Data...</Text>
-                <Text style={styles.subtitle}>{currentMessage}</Text>
+                <Text className="text-2xl font-bold text-dark-brown mb-2 text-center">Computing Data...</Text>
+                <Text className="text-sm text-placeholder text-center mb-8">{currentMessage}</Text>
 
                 {/* Progress Bar */}
-                <View style={styles.progressContainer}>
-                    <View style={styles.progressBar}>
-                        <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                <View className="w-full flex-row items-center gap-4">
+                    <View className="flex-1 h-2.5 bg-light-gray rounded-md overflow-hidden">
+                        <View
+                            className="h-full bg-primary-green rounded-md"
+                            style={{ width: `${progress}%` }}
+                        />
                     </View>
-                    <Text style={styles.progressText}>{progress}%</Text>
+                    <Text className="text-sm font-semibold text-dark-brown min-w-[45px] text-right">{progress}%</Text>
                 </View>
 
                 {/* Decorative Elements */}
-                <View style={styles.decorativeContainer}>
-                    <View style={[styles.decorDot, styles.decorDot1]} />
-                    <View style={[styles.decorDot, styles.decorDot2]} />
-                    <View style={[styles.decorDot, styles.decorDot3]} />
+                <View className="absolute inset-0">
+                    <View
+                        className="absolute w-3 h-3 rounded-full bg-dark-brown opacity-20"
+                        style={{ top: height * 0.15, left: width * 0.15 }}
+                    />
+                    <View
+                        className="absolute w-3 h-3 rounded-full bg-dark-brown opacity-20"
+                        style={{ top: height * 0.25, right: width * 0.1 }}
+                    />
+                    <View
+                        className="absolute w-3 h-3 rounded-full bg-dark-brown opacity-20"
+                        style={{ bottom: height * 0.2, left: width * 0.2 }}
+                    />
                 </View>
             </View>
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 40,
-    },
-    computingCircle: {
-        width: 200,
-        height: 200,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 40,
-    },
-    spinnerOuter: {
-        position: 'absolute',
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        borderWidth: 4,
-        borderColor: 'transparent',
-        borderTopColor: colors.darkBrown,
-        borderRightColor: colors.darkBrown,
-    },
-    spinnerDot: {
-        position: 'absolute',
-        top: 0,
-        left: '50%',
-        marginLeft: -8,
-        marginTop: -8,
-        width: 16,
-        height: 16,
-        borderRadius: 8,
-        backgroundColor: colors.darkBrown,
-    },
-    innerCircle: {
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        backgroundColor: colors.darkBrown,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    brainContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    brainEmoji: {
-        fontSize: 50,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 14,
-        color: colors.placeholderText,
-        textAlign: 'center',
-        marginBottom: 30,
-    },
-    progressContainer: {
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 15,
-    },
-    progressBar: {
-        flex: 1,
-        height: 10,
-        backgroundColor: '#E0E0E0',
-        borderRadius: 5,
-        overflow: 'hidden',
-    },
-    progressFill: {
-        height: '100%',
-        backgroundColor: colors.primaryGreen,
-        borderRadius: 5,
-    },
-    progressText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.darkBrown,
-        minWidth: 45,
-        textAlign: 'right',
-    },
-    decorativeContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
-    decorDot: {
-        position: 'absolute',
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        backgroundColor: colors.darkBrown,
-        opacity: 0.2,
-    },
-    decorDot1: {
-        top: height * 0.15,
-        left: width * 0.15,
-    },
-    decorDot2: {
-        top: height * 0.25,
-        right: width * 0.1,
-    },
-    decorDot3: {
-        bottom: height * 0.2,
-        left: width * 0.2,
-    },
-});
 
 export default ComputingScoreScreen;

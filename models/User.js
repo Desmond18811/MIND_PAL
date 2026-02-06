@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
     twoFactorSecret: {
         type: String
     }, // For 2FA
@@ -69,7 +74,7 @@ userSchema.pre('save', async function (next) {
     }
     next();
 },
-{ timestamps: true }
+    { timestamps: true }
 );
 
 export default mongoose.model('User', userSchema);

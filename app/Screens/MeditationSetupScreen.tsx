@@ -3,26 +3,12 @@ import {
     View,
     Text,
     TouchableOpacity,
-    StyleSheet,
     StatusBar,
-    Dimensions,
     ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-
-const colors = {
-    primaryGreen: '#8EBA6B',
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    textLight: '#FFFFFF',
-    placeholderText: '#A0A0A0',
-    lightGray: '#E0E0E0',
-    purple: '#9B8BB4',
-};
+import "../global.css";
 
 const MeditationSetupScreen = ({ navigation, route }) => {
     const [selectedPreferences, setSelectedPreferences] = useState([]);
@@ -54,61 +40,61 @@ const MeditationSetupScreen = ({ navigation, route }) => {
     const canContinue = selectedPreferences.length > 0;
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.lightBeige} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View className="flex-row items-center px-5 py-4">
                 <TouchableOpacity
-                    style={styles.backButton}
+                    className="w-10 h-10 rounded-full bg-white justify-center items-center shadow-sm"
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="chevron-back" size={24} color={colors.darkBrown} />
+                    <Ionicons name="chevron-back" size={24} color="#6D482F" />
                 </TouchableOpacity>
-                <View style={styles.stepIndicator}>
-                    <Text style={styles.stepText}>Meditation Setup</Text>
-                    <Text style={styles.stepNumber}>Step 5/6</Text>
+                <View className="flex-1 items-center">
+                    <Text className="text-base font-semibold text-dark-brown">Meditation Setup</Text>
+                    <Text className="text-xs text-placeholder mt-0.5">Step 5/6</Text>
                 </View>
             </View>
 
             {/* Spiral Illustration */}
-            <View style={styles.illustrationContainer}>
-                <View style={styles.spiralPlaceholder}>
-                    <View style={styles.spiralRing1} />
-                    <View style={styles.spiralRing2} />
-                    <View style={styles.spiralRing3} />
-                    <View style={styles.spiralCenter}>
-                        <Text style={styles.spiralEmoji}>🌀</Text>
+            <View className="items-center py-5">
+                <View className="w-[150px] h-[150px] justify-center items-center relative">
+                    <View className="absolute w-[150px] h-[150px] rounded-full border-2 border-[#9B8BB4] opacity-30" />
+                    <View className="absolute w-[110px] h-[110px] rounded-full border-2 border-[#9B8BB4] opacity-50" />
+                    <View className="absolute w-[70px] h-[70px] rounded-full border-2 border-[#9B8BB4] opacity-70" />
+                    <View className="w-12 h-12 rounded-full bg-[#9B8BB4] justify-center items-center">
+                        <Text className="text-2xl">🌀</Text>
                     </View>
                 </View>
             </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.title}>Mediation Roles</Text>
-                <Text style={styles.subtitle}>
+            <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
+                <Text className="text-3xl font-bold text-dark-brown text-center mb-2">Mediation Roles</Text>
+                <Text className="text-sm text-placeholder text-center leading-6 mb-6">
                     Select what you want to achieve with meditation. You can select multiple options.
                 </Text>
 
                 {/* Preference Options */}
-                <View style={styles.preferencesContainer}>
+                <View className="gap-3">
                     {preferences.map((pref) => (
                         <TouchableOpacity
                             key={pref.id}
-                            style={[
-                                styles.preferenceOption,
-                                selectedPreferences.includes(pref.id) && styles.preferenceSelected,
-                            ]}
+                            className={`flex-row items-center bg-white p-4 rounded-2xl gap-3 border-2 ${selectedPreferences.includes(pref.id)
+                                    ? 'border-primary-green bg-green-50'
+                                    : 'border-transparent'
+                                }`}
                             onPress={() => togglePreference(pref.id)}
                         >
-                            <Text style={styles.preferenceIcon}>{pref.icon}</Text>
-                            <Text style={[
-                                styles.preferenceLabel,
-                                selectedPreferences.includes(pref.id) && styles.preferenceLabelSelected,
-                            ]}>
+                            <Text className="text-2xl">{pref.icon}</Text>
+                            <Text className={`flex-1 text-base ${selectedPreferences.includes(pref.id)
+                                    ? 'text-dark-brown font-semibold'
+                                    : 'text-text-dark'
+                                }`}>
                                 {pref.label}
                             </Text>
                             {selectedPreferences.includes(pref.id) && (
-                                <Ionicons name="checkmark-circle" size={20} color={colors.primaryGreen} />
+                                <Ionicons name="checkmark-circle" size={20} color="#8EBA6B" />
                             )}
                         </TouchableOpacity>
                     ))}
@@ -116,171 +102,17 @@ const MeditationSetupScreen = ({ navigation, route }) => {
 
                 {/* Continue Button */}
                 <TouchableOpacity
-                    style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}
+                    className={`bg-dark-brown flex-row items-center justify-center py-5 rounded-3xl mt-8 mb-8 gap-2.5 ${!canContinue ? 'opacity-50' : ''
+                        }`}
                     onPress={handleContinue}
                     disabled={!canContinue}
                 >
-                    <Text style={styles.continueButtonText}>Continue</Text>
-                    <Ionicons name="arrow-forward" size={20} color={colors.textLight} />
+                    <Text className="text-white text-lg font-bold">Continue</Text>
+                    <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    stepIndicator: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    stepText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.darkBrown,
-    },
-    stepNumber: {
-        fontSize: 12,
-        color: colors.placeholderText,
-        marginTop: 2,
-    },
-    illustrationContainer: {
-        alignItems: 'center',
-        paddingVertical: 20,
-    },
-    spiralPlaceholder: {
-        width: 150,
-        height: 150,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-    },
-    spiralRing1: {
-        position: 'absolute',
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        borderWidth: 2,
-        borderColor: colors.purple,
-        opacity: 0.3,
-    },
-    spiralRing2: {
-        position: 'absolute',
-        width: 110,
-        height: 110,
-        borderRadius: 55,
-        borderWidth: 2,
-        borderColor: colors.purple,
-        opacity: 0.5,
-    },
-    spiralRing3: {
-        position: 'absolute',
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        borderWidth: 2,
-        borderColor: colors.purple,
-        opacity: 0.7,
-    },
-    spiralCenter: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: colors.purple,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    spiralEmoji: {
-        fontSize: 24,
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    subtitle: {
-        fontSize: 14,
-        color: colors.placeholderText,
-        textAlign: 'center',
-        lineHeight: 22,
-        marginBottom: 25,
-    },
-    preferencesContainer: {
-        gap: 12,
-    },
-    preferenceOption: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.textLight,
-        padding: 15,
-        borderRadius: 15,
-        gap: 12,
-        borderWidth: 2,
-        borderColor: 'transparent',
-    },
-    preferenceSelected: {
-        borderColor: colors.primaryGreen,
-        backgroundColor: '#E8F5E8',
-    },
-    preferenceIcon: {
-        fontSize: 24,
-    },
-    preferenceLabel: {
-        flex: 1,
-        fontSize: 16,
-        color: colors.textDark,
-    },
-    preferenceLabelSelected: {
-        color: colors.darkBrown,
-        fontWeight: '600',
-    },
-    continueButton: {
-        backgroundColor: colors.darkBrown,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 18,
-        borderRadius: 25,
-        marginTop: 30,
-        marginBottom: 30,
-        gap: 10,
-    },
-    continueButtonDisabled: {
-        opacity: 0.5,
-    },
-    continueButtonText: {
-        color: colors.textLight,
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-});
 
 export default MeditationSetupScreen;

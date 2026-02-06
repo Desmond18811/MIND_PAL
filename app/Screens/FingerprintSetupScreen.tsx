@@ -3,31 +3,17 @@ import {
     View,
     Text,
     TouchableOpacity,
-    StyleSheet,
     StatusBar,
-    Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-
-const colors = {
-    primaryGreen: '#8EBA6B',
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    textLight: '#FFFFFF',
-    placeholderText: '#A0A0A0',
-    lightGray: '#E0E0E0',
-};
+import "../global.css";
 
 const FingerprintSetupScreen = ({ navigation, route }) => {
     const [fingerprintEnabled, setFingerprintEnabled] = useState(false);
 
     const handleEnableFingerprint = () => {
         setFingerprintEnabled(true);
-        // In a real app, this would trigger biometric authentication
         setTimeout(() => {
             navigation.navigate('MeditationSetup', {
                 ...route.params,
@@ -44,216 +30,80 @@ const FingerprintSetupScreen = ({ navigation, route }) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.lightBeige} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View className="flex-row items-center px-5 py-4">
                 <TouchableOpacity
-                    style={styles.backButton}
+                    className="w-10 h-10 rounded-full bg-white justify-center items-center shadow-sm"
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="chevron-back" size={24} color={colors.darkBrown} />
+                    <Ionicons name="chevron-back" size={24} color="#6D482F" />
                 </TouchableOpacity>
-                <View style={styles.stepIndicator}>
-                    <Text style={styles.stepText}>Fingerprint Setup</Text>
-                    <Text style={styles.stepNumber}>Step 4/6</Text>
+                <View className="flex-1 items-center">
+                    <Text className="text-base font-semibold text-dark-brown">Fingerprint Setup</Text>
+                    <Text className="text-xs text-placeholder mt-0.5">Step 4/6</Text>
                 </View>
             </View>
 
-            <View style={styles.content}>
+            <View className="flex-1 px-5 items-center">
                 {/* Illustration */}
-                <View style={styles.illustrationContainer}>
-                    <View style={styles.fingerprintCircle}>
+                <View className="mt-10 mb-8 relative">
+                    <View className="w-[150px] h-[150px] rounded-full bg-white justify-center items-center shadow-lg">
                         <Ionicons
                             name="finger-print"
                             size={80}
-                            color={fingerprintEnabled ? colors.primaryGreen : colors.darkBrown}
+                            color={fingerprintEnabled ? '#8EBA6B' : '#6D482F'}
                         />
                     </View>
                     {fingerprintEnabled && (
-                        <View style={styles.successBadge}>
-                            <Ionicons name="checkmark" size={20} color={colors.textLight} />
+                        <View className="absolute bottom-2.5 right-2.5 w-9 h-9 rounded-full bg-primary-green justify-center items-center">
+                            <Ionicons name="checkmark" size={20} color="#FFFFFF" />
                         </View>
                     )}
                 </View>
 
-                <Text style={styles.title}>Fingerprint Note</Text>
-                <Text style={styles.subtitle}>
+                <Text className="text-3xl font-bold text-dark-brown text-center mb-4">Fingerprint Note</Text>
+                <Text className="text-sm text-placeholder text-center leading-6 mb-8 px-5">
                     Fingerprint is used to ensure security and quick access to your account.
                     You can enable or disable this feature any time in your settings.
                 </Text>
 
                 {/* Status Cards */}
-                <View style={styles.statusCard}>
-                    <View style={styles.statusRow}>
-                        <Ionicons name="lock-closed" size={24} color={colors.primaryGreen} />
-                        <Text style={styles.statusText}>Secure biometric authentication</Text>
+                <View className="bg-white rounded-2xl p-5 w-full mb-8 shadow-sm">
+                    <View className="flex-row items-center gap-4 py-2.5">
+                        <Ionicons name="lock-closed" size={24} color="#8EBA6B" />
+                        <Text className="text-sm text-text-dark flex-1">Secure biometric authentication</Text>
                     </View>
-                    <View style={styles.statusRow}>
-                        <Ionicons name="flash" size={24} color={colors.primaryGreen} />
-                        <Text style={styles.statusText}>Quick access to your account</Text>
+                    <View className="flex-row items-center gap-4 py-2.5">
+                        <Ionicons name="flash" size={24} color="#8EBA6B" />
+                        <Text className="text-sm text-text-dark flex-1">Quick access to your account</Text>
                     </View>
-                    <View style={styles.statusRow}>
-                        <Ionicons name="settings" size={24} color={colors.primaryGreen} />
-                        <Text style={styles.statusText}>Can be changed anytime</Text>
+                    <View className="flex-row items-center gap-4 py-2.5">
+                        <Ionicons name="settings" size={24} color="#8EBA6B" />
+                        <Text className="text-sm text-text-dark flex-1">Can be changed anytime</Text>
                     </View>
                 </View>
 
                 {/* Buttons */}
                 <TouchableOpacity
-                    style={styles.enableButton}
+                    className="bg-dark-brown flex-row items-center justify-center py-5 rounded-3xl w-full gap-2.5"
                     onPress={handleEnableFingerprint}
                 >
-                    <Ionicons name="finger-print" size={20} color={colors.textLight} />
-                    <Text style={styles.enableButtonText}>Enable Fingerprint</Text>
+                    <Ionicons name="finger-print" size={20} color="#FFFFFF" />
+                    <Text className="text-white text-lg font-bold">Enable Fingerprint</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={styles.skipButton}
+                    className="py-4 mt-4"
                     onPress={handleSkip}
                 >
-                    <Text style={styles.skipButtonText}>Skip for now</Text>
+                    <Text className="text-primary-green text-base font-semibold">Skip for now</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    stepIndicator: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    stepText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.darkBrown,
-    },
-    stepNumber: {
-        fontSize: 12,
-        color: colors.placeholderText,
-        marginTop: 2,
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: 20,
-        alignItems: 'center',
-    },
-    illustrationContainer: {
-        marginTop: 40,
-        marginBottom: 30,
-        position: 'relative',
-    },
-    fingerprintCircle: {
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 10,
-        elevation: 5,
-    },
-    successBadge: {
-        position: 'absolute',
-        bottom: 10,
-        right: 10,
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: colors.primaryGreen,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-        textAlign: 'center',
-        marginBottom: 15,
-    },
-    subtitle: {
-        fontSize: 14,
-        color: colors.placeholderText,
-        textAlign: 'center',
-        lineHeight: 22,
-        marginBottom: 30,
-        paddingHorizontal: 20,
-    },
-    statusCard: {
-        backgroundColor: colors.textLight,
-        borderRadius: 20,
-        padding: 20,
-        width: '100%',
-        marginBottom: 30,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-        elevation: 2,
-    },
-    statusRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 15,
-        paddingVertical: 10,
-    },
-    statusText: {
-        fontSize: 14,
-        color: colors.textDark,
-        flex: 1,
-    },
-    enableButton: {
-        backgroundColor: colors.darkBrown,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 18,
-        borderRadius: 25,
-        width: '100%',
-        gap: 10,
-    },
-    enableButtonText: {
-        color: colors.textLight,
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    skipButton: {
-        paddingVertical: 15,
-        marginTop: 15,
-    },
-    skipButtonText: {
-        color: colors.primaryGreen,
-        fontSize: 16,
-        fontWeight: '600',
-    },
-});
 
 export default FingerprintSetupScreen;

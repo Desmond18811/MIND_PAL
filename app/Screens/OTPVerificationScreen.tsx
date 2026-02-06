@@ -4,33 +4,22 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
     StatusBar,
-    Dimensions,
     Alert,
+    KeyboardAvoidingView,
+    ScrollView,
+    Platform
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-
-const colors = {
-    primaryGreen: '#8EBA6B',
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    textLight: '#FFFFFF',
-    borderColor: '#8DC63F',
-    placeholderText: '#A0A0A0',
-    lightGray: '#E0E0E0',
-    successGreen: '#4CAF50',
-};
+import "../global.css";
 
 const OTPVerificationScreen = ({ navigation, route }) => {
+    const insets = useSafeAreaInsets();
     const [otp, setOtp] = useState(['', '', '', '']);
     const [timer, setTimer] = useState(60);
     const [canResend, setCanResend] = useState(false);
-    const inputRefs = useRef([]);
+    const inputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
         if (timer > 0) {
@@ -43,18 +32,17 @@ const OTPVerificationScreen = ({ navigation, route }) => {
         }
     }, [timer]);
 
-    const handleOtpChange = (value, index) => {
+    const handleOtpChange = (value: string, index: number) => {
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
-        // Auto-focus next input
         if (value && index < 3) {
             inputRefs.current[index + 1]?.focus();
         }
     };
 
-    const handleKeyPress = (e, index) => {
+    const handleKeyPress = (e: any, index: number) => {
         if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
             inputRefs.current[index - 1]?.focus();
         }
@@ -73,239 +61,107 @@ const OTPVerificationScreen = ({ navigation, route }) => {
             Alert.alert('Invalid OTP', 'Please enter the complete 4-digit OTP.');
             return;
         }
-        // Navigate to next screen
-        navigation.navigate('FingerprintSetup', {
-            ...route.params,
-            otpVerified: true,
-        });
+        // Navigate to Reset Password if it's for pw reset, or Home if signup verification
+        // For this flow (auth), let's assume it leads to ResetPassword
+        navigation.navigate('ResetPassword');
     };
 
     const canContinue = otp.every(digit => digit !== '');
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.lightBeige} />
+        <View className="flex-1 bg-white">
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Ionicons name="chevron-back" size={24} color={colors.darkBrown} />
-                </TouchableOpacity>
-                <View style={styles.stepIndicator}>
-                    <Text style={styles.stepText}>OTP Setup</Text>
-                    <Text style={styles.stepNumber}>Step 3/6</Text>
+            {/* Green Header */}
+            <View
+                className="bg-[#A8C789] w-full items-center pt-8 pb-12 rounded-b-[40px] absolute top-0 z-0"
+                style={{ paddingTop: insets.top + 20, height: 220 }}
+            >
+                <View className="w-full px-6 flex-row items-center justify-between">
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        className="w-10 h-10 rounded-full bg-white/20 items-center justify-center"
+                    >
+                        <Ionicons name="chevron-back" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text className="text-white text-lg font-bold">Verification</Text>
+                    <View className="w-10" />
                 </View>
             </View>
 
-            {/* Illustration */}
-            <View style={styles.illustrationContainer}>
-                <View style={styles.illustrationBox}>
-                    <Ionicons name="shield-checkmark" size={60} color={colors.primaryGreen} />
-                </View>
-            </View>
-
-            <View style={styles.content}>
-                <Text style={styles.title}>Enter 4-Digit OTP Code</Text>
-                <Text style={styles.subtitle}>
-                    We sent a 4-digit OTP code to your email address. Please enter the code below.
-                </Text>
-
-                {/* OTP Inputs */}
-                <View style={styles.otpContainer}>
-                    {otp.map((digit, index) => (
-                        <TextInput
-                            key={index}
-                            ref={ref => inputRefs.current[index] = ref}
-                            style={[
-                                styles.otpInput,
-                                digit && styles.otpInputFilled,
-                            ]}
-                            value={digit}
-                            onChangeText={(value) => handleOtpChange(value.replace(/[^0-9]/g, ''), index)}
-                            onKeyPress={(e) => handleKeyPress(e, index)}
-                            keyboardType="number-pad"
-                            maxLength={1}
-                            selectTextOnFocus
-                        />
-                    ))}
-                </View>
-
-                {/* Timer */}
-                <View style={styles.timerContainer}>
-                    <Ionicons name="time-outline" size={20} color={colors.placeholderText} />
-                    <Text style={styles.timerText}>
-                        {timer > 0 ? `Resend in ${timer}s` : 'You can resend now'}
-                    </Text>
-                </View>
-
-                {/* Resend Button */}
-                <TouchableOpacity
-                    style={[styles.resendButton, !canResend && styles.resendButtonDisabled]}
-                    onPress={handleResend}
-                    disabled={!canResend}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+            >
+                <ScrollView
+                    className="flex-1 bg-transparent"
+                    contentContainerStyle={{ paddingTop: 180, paddingHorizontal: 24, paddingBottom: 40 }}
+                    showsVerticalScrollIndicator={false}
                 >
-                    <Text style={[styles.resendText, !canResend && styles.resendTextDisabled]}>
-                        Resend OTP
-                    </Text>
-                </TouchableOpacity>
+                    <View className="bg-white rounded-t-[30px] pt-6 items-center">
+                        <Text className="text-3xl font-bold text-[#4A3B32] mb-4 text-center">Enter 4-Digit OTP Code</Text>
+                        <Text className="text-base text-[#4A3B32] text-center opacity-70 leading-6 mb-10 px-4">
+                            We sent a 4-digit OTP code to your email address. Please enter the code below.
+                        </Text>
 
-                {/* Verify Button */}
-                <TouchableOpacity
-                    style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}
-                    onPress={handleVerify}
-                    disabled={!canContinue}
-                >
-                    <Text style={styles.continueButtonText}>Confirm</Text>
-                    <Ionicons name="arrow-forward" size={20} color={colors.textLight} />
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+                        {/* OTP Inputs */}
+                        <View className="flex-row justify-center gap-4 mb-10">
+                            {otp.map((digit, index) => (
+                                <TextInput
+                                    key={index}
+                                    ref={ref => inputRefs.current[index] = ref}
+                                    className={`w-14 h-14 rounded-[20px] border-2 text-2xl font-bold text-center text-[#4A3B32] ${digit ? 'border-[#8EAA79] bg-[#F5FAF2]' : 'border-[#E0E0E0] bg-white'}`}
+                                    value={digit}
+                                    onChangeText={(value) => handleOtpChange(value.replace(/[^0-9]/g, ''), index)}
+                                    onKeyPress={(e) => handleKeyPress(e, index)}
+                                    keyboardType="number-pad"
+                                    maxLength={1}
+                                    selectTextOnFocus
+                                    // Add shadow slightly
+                                    style={{
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 2 },
+                                        shadowOpacity: 0.05,
+                                        shadowRadius: 3,
+                                        elevation: 2
+                                    }}
+                                />
+                            ))}
+                        </View>
+
+                        {/* Timer */}
+                        <View className="flex-row justify-center items-center gap-2 mb-8">
+                            <Ionicons name="time-outline" size={20} color="#8EAA79" />
+                            <Text className="text-sm text-[#4A3B32] font-medium">
+                                {timer > 0 ? `Resend in ${timer}s` : 'You can resend now'}
+                            </Text>
+                        </View>
+
+                        {/* Resend Button */}
+                        <TouchableOpacity
+                            className={`items-center mb-8 py-2 px-4 ${!canResend ? 'opacity-50' : ''}`}
+                            onPress={handleResend}
+                            disabled={!canResend}
+                        >
+                            <Text className={`text-base font-bold ${canResend ? 'text-[#8EAA79]' : 'text-[#A0A0A0]'}`}>
+                                Resend OTP
+                            </Text>
+                        </TouchableOpacity>
+
+                        {/* Verify Button */}
+                        <TouchableOpacity
+                            className={`bg-[#4A3B32] w-full rounded-full py-4 flex-row justify-center items-center shadow-md active:opacity-90 ${!canContinue ? 'opacity-70' : ''}`}
+                            onPress={handleVerify}
+                            disabled={!canContinue}
+                        >
+                            <Text className="text-white text-lg font-bold mr-2">Confirm</Text>
+                            <Ionicons name="arrow-forward" size={20} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    stepIndicator: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    stepText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.darkBrown,
-    },
-    stepNumber: {
-        fontSize: 12,
-        color: colors.placeholderText,
-        marginTop: 2,
-    },
-    illustrationContainer: {
-        alignItems: 'center',
-        paddingVertical: 30,
-    },
-    illustrationBox: {
-        width: 120,
-        height: 120,
-        borderRadius: 20,
-        backgroundColor: colors.textLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    subtitle: {
-        fontSize: 14,
-        color: colors.placeholderText,
-        textAlign: 'center',
-        lineHeight: 22,
-        marginBottom: 30,
-    },
-    otpContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 15,
-        marginBottom: 30,
-    },
-    otpInput: {
-        width: 60,
-        height: 60,
-        borderRadius: 15,
-        backgroundColor: colors.textLight,
-        borderWidth: 2,
-        borderColor: colors.lightGray,
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        color: colors.darkBrown,
-    },
-    otpInputFilled: {
-        borderColor: colors.primaryGreen,
-        backgroundColor: '#E8F5E8',
-    },
-    timerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 15,
-    },
-    timerText: {
-        fontSize: 14,
-        color: colors.placeholderText,
-    },
-    resendButton: {
-        alignItems: 'center',
-        marginBottom: 30,
-    },
-    resendButtonDisabled: {
-        opacity: 0.5,
-    },
-    resendText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: colors.primaryGreen,
-    },
-    resendTextDisabled: {
-        color: colors.placeholderText,
-    },
-    continueButton: {
-        backgroundColor: colors.darkBrown,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 18,
-        borderRadius: 25,
-        marginTop: 'auto',
-        marginBottom: 30,
-        gap: 10,
-    },
-    continueButtonDisabled: {
-        opacity: 0.5,
-    },
-    continueButtonText: {
-        color: colors.textLight,
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-});
 
 export default OTPVerificationScreen;

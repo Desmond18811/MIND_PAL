@@ -1,7 +1,9 @@
+import "./global.css";
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 
 import WelcomeScreen from './Screens/Welcome';
 import OnboardingScreen from './Screens/OnboardingScreen';

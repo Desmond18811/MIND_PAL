@@ -51,7 +51,7 @@ import {
 } from '../types/types';
 
 // Configuration
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://mind-pal-jgpr.onrender.com/api';
 const TOKEN_KEY = '@mindpal_token';
 
 // Create axios instance

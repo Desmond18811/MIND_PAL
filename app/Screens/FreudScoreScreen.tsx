@@ -3,34 +3,17 @@ import {
     View,
     Text,
     TouchableOpacity,
-    StyleSheet,
     StatusBar,
     ScrollView,
-    Dimensions,
-    ActivityIndicator,
     Alert,
     Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const { width } = Dimensions.get('window');
-
-const colors = {
-    primaryGreen: '#8EBA6B',
-    darkBrown: '#6D482F',
-    lightBeige: '#F3EDE4',
-    textDark: '#333333',
-    textLight: '#FFFFFF',
-    placeholderText: '#A0A0A0',
-    lightGray: '#E0E0E0',
-    orange: '#FF8C42',
-};
+import "../global.css";
 
 const FreudScoreScreen = ({ navigation }) => {
     const [score, setScore] = useState(80);
-    const [loading, setLoading] = useState(false);
     const [includeAISuggestions, setIncludeAISuggestions] = useState(true);
     const [fadeAnim] = useState(new Animated.Value(0));
     const [slideAnim] = useState(new Animated.Value(50));
@@ -59,283 +42,107 @@ const FreudScoreScreen = ({ navigation }) => {
     ];
 
     const getScoreStatus = () => {
-        if (score >= 70) return { text: 'Mentally Stable', color: colors.primaryGreen };
-        if (score >= 40) return { text: 'Needs Attention', color: colors.orange };
+        if (score >= 70) return { text: 'Mentally Stable', color: '#8EBA6B' };
+        if (score >= 40) return { text: 'Needs Attention', color: '#FF8C42' };
         return { text: 'Seek Help', color: '#9B8BB4' };
     };
 
     const status = getScoreStatus();
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor={colors.darkBrown} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#6D482F' }}>
+            <StatusBar barStyle="light-content" backgroundColor="#6D482F" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View className="flex-row items-center justify-between px-5 py-4">
                 <TouchableOpacity
-                    style={styles.backButton}
+                    className="w-10 h-10 rounded-full bg-white/20 justify-center items-center"
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="chevron-back" size={24} color={colors.textLight} />
+                    <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Pal Score</Text>
-                <TouchableOpacity style={styles.settingsButton}>
-                    <Text style={styles.manageText}>Manage</Text>
+                <Text className="text-lg font-semibold text-white">Pal Score</Text>
+                <TouchableOpacity className="px-4 py-2 rounded-2xl bg-white/20">
+                    <Text className="text-white text-sm">Manage</Text>
                 </TouchableOpacity>
             </View>
 
             {/* Score Display */}
-            <Animated.View style={[styles.scoreSection, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}>
-                <View style={styles.scoreCircle}>
-                    <Text style={styles.scoreNumber}>{score}</Text>
+            <Animated.View
+                className="items-center py-8"
+                style={{ opacity: fadeAnim, transform: [{ scale: fadeAnim }] }}
+            >
+                <View className="w-[150px] h-[150px] rounded-full bg-white/20 justify-center items-center mb-4">
+                    <Text className="text-6xl font-bold text-white">{score}</Text>
                 </View>
-                <Text style={styles.scoreStatus}>{status.text}</Text>
-                <TouchableOpacity style={styles.insightsButton}>
-                    <Ionicons name="bar-chart" size={20} color={colors.textLight} />
+                <Text className="text-lg text-white mb-4">{status.text}</Text>
+                <TouchableOpacity className="w-12 h-12 rounded-full bg-white/20 justify-center items-center">
+                    <Ionicons name="bar-chart" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
             </Animated.View>
 
             <Animated.ScrollView
-                style={[styles.content, { transform: [{ translateY: slideAnim }] }]}
+                className="flex-1 bg-light-beige rounded-t-3xl px-5 pt-6"
+                style={{ transform: [{ translateY: slideAnim }] }}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Score History Section */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Score History</Text>
+                <View className="flex-row justify-between items-center mb-4">
+                    <Text className="text-lg font-semibold text-dark-brown">Score History</Text>
                     <TouchableOpacity>
-                        <Text style={styles.seeAllText}>See All</Text>
+                        <Text className="text-sm text-primary-green">See All</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.historyContainer}>
+                <View className="bg-white rounded-2xl p-4 mb-5">
                     {scoreHistory.map((item, index) => (
-                        <View key={index} style={styles.historyItem}>
-                            <Text style={styles.historyScore}>{item.score}</Text>
-                            <View style={styles.historyDetails}>
-                                <Text style={styles.historyMood}>{item.emoji} {item.mood}</Text>
-                                <Text style={styles.historyDate}>{item.date}</Text>
+                        <View
+                            key={index}
+                            className={`flex-row items-center py-3 ${index < scoreHistory.length - 1 ? 'border-b border-light-gray' : ''
+                                }`}
+                        >
+                            <Text className="w-10 text-lg font-bold text-dark-brown">{item.score}</Text>
+                            <View className="flex-1">
+                                <Text className="text-sm text-text-dark">{item.emoji} {item.mood}</Text>
+                                <Text className="text-xs text-placeholder mt-0.5">{item.date}</Text>
                             </View>
                         </View>
                     ))}
                 </View>
 
                 {/* Toggle AI Suggestions */}
-                <View style={styles.toggleContainer}>
-                    <Text style={styles.toggleLabel}>Include AI Suggestions</Text>
+                <View className="flex-row justify-between items-center bg-white rounded-2xl p-4 mb-5">
+                    <Text className="text-base text-dark-brown">Include AI Suggestions</Text>
                     <TouchableOpacity
-                        style={[styles.toggle, includeAISuggestions && styles.toggleActive]}
+                        className={`w-12 h-7 rounded-full p-0.5 ${includeAISuggestions ? 'bg-primary-green' : 'bg-light-gray'
+                            }`}
                         onPress={() => setIncludeAISuggestions(!includeAISuggestions)}
                     >
-                        <View style={[styles.toggleKnob, includeAISuggestions && styles.toggleKnobActive]} />
+                        <View className={`w-6 h-6 rounded-full bg-white ${includeAISuggestions ? 'ml-5' : ''
+                            }`} />
                     </TouchableOpacity>
                 </View>
 
                 {/* Filter Button */}
                 <TouchableOpacity
-                    style={styles.filterButton}
+                    className="bg-dark-brown flex-row items-center justify-center py-4 rounded-3xl mb-4 gap-2.5"
                     onPress={() => Alert.alert('Filter', 'Filter feature coming soon!')}
                 >
-                    <Text style={styles.filterButtonText}>Filter Pal Score (5)</Text>
-                    <Ionicons name="options" size={20} color={colors.textLight} />
+                    <Text className="text-white text-base font-semibold">Filter Pal Score (5)</Text>
+                    <Ionicons name="options" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
 
                 {/* AI Suggestions Button */}
                 <TouchableOpacity
-                    style={styles.suggestionsButton}
+                    className="bg-white flex-row items-center justify-center py-4 rounded-3xl mb-8 gap-2.5 border-2 border-primary-green"
                     onPress={() => navigation.navigate('AISuggestions')}
                 >
-                    <Ionicons name="sparkles" size={20} color={colors.primaryGreen} />
-                    <Text style={styles.suggestionsButtonText}>Scope for AI Suggestions</Text>
+                    <Ionicons name="sparkles" size={20} color="#8EBA6B" />
+                    <Text className="text-primary-green text-base font-semibold">Scope for AI Suggestions</Text>
                 </TouchableOpacity>
             </Animated.ScrollView>
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.darkBrown,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: colors.textLight,
-    },
-    settingsButton: {
-        paddingHorizontal: 15,
-        paddingVertical: 8,
-        borderRadius: 15,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-    },
-    manageText: {
-        color: colors.textLight,
-        fontSize: 14,
-    },
-    scoreSection: {
-        alignItems: 'center',
-        paddingVertical: 30,
-    },
-    scoreCircle: {
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 15,
-    },
-    scoreNumber: {
-        fontSize: 56,
-        fontWeight: 'bold',
-        color: colors.textLight,
-    },
-    scoreStatus: {
-        fontSize: 18,
-        color: colors.textLight,
-        marginBottom: 15,
-    },
-    insightsButton: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    content: {
-        flex: 1,
-        backgroundColor: colors.lightBeige,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingHorizontal: 20,
-        paddingTop: 25,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 15,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: colors.darkBrown,
-    },
-    seeAllText: {
-        fontSize: 14,
-        color: colors.primaryGreen,
-    },
-    historyContainer: {
-        backgroundColor: colors.textLight,
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 20,
-    },
-    historyItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.lightGray,
-    },
-    historyScore: {
-        width: 40,
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: colors.darkBrown,
-    },
-    historyDetails: {
-        flex: 1,
-    },
-    historyMood: {
-        fontSize: 14,
-        color: colors.textDark,
-    },
-    historyDate: {
-        fontSize: 12,
-        color: colors.placeholderText,
-        marginTop: 2,
-    },
-    toggleContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: colors.textLight,
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 20,
-    },
-    toggleLabel: {
-        fontSize: 16,
-        color: colors.darkBrown,
-    },
-    toggle: {
-        width: 50,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: colors.lightGray,
-        padding: 2,
-    },
-    toggleActive: {
-        backgroundColor: colors.primaryGreen,
-    },
-    toggleKnob: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: colors.textLight,
-    },
-    toggleKnobActive: {
-        marginLeft: 22,
-    },
-    filterButton: {
-        backgroundColor: colors.darkBrown,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 15,
-        borderRadius: 25,
-        marginBottom: 15,
-        gap: 10,
-    },
-    filterButtonText: {
-        color: colors.textLight,
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    suggestionsButton: {
-        backgroundColor: colors.textLight,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 15,
-        borderRadius: 25,
-        marginBottom: 30,
-        gap: 10,
-        borderWidth: 2,
-        borderColor: colors.primaryGreen,
-    },
-    suggestionsButtonText: {
-        color: colors.primaryGreen,
-        fontSize: 16,
-        fontWeight: '600',
-    },
-});
 
 export default FreudScoreScreen;
