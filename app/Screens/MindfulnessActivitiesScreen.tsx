@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const MindfulnessActivitiesScreen = ({ navigation, route }) => {
+const MindfulnessActivitiesScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const [showCompletedModal, setShowCompletedModal] = useState(false);
     const fadeAnim = React.useRef(new Animated.Value(0)).current;
     const slideAnim = React.useRef(new Animated.Value(50)).current;

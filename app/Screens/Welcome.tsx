@@ -9,7 +9,7 @@ const { width, height } = Dimensions.get('window');
 // Assuming illustration.png is the robot character
 const WelcomeIllustration = require('../assets/illustration.png');
 
-const WelcomeScreen = ({ navigation }) => {
+const WelcomeScreen = ({ navigation }: { navigation: any }) => {
   const handleGetStarted = () => {
     navigation.navigate('Onboarding');
   };

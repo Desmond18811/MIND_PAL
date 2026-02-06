@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const FreudScoreResultScreen = ({ navigation, route }) => {
+const FreudScoreResultScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const score = route.params?.score || 80;
     const animatedScore = useRef(new Animated.Value(0)).current;
     const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -103,11 +103,11 @@ const FreudScoreResultScreen = ({ navigation, route }) => {
     );
 };
 
-const AnimatedScore = ({ value }) => {
+const AnimatedScore = ({ value }: { value: Animated.Value }) => {
     const [displayValue, setDisplayValue] = React.useState(0);
 
     React.useEffect(() => {
-        const listener = value.addListener(({ value: v }) => {
+        const listener = value.addListener(({ value: v }: { value: number }) => {
             setDisplayValue(Math.round(v));
         });
         return () => value.removeListener(listener);

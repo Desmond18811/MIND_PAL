@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const ForgotPasswordScreen = ({ navigation }) => {
+const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
   const insets = useSafeAreaInsets();
   const [resetMethod, setResetMethod] = useState<'2fa' | 'password'>('password'); // Defaulting to email ('password' refers to email in this context based on UI)
   const [loading, setLoading] = useState(false);

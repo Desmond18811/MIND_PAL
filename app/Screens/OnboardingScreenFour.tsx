@@ -2,7 +2,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import OnboardingLayout from '../components/OnboardingLayout';
 
-const OnboardingScreenFour = ({ navigation }) => {
+const OnboardingScreenFour = ({ navigation }: { navigation: any }) => {
   return (
     <OnboardingLayout
       backgroundColor="#FFF4E0" // Light Yellow

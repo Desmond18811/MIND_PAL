@@ -1,0 +1,3618 @@
+diff --git a/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.d.ts b/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.d.ts
+index ea95a98..7a80af2 100644
+--- a/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.d.ts
++++ b/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.d.ts
+@@ -7,8 +7,8 @@
+  * @format
+  */
+ 
+-import {ProcessedColorValue} from '../StyleSheet/processColor';
+-import {ColorValue} from '../StyleSheet/StyleSheet';
++import { ProcessedColorValue } from 'react-native/Libraries/StyleSheet/processColor';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ /**
+  * @see: https://reactnative.dev/docs/actionsheetios#content
+diff --git a/node_modules/react-native/Libraries/Animated/Animated.d.ts b/node_modules/react-native/Libraries/Animated/Animated.d.ts
+index aeeb981..cd1a544 100644
+--- a/node_modules/react-native/Libraries/Animated/Animated.d.ts
++++ b/node_modules/react-native/Libraries/Animated/Animated.d.ts
+@@ -8,18 +8,18 @@
+  */
+ 
+ import type * as React from 'react';
+-import {ScrollView} from '../Components/ScrollView/ScrollView';
+-import {View} from '../Components/View/View';
+-import {Image} from '../Image/Image';
+-import {FlatListComponent, FlatListProps} from '../Lists/FlatList';
++import { ScrollView } from 'react-native/Libraries/Components/ScrollView/ScrollView';
++import { View } from 'react-native/Libraries/Components/View/View';
++import { Image } from 'react-native/Libraries/Image/Image';
++import { FlatListComponent, FlatListProps } from 'react-native/Libraries/Lists/FlatList';
+ import {
+   DefaultSectionT,
+   SectionListComponent,
+   SectionListProps,
+-} from '../Lists/SectionList';
+-import {ColorValue} from '../StyleSheet/StyleSheet';
+-import {Text} from '../Text/Text';
+-import {NativeSyntheticEvent} from '../Types/CoreEventTypes';
++} from 'react-native/Libraries/Lists/SectionList';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { Text } from 'react-native/Libraries/Text/Text';
++import { NativeSyntheticEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ export namespace Animated {
+   type AnimatedValue = Value;
+@@ -118,7 +118,7 @@ export namespace Animated {
+     extrapolateRight?: ExtrapolateType | undefined;
+   };
+ 
+-  type ValueListenerCallback = (state: {value: number}) => void;
++  type ValueListenerCallback = (state: { value: number }) => void;
+ 
+   type Animation = {
+     start(
+@@ -207,7 +207,7 @@ export namespace Animated {
+     animate(animation: Animation, callback?: EndCallback | null): void;
+   }
+ 
+-  type ValueXYListenerCallback = (value: {x: number; y: number}) => void;
++  type ValueXYListenerCallback = (value: { x: number; y: number }) => void;
+ 
+   /**
+    * 2D Value for driving 2D animations, such as pan gestures.  Almost identical
+@@ -219,21 +219,21 @@ export namespace Animated {
+     y: AnimatedValue;
+ 
+     constructor(
+-      valueIn?: {x: number | AnimatedValue; y: number | AnimatedValue},
++      valueIn?: { x: number | AnimatedValue; y: number | AnimatedValue },
+       config?: AnimatedConfig | null,
+     );
+ 
+-    setValue(value: {x: number; y: number}): void;
++    setValue(value: { x: number; y: number }): void;
+ 
+-    setOffset(offset: {x: number; y: number}): void;
++    setOffset(offset: { x: number; y: number }): void;
+ 
+     flattenOffset(): void;
+ 
+     extractOffset(): void;
+ 
+-    resetAnimation(callback?: (value: {x: number; y: number}) => void): void;
++    resetAnimation(callback?: (value: { x: number; y: number }) => void): void;
+ 
+-    stopAnimation(callback?: (value: {x: number; y: number}) => void): void;
++    stopAnimation(callback?: (value: { x: number; y: number }) => void): void;
+ 
+     addListener(callback: ValueXYListenerCallback): string;
+ 
+@@ -246,7 +246,7 @@ export namespace Animated {
+      *  style={this.state.anim.getLayout()}
+      *```
+      */
+-    getLayout(): {[key: string]: AnimatedValue};
++    getLayout(): { [key: string]: AnimatedValue };
+ 
+     /**
+      * Converts `{x, y}` into a useable translation transform, e.g.
+@@ -258,12 +258,12 @@ export namespace Animated {
+      *```
+      */
+     getTranslateTransform(): [
+-      {translateX: AnimatedValue},
+-      {translateY: AnimatedValue},
++      { translateX: AnimatedValue },
++      { translateY: AnimatedValue },
+     ];
+   }
+ 
+-  type EndResult = {finished: boolean};
++  type EndResult = { finished: boolean };
+   type EndCallback = (result: EndResult) => void;
+ 
+   export interface CompositeAnimation {
+@@ -308,7 +308,7 @@ export namespace Animated {
+   ): CompositeAnimation;
+ 
+   interface DecayAnimationConfig extends AnimationConfig {
+-    velocity: number | {x: number; y: number};
++    velocity: number | { x: number; y: number };
+     deceleration?: number | undefined;
+   }
+ 
+@@ -323,11 +323,11 @@ export namespace Animated {
+ 
+   interface TimingAnimationConfig extends AnimationConfig {
+     toValue:
+-      | number
+-      | AnimatedValue
+-      | {x: number; y: number}
+-      | AnimatedValueXY
+-      | AnimatedInterpolation<number>;
++    | number
++    | AnimatedValue
++    | { x: number; y: number }
++    | AnimatedValueXY
++    | AnimatedInterpolation<number>;
+     easing?: ((value: number) => number) | undefined;
+     duration?: number | undefined;
+     delay?: number | undefined;
+@@ -335,17 +335,17 @@ export namespace Animated {
+ 
+   interface SpringAnimationConfig extends AnimationConfig {
+     toValue:
+-      | number
+-      | AnimatedValue
+-      | {x: number; y: number}
+-      | AnimatedValueXY
+-      | RgbaValue
+-      | AnimatedColor
+-      | AnimatedInterpolation<number>;
++    | number
++    | AnimatedValue
++    | { x: number; y: number }
++    | AnimatedValueXY
++    | RgbaValue
++    | AnimatedColor
++    | AnimatedInterpolation<number>;
+     overshootClamping?: boolean | undefined;
+     restDisplacementThreshold?: number | undefined;
+     restSpeedThreshold?: number | undefined;
+-    velocity?: number | {x: number; y: number} | undefined;
++    velocity?: number | { x: number; y: number } | undefined;
+     bounciness?: number | undefined;
+     speed?: number | undefined;
+     tension?: number | undefined;
+@@ -375,7 +375,7 @@ export namespace Animated {
+ 
+   class AnimatedAddition<
+     OutputT extends number | string,
+-  > extends AnimatedInterpolation<OutputT> {}
++  > extends AnimatedInterpolation<OutputT> { }
+ 
+   /**
+    * Creates a new Animated value composed by subtracting the second Animated
+@@ -388,7 +388,7 @@ export namespace Animated {
+ 
+   class AnimatedSubtraction<
+     OutputT extends number | string,
+-  > extends AnimatedInterpolation<OutputT> {}
++  > extends AnimatedInterpolation<OutputT> { }
+ 
+   /**
+    * Creates a new Animated value composed by dividing the first Animated
+@@ -401,7 +401,7 @@ export namespace Animated {
+ 
+   class AnimatedDivision<
+     OutputT extends number | string,
+-  > extends AnimatedInterpolation<OutputT> {}
++  > extends AnimatedInterpolation<OutputT> { }
+ 
+   /**
+    * Creates a new Animated value composed from two Animated values multiplied
+@@ -414,7 +414,7 @@ export namespace Animated {
+ 
+   class AnimatedMultiplication<
+     OutputT extends number | string,
+-  > extends AnimatedInterpolation<OutputT> {}
++  > extends AnimatedInterpolation<OutputT> { }
+ 
+   /**
+    * Creates a new Animated value that is the (non-negative) modulo of the
+@@ -427,7 +427,7 @@ export namespace Animated {
+ 
+   class AnimatedModulo<
+     OutputT extends number | string,
+-  > extends AnimatedInterpolation<OutputT> {}
++  > extends AnimatedInterpolation<OutputT> { }
+ 
+   /**
+    * Create a new Animated value that is limited between 2 values. It uses the
+@@ -446,7 +446,7 @@ export namespace Animated {
+ 
+   class AnimatedDiffClamp<
+     OutputT extends number | string,
+-  > extends AnimatedInterpolation<OutputT> {}
++  > extends AnimatedInterpolation<OutputT> { }
+ 
+   /**
+    * Starts an animation after the given delay.
+@@ -507,7 +507,7 @@ export namespace Animated {
+     config?: ParallelConfig,
+   ): CompositeAnimation;
+ 
+-  type Mapping = {[key: string]: Mapping} | AnimatedValue;
++  type Mapping = { [key: string]: Mapping } | AnimatedValue;
+   interface EventConfig<T> {
+     listener?: ((event: NativeSyntheticEvent<T>) => void) | undefined;
+     useNativeDriver: boolean;
+@@ -540,13 +540,13 @@ export namespace Animated {
+     ? P
+     : never;
+ 
+-  export type LegacyRef<C> = {getNode(): C};
++  export type LegacyRef<C> = { getNode(): C };
+ 
+   type Nullable = undefined | null;
+   type Primitive = string | number | boolean | symbol;
+   type Builtin = Function | Date | Error | RegExp;
+ 
+-  interface WithAnimatedArray<P> extends Array<WithAnimatedValue<P>> {}
++  interface WithAnimatedArray<P> extends Array<WithAnimatedValue<P>> { }
+   type WithAnimatedObject<T> = {
+     [K in keyof T]: WithAnimatedValue<T[K]>;
+   };
+@@ -565,20 +565,20 @@ export namespace Animated {
+ 
+   type TAugmentRef<T> = T extends React.Ref<infer R>
+     ? unknown extends R
+-      ? never
+-      : React.Ref<R | LegacyRef<R>>
++    ? never
++    : React.Ref<R | LegacyRef<R>>
+     : never;
+ 
+   export type AnimatedProps<T> = {
+     [key in keyof T]: key extends NonAnimatedProps
+-      ? key extends 'ref'
+-        ? TAugmentRef<T[key]>
+-        : T[key]
+-      : WithAnimatedValue<T[key]>;
++    ? key extends 'ref'
++    ? TAugmentRef<T[key]>
++    : T[key]
++    : WithAnimatedValue<T[key]>;
+   };
+ 
+   export interface AnimatedComponent<T extends React.ComponentType<any>>
+-    extends React.FC<AnimatedProps<React.ComponentPropsWithRef<T>>> {}
++    extends React.FC<AnimatedProps<React.ComponentPropsWithRef<T>>> { }
+ 
+   export type AnimatedComponentOptions = {
+     collapsable?: boolean | undefined;
+@@ -608,14 +608,14 @@ export namespace Animated {
+   export class FlatList<ItemT = any> extends FlatListComponent<
+     ItemT,
+     AnimatedProps<FlatListProps<ItemT>>
+-  > {}
++  > { }
+ 
+   export class SectionList<
+     ItemT = any,
+     SectionT = DefaultSectionT,
+   > extends SectionListComponent<
+     AnimatedProps<SectionListProps<ItemT, SectionT>>
+-  > {}
++  > { }
+ }
+ 
+ // We need to alias these views so we can reference them in the Animated
+diff --git a/node_modules/react-native/Libraries/Animated/useAnimatedValue.d.ts b/node_modules/react-native/Libraries/Animated/useAnimatedValue.d.ts
+index 69e5a59..dd12c72 100644
+--- a/node_modules/react-native/Libraries/Animated/useAnimatedValue.d.ts
++++ b/node_modules/react-native/Libraries/Animated/useAnimatedValue.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import type {Animated} from './Animated';
++import type { Animated } from 'react-native/Libraries/Animated/Animated';
+ 
+ export function useAnimatedValue(
+   initialValue: number,
+diff --git a/node_modules/react-native/Libraries/AppState/AppState.d.ts b/node_modules/react-native/Libraries/AppState/AppState.d.ts
+index 6333c81..ef8d1ea 100644
+--- a/node_modules/react-native/Libraries/AppState/AppState.d.ts
++++ b/node_modules/react-native/Libraries/AppState/AppState.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {NativeEventSubscription} from '../EventEmitter/RCTNativeAppEventEmitter';
++import { NativeEventSubscription } from 'react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter';
+ 
+ /**
+  * AppState can tell you if the app is in the foreground or background,
+diff --git a/node_modules/react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo.d.ts b/node_modules/react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo.d.ts
+index fea5588..bb7c866 100644
+--- a/node_modules/react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo.d.ts
++++ b/node_modules/react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo.d.ts
+@@ -7,8 +7,8 @@
+  * @format
+  */
+ 
+-import {HostInstance} from '../../../types/public/ReactNativeTypes';
+-import {EmitterSubscription} from '../../vendor/emitter/EventEmitter';
++import { HostInstance } from 'react-native/types/public/ReactNativeTypes';
++import { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ type AccessibilityChangeEventName =
+   | 'change' // deprecated, maps to screenReaderChanged
+@@ -153,7 +153,7 @@ export interface AccessibilityInfoStatic {
+    */
+   announceForAccessibilityWithOptions(
+     announcement: string,
+-    options: {queue?: boolean | undefined},
++    options: { queue?: boolean | undefined },
+   ): void;
+ 
+   /**
+diff --git a/node_modules/react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.d.ts b/node_modules/react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.d.ts
+index f1a4b24..d39c0d6 100644
+--- a/node_modules/react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.d.ts
++++ b/node_modules/react-native/Libraries/Components/ActivityIndicator/ActivityIndicator.d.ts
+@@ -8,12 +8,12 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
+-import {LayoutChangeEvent} from '../../Types/CoreEventTypes';
+-import {ViewProps} from '../View/ViewPropTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++import { LayoutChangeEvent } from 'react-native/Libraries/Types/CoreEventTypes';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ /**
+  * @see https://reactnative.dev/docs/activityindicator#props
+@@ -45,10 +45,8 @@ export interface ActivityIndicatorProps extends ViewProps {
+   style?: StyleProp<ViewStyle> | undefined;
+ }
+ 
+-declare class ActivityIndicatorComponent extends React.Component<ActivityIndicatorProps> {}
+-declare const ActivityIndicatorBase: Constructor<NativeMethods> &
+-  typeof ActivityIndicatorComponent;
+-export class ActivityIndicator extends ActivityIndicatorBase {}
++export class ActivityIndicator extends React.Component<ActivityIndicatorProps> { }
++export interface ActivityIndicator extends NativeMethods { }
+ 
+ /**
+  * @see https://reactnative.dev/docs/activityindicatorios#props
+diff --git a/node_modules/react-native/Libraries/Components/Button.d.ts b/node_modules/react-native/Libraries/Components/Button.d.ts
+index 7063071..3792852 100644
+--- a/node_modules/react-native/Libraries/Components/Button.d.ts
++++ b/node_modules/react-native/Libraries/Components/Button.d.ts
+@@ -8,9 +8,9 @@
+  */
+ 
+ import type * as React from 'react';
+-import {ColorValue} from '../StyleSheet/StyleSheet';
+-import {TouchableNativeFeedbackProps} from './Touchable/TouchableNativeFeedback';
+-import {TouchableOpacityProps} from './Touchable/TouchableOpacity';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { TouchableNativeFeedbackProps } from 'react-native/Libraries/Components/Touchable/TouchableNativeFeedback';
++import { TouchableOpacityProps } from 'react-native/Libraries/Components/Touchable/TouchableOpacity';
+ 
+ export interface ButtonProps
+   extends Pick<
+@@ -39,4 +39,4 @@ export interface ButtonProps
+   color?: ColorValue | undefined;
+ }
+ 
+-export class Button extends React.Component<ButtonProps> {}
++export class Button extends React.Component<ButtonProps> { }
+diff --git a/node_modules/react-native/Libraries/Components/DrawerAndroid/DrawerLayoutAndroid.d.ts b/node_modules/react-native/Libraries/Components/DrawerAndroid/DrawerLayoutAndroid.d.ts
+index e6756ff..234ed33 100644
+--- a/node_modules/react-native/Libraries/Components/DrawerAndroid/DrawerLayoutAndroid.d.ts
++++ b/node_modules/react-native/Libraries/Components/DrawerAndroid/DrawerLayoutAndroid.d.ts
+@@ -8,17 +8,17 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue} from '../../StyleSheet/StyleSheet';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ import {
+   NativeSyntheticEvent,
+   NativeTouchEvent,
+-} from '../../Types/CoreEventTypes';
+-import {ViewProps} from '../View/ViewPropTypes';
++} from 'react-native/Libraries/Types/CoreEventTypes';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ export interface DrawerSlideEvent
+-  extends NativeSyntheticEvent<NativeTouchEvent> {}
++  extends NativeSyntheticEvent<NativeTouchEvent> { }
+ 
+ /**
+  * @see DrawerLayoutAndroid.android.js
+@@ -98,8 +98,8 @@ export interface DrawerLayoutAndroidProps extends ViewProps {
+    *   it's closing or opening animation
+    */
+   onDrawerStateChanged?:
+-    | ((event: 'Idle' | 'Dragging' | 'Settling') => void)
+-    | undefined;
++  | ((event: 'Idle' | 'Dragging' | 'Settling') => void)
++  | undefined;
+ 
+   /**
+    * The navigation view that will be rendered to the side of the
+@@ -120,7 +120,7 @@ interface DrawerPosition {
+   Right: number;
+ }
+ 
+-declare class DrawerLayoutAndroidComponent extends React.Component<DrawerLayoutAndroidProps> {}
++declare class DrawerLayoutAndroidComponent extends React.Component<DrawerLayoutAndroidProps> { }
+ declare const DrawerLayoutAndroidBase: Constructor<NativeMethods> &
+   typeof DrawerLayoutAndroidComponent;
+ export class DrawerLayoutAndroid extends DrawerLayoutAndroidBase {
+diff --git a/node_modules/react-native/Libraries/Components/Keyboard/Keyboard.d.ts b/node_modules/react-native/Libraries/Components/Keyboard/Keyboard.d.ts
+index 062016e..154804d 100644
+--- a/node_modules/react-native/Libraries/Components/Keyboard/Keyboard.d.ts
++++ b/node_modules/react-native/Libraries/Components/Keyboard/Keyboard.d.ts
+@@ -7,8 +7,8 @@
+  * @format
+  */
+ 
+-import {NativeEventEmitter} from '../../EventEmitter/NativeEventEmitter';
+-import {EmitterSubscription} from '../../vendor/emitter/EventEmitter';
++import { NativeEventEmitter } from 'react-native/Libraries/EventEmitter/NativeEventEmitter';
++import { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ export type KeyboardEventName =
+   | 'keyboardWillShow'
+diff --git a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.d.ts b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.d.ts
+index 42bff4a..a09c579 100644
+--- a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.d.ts
++++ b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.d.ts
+@@ -8,20 +8,18 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {TimerMixin} from '../../../types/private/TimerMixin';
+-import {StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
+-import {ViewProps} from '../View/ViewPropTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { TimerMixin } from 'react-native/types/private/TimerMixin';
++import { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ /**
+  * It is a component to solve the common problem of views that need to move out of the way of the virtual keyboard.
+  * It can automatically adjust either its position or bottom padding based on the position of the keyboard.
+  */
+-declare class KeyboardAvoidingViewComponent extends React.Component<KeyboardAvoidingViewProps> {}
+-declare const KeyboardAvoidingViewBase: Constructor<TimerMixin> &
+-  typeof KeyboardAvoidingViewComponent;
+-export class KeyboardAvoidingView extends KeyboardAvoidingViewBase {}
++export class KeyboardAvoidingView extends React.Component<KeyboardAvoidingViewProps> { }
++export interface KeyboardAvoidingView extends TimerMixin { }
+ 
+ export interface KeyboardAvoidingViewProps extends ViewProps {
+   behavior?: 'height' | 'position' | 'padding' | undefined;
+diff --git a/node_modules/react-native/Libraries/Components/Pressable/Pressable.d.ts b/node_modules/react-native/Libraries/Components/Pressable/Pressable.d.ts
+index cb0797f..f0ac12b 100644
+--- a/node_modules/react-native/Libraries/Components/Pressable/Pressable.d.ts
++++ b/node_modules/react-native/Libraries/Components/Pressable/Pressable.d.ts
+@@ -8,18 +8,18 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Insets} from '../../../types/public/Insets';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
++import { Insets } from 'react-native/types/public/Insets';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ import {
+   GestureResponderEvent,
+   MouseEvent,
+   NativeSyntheticEvent,
+   TargetedEvent,
+-} from '../../Types/CoreEventTypes';
+-import {View} from '../View/View';
+-import {AccessibilityProps} from '../View/ViewAccessibility';
+-import {ViewProps} from '../View/ViewPropTypes';
++} from 'react-native/Libraries/Types/CoreEventTypes';
++import { View } from 'react-native/Libraries/Components/View/View';
++import { AccessibilityProps } from 'react-native/Libraries/Components/View/ViewAccessibility';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ export interface PressableStateCallbackType {
+   readonly pressed: boolean;
+@@ -34,7 +34,7 @@ export interface PressableAndroidRippleConfig {
+ 
+ export interface PressableProps
+   extends AccessibilityProps,
+-    Omit<ViewProps, 'children' | 'style' | 'hitSlop'> {
++  Omit<ViewProps, 'children' | 'style' | 'hitSlop'> {
+   /**
+    * Called when the hover is activated to provide visual feedback.
+    */
+@@ -70,27 +70,27 @@ export interface PressableProps
+    * @platform macos windows
+    */
+   onBlur?:
+-    | null
+-    | ((event: NativeSyntheticEvent<TargetedEvent>) => void)
+-    | undefined;
++  | null
++  | ((event: NativeSyntheticEvent<TargetedEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Called after the element is focused.
+    * @platform macos windows
+    */
+   onFocus?:
+-    | null
+-    | ((event: NativeSyntheticEvent<TargetedEvent>) => void)
+-    | undefined;
++  | null
++  | ((event: NativeSyntheticEvent<TargetedEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Either children or a render prop that receives a boolean reflecting whether
+    * the component is currently pressed.
+    */
+   children?:
+-    | React.ReactNode
+-    | ((state: PressableStateCallbackType) => React.ReactNode)
+-    | undefined;
++  | React.ReactNode
++  | ((state: PressableStateCallbackType) => React.ReactNode)
++  | undefined;
+ 
+   /**
+    * Whether a press gesture can be interrupted by a parent gesture such as a
+@@ -151,9 +151,9 @@ export interface PressableProps
+    * the component is currently pressed and returns view styles.
+    */
+   style?:
+-    | StyleProp<ViewStyle>
+-    | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>)
+-    | undefined;
++  | StyleProp<ViewStyle>
++  | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>)
++  | undefined;
+ 
+   /**
+    * Duration (in milliseconds) to wait after press down before calling onPressIn.
+diff --git a/node_modules/react-native/Libraries/Components/ProgressBarAndroid/ProgressBarAndroid.d.ts b/node_modules/react-native/Libraries/Components/ProgressBarAndroid/ProgressBarAndroid.d.ts
+index a368adf..ace4c74 100644
+--- a/node_modules/react-native/Libraries/Components/ProgressBarAndroid/ProgressBarAndroid.d.ts
++++ b/node_modules/react-native/Libraries/Components/ProgressBarAndroid/ProgressBarAndroid.d.ts
+@@ -8,10 +8,10 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue} from '../../StyleSheet/StyleSheet';
+-import {ViewProps} from '../View/ViewPropTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ /**
+  * ProgressBarAndroid has been extracted from react-native core and will be removed in a future release.
+@@ -31,14 +31,14 @@ export interface ProgressBarAndroidProps extends ViewProps {
+          LargeInverse
+      */
+   styleAttr?:
+-    | 'Horizontal'
+-    | 'Normal'
+-    | 'Small'
+-    | 'Large'
+-    | 'Inverse'
+-    | 'SmallInverse'
+-    | 'LargeInverse'
+-    | undefined;
++  | 'Horizontal'
++  | 'Normal'
++  | 'Small'
++  | 'Large'
++  | 'Inverse'
++  | 'SmallInverse'
++  | 'LargeInverse'
++  | undefined;
+ 
+   /**
+    * If the progress bar will show indeterminate progress.
+@@ -71,7 +71,7 @@ export interface ProgressBarAndroidProps extends ViewProps {
+  * React component that wraps the Android-only `ProgressBar`. This component is used to indicate
+  * that the app is loading or there is some activity in the app.
+  */
+-declare class ProgressBarAndroidComponent extends React.Component<ProgressBarAndroidProps> {}
++declare class ProgressBarAndroidComponent extends React.Component<ProgressBarAndroidProps> { }
+ declare const ProgressBarAndroidBase: Constructor<NativeMethods> &
+   typeof ProgressBarAndroidComponent;
+ /**
+@@ -80,4 +80,4 @@ declare const ProgressBarAndroidBase: Constructor<NativeMethods> &
+  * @see https://github.com/react-native-progress-view/progress-bar-android
+  * @deprecated
+  */
+-export class ProgressBarAndroid extends ProgressBarAndroidBase {}
++export class ProgressBarAndroid extends ProgressBarAndroidBase { }
+diff --git a/node_modules/react-native/Libraries/Components/RefreshControl/RefreshControl.d.ts b/node_modules/react-native/Libraries/Components/RefreshControl/RefreshControl.d.ts
+index 81eba74..fc26ecf 100644
+--- a/node_modules/react-native/Libraries/Components/RefreshControl/RefreshControl.d.ts
++++ b/node_modules/react-native/Libraries/Components/RefreshControl/RefreshControl.d.ts
+@@ -8,10 +8,10 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue} from '../../StyleSheet/StyleSheet';
+-import {ViewProps} from '../View/ViewPropTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ export interface RefreshControlPropsIOS extends ViewProps {
+   /**
+@@ -54,7 +54,7 @@ export interface RefreshControlPropsAndroid extends ViewProps {
+ 
+ export interface RefreshControlProps
+   extends RefreshControlPropsIOS,
+-    RefreshControlPropsAndroid {
++  RefreshControlPropsAndroid {
+   /**
+    * Called when the view starts refreshing.
+    */
+@@ -79,7 +79,7 @@ export interface RefreshControlProps
+  * __Note:__ `refreshing` is a controlled prop, this is why it needs to be set to true
+  * in the `onRefresh` function otherwise the refresh indicator will stop immediately.
+  */
+-declare class RefreshControlComponent extends React.Component<RefreshControlProps> {}
++declare class RefreshControlComponent extends React.Component<RefreshControlProps> { }
+ declare const RefreshControlBase: Constructor<NativeMethods> &
+   typeof RefreshControlComponent;
+ export class RefreshControl extends RefreshControlBase {
+diff --git a/node_modules/react-native/Libraries/Components/SafeAreaView/SafeAreaView.d.ts b/node_modules/react-native/Libraries/Components/SafeAreaView/SafeAreaView.d.ts
+index 6fa77f5..c39a1d2 100644
+--- a/node_modules/react-native/Libraries/Components/SafeAreaView/SafeAreaView.d.ts
++++ b/node_modules/react-native/Libraries/Components/SafeAreaView/SafeAreaView.d.ts
+@@ -8,9 +8,9 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+-import {ViewProps} from '../View/ViewPropTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ /**
+  * @deprecated
+@@ -21,7 +21,7 @@ import {ViewProps} from '../View/ViewPropTypes';
+  * Moreover, and most importantly, Safe Area's paddings reflect physical limitation of the screen,
+  * such as rounded corners or camera notches (aka sensor housing area on iPhone X).
+  */
+-declare class SafeAreaViewComponent extends React.Component<ViewProps> {}
++declare class SafeAreaViewComponent extends React.Component<ViewProps> { }
+ 
+ declare const SafeAreaViewBase: Constructor<NativeMethods> &
+   typeof SafeAreaViewComponent;
+@@ -30,4 +30,4 @@ declare const SafeAreaViewBase: Constructor<NativeMethods> &
+  * @deprecated
+  * Use `react-native-safe-area-context` instead. This component is deprecated and will be removed in a future release.
+  */
+-export class SafeAreaView extends SafeAreaViewBase {}
++export class SafeAreaView extends SafeAreaViewBase { }
+diff --git a/node_modules/react-native/Libraries/Components/ScrollView/ScrollView.d.ts b/node_modules/react-native/Libraries/Components/ScrollView/ScrollView.d.ts
+index b6e538d..763e789 100644
+--- a/node_modules/react-native/Libraries/Components/ScrollView/ScrollView.d.ts
++++ b/node_modules/react-native/Libraries/Components/ScrollView/ScrollView.d.ts
+@@ -8,19 +8,19 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {Insets} from '../../../types/public/Insets';
+-import {HostInstance} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { Insets } from 'react-native/types/public/Insets';
++import { HostInstance } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ import {
+   NativeSyntheticEvent,
+   NativeTouchEvent,
+-} from '../../Types/CoreEventTypes';
+-import {RefreshControlProps} from '../RefreshControl/RefreshControl';
+-import {Touchable} from '../Touchable/Touchable';
+-import {ViewProps} from '../View/ViewPropTypes';
+-import {View} from '../View/View';
++} from 'react-native/Libraries/Types/CoreEventTypes';
++import { RefreshControlProps } from 'react-native/Libraries/Components/RefreshControl/RefreshControl';
++import { Touchable } from 'react-native/Libraries/Components/Touchable/Touchable';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
++import { View } from 'react-native/Libraries/Components/View/View';
+ 
+ // See https://reactnative.dev/docs/scrollview#contentoffset
+ export interface PointProp {
+@@ -29,7 +29,7 @@ export interface PointProp {
+ }
+ 
+ export interface ScrollResponderEvent
+-  extends NativeSyntheticEvent<NativeTouchEvent> {}
++  extends NativeSyntheticEvent<NativeTouchEvent> { }
+ 
+ interface SubscribableMixin {
+   /**
+@@ -228,10 +228,10 @@ interface ScrollResponderMixin extends SubscribableMixin {
+     x?:
+       | number
+       | {
+-          x?: number | undefined;
+-          y?: number | undefined;
+-          animated?: boolean | undefined;
+-        },
++        x?: number | undefined;
++        y?: number | undefined;
++        animated?: boolean | undefined;
++      },
+     y?: number,
+     animated?: boolean,
+   ): void;
+@@ -410,11 +410,11 @@ export interface ScrollViewPropsIOS {
+    * The default value of this property is "never".
+    */
+   contentInsetAdjustmentBehavior?:
+-    | 'automatic'
+-    | 'scrollableAxes'
+-    | 'never'
+-    | 'always'
+-    | undefined;
++  | 'automatic'
++  | 'scrollableAxes'
++  | 'never'
++  | 'always'
++  | undefined;
+ 
+   /**
+    * When true the ScrollView will try to lock to only vertical or horizontal
+@@ -455,12 +455,12 @@ export interface ScrollViewPropsIOS {
+    * content is "visible" or not.
+    */
+   maintainVisibleContentPosition?:
+-    | null
+-    | {
+-        autoscrollToTopThreshold?: number | null | undefined;
+-        minIndexForVisible: number;
+-      }
+-    | undefined;
++  | null
++  | {
++    autoscrollToTopThreshold?: number | null | undefined;
++    minIndexForVisible: number;
++  }
++  | undefined;
+   /**
+    * The maximum allowed zoom scale. The default value is 1.0.
+    */
+@@ -523,8 +523,8 @@ export interface ScrollViewPropsIOS {
+    * @platform ios
+    */
+   onScrollToTop?:
+-    | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
++  | undefined;
+ 
+   /**
+    * The current scale of the scroll view content. The default value is 1.0.
+@@ -580,7 +580,7 @@ export interface ScrollViewPropsAndroid {
+    *
+    * @platform android
+    */
+-  fadingEdgeLength?: number | {start: number; end: number} | undefined;
++  fadingEdgeLength?: number | { start: number; end: number } | undefined;
+ 
+   /**
+    * Causes the scrollbars not to turn transparent when they are not in use. The default value is false.
+@@ -590,9 +590,9 @@ export interface ScrollViewPropsAndroid {
+ 
+ export interface ScrollViewProps
+   extends ViewProps,
+-    ScrollViewPropsIOS,
+-    ScrollViewPropsAndroid,
+-    Touchable {
++  ScrollViewPropsIOS,
++  ScrollViewPropsAndroid,
++  Touchable {
+   /**
+    * These styles will be applied to the scroll view content container which
+    * wraps all of the child views. Example:
+@@ -666,11 +666,11 @@ export interface ScrollViewProps
+    * - true, deprecated, use 'always' instead
+    */
+   keyboardShouldPersistTaps?:
+-    | boolean
+-    | 'always'
+-    | 'never'
+-    | 'handled'
+-    | undefined;
++  | boolean
++  | 'always'
++  | 'never'
++  | 'handled'
++  | undefined;
+ 
+   /**
+    * Called when scrollable content view of the ScrollView changes.
+@@ -679,43 +679,43 @@ export interface ScrollViewProps
+    *
+    */
+   onContentSizeChange?:
+-    | ((contentWidth: number, contentHeight: number) => void)
+-    | undefined;
++  | ((contentWidth: number, contentHeight: number) => void)
++  | undefined;
+ 
+   /**
+    * Fires at most once per frame during scrolling.
+    */
+   onScroll?:
+-    | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Fires if a user initiates a scroll gesture.
+    */
+   onScrollBeginDrag?:
+-    | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Fires when a user has finished scrolling.
+    */
+   onScrollEndDrag?:
+-    | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Fires when scroll view has finished moving
+    */
+   onMomentumScrollEnd?:
+-    | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Fires when scroll view has begun moving
+    */
+   onMomentumScrollBegin?:
+-    | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
++  | undefined;
+ 
+   /**
+    * When true the scroll view stops on multiples of the scroll view's size
+@@ -827,10 +827,7 @@ export interface ScrollViewProps
+   StickyHeaderComponent?: React.ComponentType<any> | undefined;
+ }
+ 
+-declare class ScrollViewComponent extends React.Component<ScrollViewProps> {}
+-export declare const ScrollViewBase: Constructor<ScrollResponderMixin> &
+-  typeof ScrollViewComponent;
+-export class ScrollView extends ScrollViewBase {
++export class ScrollView extends React.Component<ScrollViewProps> {
+   /**
+    * Scrolls to a given x, y offset, either immediately or with a smooth animation.
+    * Syntax:
+@@ -845,10 +842,10 @@ export class ScrollView extends ScrollViewBase {
+     y?:
+       | number
+       | {
+-          x?: number | undefined;
+-          y?: number | undefined;
+-          animated?: boolean | undefined;
+-        },
++        x?: number | undefined;
++        y?: number | undefined;
++        animated?: boolean | undefined;
++      },
+     deprecatedX?: number,
+     deprecatedAnimated?: boolean,
+   ): void;
+@@ -861,7 +858,7 @@ export class ScrollView extends ScrollViewBase {
+    * The options object has an animated prop, that enables the scrolling animation or not.
+    * The animated prop defaults to true
+    */
+-  scrollToEnd(options?: {animated?: boolean | undefined}): void;
++  scrollToEnd(options?: { animated?: boolean | undefined }): void;
+ 
+   /**
+    * Displays the scroll indicators momentarily.
+@@ -900,6 +897,7 @@ export class ScrollView extends ScrollViewBase {
+    */
+   setNativeProps(nativeProps: object): void;
+ }
++export interface ScrollView extends Omit<ScrollResponderMixin, 'componentWillMount'> { }
+ 
+ export interface NativeScrollRectangle {
+   left: number;
+diff --git a/node_modules/react-native/Libraries/Components/StatusBar/StatusBar.d.ts b/node_modules/react-native/Libraries/Components/StatusBar/StatusBar.d.ts
+index 53144c3..2475a71 100644
+--- a/node_modules/react-native/Libraries/Components/StatusBar/StatusBar.d.ts
++++ b/node_modules/react-native/Libraries/Components/StatusBar/StatusBar.d.ts
+@@ -8,7 +8,7 @@
+  */
+ 
+ import type * as React from 'react';
+-import {ColorValue} from '../../StyleSheet/StyleSheet';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ export type StatusBarStyle = 'default' | 'light-content' | 'dark-content';
+ 
+@@ -55,7 +55,7 @@ export interface StatusBarPropsAndroid {
+ 
+ export interface StatusBarProps
+   extends StatusBarPropsIOS,
+-    StatusBarPropsAndroid {
++  StatusBarPropsAndroid {
+   /**
+    * If the transition between status bar property changes should be
+    * animated. Supported for backgroundColor, barStyle and hidden.
+diff --git a/node_modules/react-native/Libraries/Components/Switch/Switch.d.ts b/node_modules/react-native/Libraries/Components/Switch/Switch.d.ts
+index c875390..b724118 100644
+--- a/node_modules/react-native/Libraries/Components/Switch/Switch.d.ts
++++ b/node_modules/react-native/Libraries/Components/Switch/Switch.d.ts
+@@ -8,12 +8,12 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
+-import {ViewProps} from '../View/ViewPropTypes';
+-import {NativeSyntheticEvent, TargetedEvent} from '../../Types/CoreEventTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
++import { NativeSyntheticEvent, TargetedEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ export interface SwitchPropsIOS extends ViewProps {
+   /**
+@@ -46,7 +46,7 @@ export interface SwitchChangeEventData extends TargetedEvent {
+ }
+ 
+ export interface SwitchChangeEvent
+-  extends NativeSyntheticEvent<SwitchChangeEventData> {}
++  extends NativeSyntheticEvent<SwitchChangeEventData> { }
+ 
+ export interface SwitchProps extends SwitchPropsIOS {
+   /**
+@@ -60,11 +60,11 @@ export interface SwitchProps extends SwitchPropsIOS {
+    * Color when false and color when true
+    */
+   trackColor?:
+-    | {
+-        false?: ColorValue | null | undefined;
+-        true?: ColorValue | null | undefined;
+-      }
+-    | undefined;
++  | {
++    false?: ColorValue | null | undefined;
++    true?: ColorValue | null | undefined;
++  }
++  | undefined;
+ 
+   /**
+    * If true the user won't be able to toggle the switch.
+@@ -76,9 +76,9 @@ export interface SwitchProps extends SwitchPropsIOS {
+    * Invoked with the change event as an argument when the value changes.
+    */
+   onChange?:
+-    | ((event: SwitchChangeEvent) => Promise<void> | void)
+-    | null
+-    | undefined;
++  | ((event: SwitchChangeEvent) => Promise<void> | void)
++  | null
++  | undefined;
+ 
+   /**
+    * Invoked with the new value when the value changes.
+@@ -113,6 +113,6 @@ export interface SwitchProps extends SwitchPropsIOS {
+  * If the `value` prop is not updated, the component will continue to render
+  * the supplied `value` prop instead of the expected result of any user actions.
+  */
+-declare class SwitchComponent extends React.Component<SwitchProps> {}
++declare class SwitchComponent extends React.Component<SwitchProps> { }
+ declare const SwitchBase: Constructor<NativeMethods> & typeof SwitchComponent;
+-export class Switch extends SwitchBase {}
++export class Switch extends SwitchBase { }
+diff --git a/node_modules/react-native/Libraries/Components/TextInput/InputAccessoryView.d.ts b/node_modules/react-native/Libraries/Components/TextInput/InputAccessoryView.d.ts
+index d64911f..3035a2f 100644
+--- a/node_modules/react-native/Libraries/Components/TextInput/InputAccessoryView.d.ts
++++ b/node_modules/react-native/Libraries/Components/TextInput/InputAccessoryView.d.ts
+@@ -8,8 +8,8 @@
+  */
+ 
+ import type * as React from 'react';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ 
+ /**
+  * A component which enables customization of the keyboard input accessory view on iOS. The input accessory view is
+@@ -18,7 +18,7 @@ import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
+  * To use this component wrap your custom toolbar with the InputAccessoryView component, and set a nativeID. Then, pass
+  * that nativeID as the inputAccessoryViewID of whatever TextInput you desire.
+  */
+-export class InputAccessoryView extends React.Component<InputAccessoryViewProps> {}
++export class InputAccessoryView extends React.Component<InputAccessoryViewProps> { }
+ 
+ export interface InputAccessoryViewProps {
+   backgroundColor?: ColorValue | undefined;
+diff --git a/node_modules/react-native/Libraries/Components/TextInput/TextInput.d.ts b/node_modules/react-native/Libraries/Components/TextInput/TextInput.d.ts
+index b3ca156..a0e6c87 100644
+--- a/node_modules/react-native/Libraries/Components/TextInput/TextInput.d.ts
++++ b/node_modules/react-native/Libraries/Components/TextInput/TextInput.d.ts
+@@ -8,24 +8,24 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {TimerMixin} from '../../../types/private/TimerMixin';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { TimerMixin } from 'react-native/types/private/TimerMixin';
+ import {
+   HostInstance,
+   NativeMethods,
+-} from '../../../types/public/ReactNativeTypes';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {TextStyle} from '../../StyleSheet/StyleSheetTypes';
++} from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { TextStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ import {
+   BlurEvent,
+   FocusEvent,
+   NativeSyntheticEvent,
+   NativeTouchEvent,
+   TargetedEvent,
+-} from '../../Types/CoreEventTypes';
+-import EventEmitter from '../../vendor/emitter/EventEmitter';
+-import {AccessibilityProps} from '../View/ViewAccessibility';
+-import {ViewProps} from '../View/ViewPropTypes';
++} from 'react-native/Libraries/Types/CoreEventTypes';
++import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
++import { AccessibilityProps } from 'react-native/Libraries/Components/View/ViewAccessibility';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+ 
+ export type KeyboardType =
+   | 'default'
+@@ -104,7 +104,7 @@ export type SubmitBehavior = 'submit' | 'blurAndSubmit' | 'newline';
+  * components re-render.
+  */
+ export interface DocumentSelectionState extends EventEmitter {
+-  new (anchor: number, focus: number): DocumentSelectionState;
++  new(anchor: number, focus: number): DocumentSelectionState;
+ 
+   /**
+    * Apply an update to the state. If either offset value has changed,
+@@ -148,11 +148,11 @@ export interface TextInputIOSProps {
+    * When the clear button should appear on the right side of the text view
+    */
+   clearButtonMode?:
+-    | 'never'
+-    | 'while-editing'
+-    | 'unless-editing'
+-    | 'always'
+-    | undefined;
++  | 'never'
++  | 'while-editing'
++  | 'unless-editing'
++  | 'always'
++  | undefined;
+ 
+   /**
+    * If true, clears the text field automatically when editing begins
+@@ -270,53 +270,53 @@ export interface TextInputIOSProps {
+    *
+    */
+   textContentType?:
+-    | 'none'
+-    | 'URL'
+-    | 'addressCity'
+-    | 'addressCityAndState'
+-    | 'addressState'
+-    | 'countryName'
+-    | 'creditCardNumber'
+-    | 'creditCardExpiration'
+-    | 'creditCardExpirationMonth'
+-    | 'creditCardExpirationYear'
+-    | 'creditCardSecurityCode'
+-    | 'creditCardType'
+-    | 'creditCardName'
+-    | 'creditCardGivenName'
+-    | 'creditCardMiddleName'
+-    | 'creditCardFamilyName'
+-    | 'emailAddress'
+-    | 'familyName'
+-    | 'fullStreetAddress'
+-    | 'givenName'
+-    | 'jobTitle'
+-    | 'location'
+-    | 'middleName'
+-    | 'name'
+-    | 'namePrefix'
+-    | 'nameSuffix'
+-    | 'nickname'
+-    | 'organizationName'
+-    | 'postalCode'
+-    | 'streetAddressLine1'
+-    | 'streetAddressLine2'
+-    | 'sublocality'
+-    | 'telephoneNumber'
+-    | 'username'
+-    | 'password'
+-    | 'newPassword'
+-    | 'oneTimeCode'
+-    | 'birthdate'
+-    | 'birthdateDay'
+-    | 'birthdateMonth'
+-    | 'birthdateYear'
+-    | 'cellularEID'
+-    | 'cellularIMEI'
+-    | 'dateTime'
+-    | 'flightNumber'
+-    | 'shipmentTrackingNumber'
+-    | undefined;
++  | 'none'
++  | 'URL'
++  | 'addressCity'
++  | 'addressCityAndState'
++  | 'addressState'
++  | 'countryName'
++  | 'creditCardNumber'
++  | 'creditCardExpiration'
++  | 'creditCardExpirationMonth'
++  | 'creditCardExpirationYear'
++  | 'creditCardSecurityCode'
++  | 'creditCardType'
++  | 'creditCardName'
++  | 'creditCardGivenName'
++  | 'creditCardMiddleName'
++  | 'creditCardFamilyName'
++  | 'emailAddress'
++  | 'familyName'
++  | 'fullStreetAddress'
++  | 'givenName'
++  | 'jobTitle'
++  | 'location'
++  | 'middleName'
++  | 'name'
++  | 'namePrefix'
++  | 'nameSuffix'
++  | 'nickname'
++  | 'organizationName'
++  | 'postalCode'
++  | 'streetAddressLine1'
++  | 'streetAddressLine2'
++  | 'sublocality'
++  | 'telephoneNumber'
++  | 'username'
++  | 'password'
++  | 'newPassword'
++  | 'oneTimeCode'
++  | 'birthdate'
++  | 'birthdateDay'
++  | 'birthdateMonth'
++  | 'birthdateYear'
++  | 'cellularEID'
++  | 'cellularIMEI'
++  | 'dateTime'
++  | 'flightNumber'
++  | 'shipmentTrackingNumber'
++  | undefined;
+ 
+   /**
+    * If false, scrolling of the text view will be disabled. The default value is true. Only works with multiline={true}
+@@ -327,24 +327,24 @@ export interface TextInputIOSProps {
+    * Set line break strategy on iOS.
+    */
+   lineBreakStrategyIOS?:
+-    | 'none'
+-    | 'standard'
+-    | 'hangul-word'
+-    | 'push-out'
+-    | undefined;
++  | 'none'
++  | 'standard'
++  | 'hangul-word'
++  | 'push-out'
++  | undefined;
+ 
+   /**
+    * Set line break mode on iOS.
+    * @platform ios
+    */
+   lineBreakModeIOS?:
+-    | 'wordWrapping'
+-    | 'char'
+-    | 'clip'
+-    | 'head'
+-    | 'middle'
+-    | 'tail'
+-    | undefined;
++  | 'wordWrapping'
++  | 'char'
++  | 'clip'
++  | 'head'
++  | 'middle'
++  | 'tail'
++  | undefined;
+ 
+   /**
+    * If `false`, the iOS system will not insert an extra space after a paste operation
+@@ -392,12 +392,12 @@ export interface TextInputAndroidProps {
+    * - `yesExcludeDescendants` - this view is important for autofill but its children aren't
+    */
+   importantForAutofill?:
+-    | 'auto'
+-    | 'no'
+-    | 'noExcludeDescendants'
+-    | 'yes'
+-    | 'yesExcludeDescendants'
+-    | undefined;
++  | 'auto'
++  | 'no'
++  | 'noExcludeDescendants'
++  | 'yes'
++  | 'yesExcludeDescendants'
++  | undefined;
+ 
+   /**
+    * When false, if there is a small amount of space available around a text input (e.g. landscape orientation on a phone),
+@@ -474,7 +474,7 @@ export type TextInputFocusEvent = NativeSyntheticEvent<TextInputFocusEventData>;
+  * @deprecated Use `TextInputScrollEvent` instead
+  */
+ export interface TextInputScrollEventData {
+-  contentOffset: {x: number; y: number};
++  contentOffset: { x: number; y: number };
+ }
+ 
+ /**
+@@ -530,7 +530,7 @@ export type TextInputChangeEvent =
+  * @deprecated Use `TextInputContentSizeChangeEvent` instead
+  */
+ export interface TextInputContentSizeChangeEventData {
+-  contentSize: {width: number; height: number};
++  contentSize: { width: number; height: number };
+ }
+ 
+ /**
+@@ -570,9 +570,9 @@ export type TextInputSubmitEditingEvent =
+  */
+ export interface TextInputProps
+   extends ViewProps,
+-    TextInputIOSProps,
+-    TextInputAndroidProps,
+-    AccessibilityProps {
++  TextInputIOSProps,
++  TextInputAndroidProps,
++  AccessibilityProps {
+   /**
+    * Specifies whether fonts should scale to respect Text Size accessibility settings.
+    * The default is `true`.
+@@ -657,64 +657,64 @@ export interface TextInputProps
+    * - `username-new`
+    */
+   autoComplete?:
+-    | 'additional-name'
+-    | 'address-line1'
+-    | 'address-line2'
+-    | 'birthdate-day'
+-    | 'birthdate-full'
+-    | 'birthdate-month'
+-    | 'birthdate-year'
+-    | 'cc-csc'
+-    | 'cc-exp'
+-    | 'cc-exp-day'
+-    | 'cc-exp-month'
+-    | 'cc-exp-year'
+-    | 'cc-number'
+-    | 'cc-name'
+-    | 'cc-given-name'
+-    | 'cc-middle-name'
+-    | 'cc-family-name'
+-    | 'cc-type'
+-    | 'country'
+-    | 'current-password'
+-    | 'email'
+-    | 'family-name'
+-    | 'gender'
+-    | 'given-name'
+-    | 'honorific-prefix'
+-    | 'honorific-suffix'
+-    | 'name'
+-    | 'name-family'
+-    | 'name-given'
+-    | 'name-middle'
+-    | 'name-middle-initial'
+-    | 'name-prefix'
+-    | 'name-suffix'
+-    | 'new-password'
+-    | 'nickname'
+-    | 'one-time-code'
+-    | 'organization'
+-    | 'organization-title'
+-    | 'password'
+-    | 'password-new'
+-    | 'postal-address'
+-    | 'postal-address-country'
+-    | 'postal-address-extended'
+-    | 'postal-address-extended-postal-code'
+-    | 'postal-address-locality'
+-    | 'postal-address-region'
+-    | 'postal-code'
+-    | 'street-address'
+-    | 'sms-otp'
+-    | 'tel'
+-    | 'tel-country-code'
+-    | 'tel-national'
+-    | 'tel-device'
+-    | 'url'
+-    | 'username'
+-    | 'username-new'
+-    | 'off'
+-    | undefined;
++  | 'additional-name'
++  | 'address-line1'
++  | 'address-line2'
++  | 'birthdate-day'
++  | 'birthdate-full'
++  | 'birthdate-month'
++  | 'birthdate-year'
++  | 'cc-csc'
++  | 'cc-exp'
++  | 'cc-exp-day'
++  | 'cc-exp-month'
++  | 'cc-exp-year'
++  | 'cc-number'
++  | 'cc-name'
++  | 'cc-given-name'
++  | 'cc-middle-name'
++  | 'cc-family-name'
++  | 'cc-type'
++  | 'country'
++  | 'current-password'
++  | 'email'
++  | 'family-name'
++  | 'gender'
++  | 'given-name'
++  | 'honorific-prefix'
++  | 'honorific-suffix'
++  | 'name'
++  | 'name-family'
++  | 'name-given'
++  | 'name-middle'
++  | 'name-middle-initial'
++  | 'name-prefix'
++  | 'name-suffix'
++  | 'new-password'
++  | 'nickname'
++  | 'one-time-code'
++  | 'organization'
++  | 'organization-title'
++  | 'password'
++  | 'password-new'
++  | 'postal-address'
++  | 'postal-address-country'
++  | 'postal-address-extended'
++  | 'postal-address-extended-postal-code'
++  | 'postal-address-locality'
++  | 'postal-address-region'
++  | 'postal-code'
++  | 'street-address'
++  | 'sms-otp'
++  | 'tel'
++  | 'tel-country-code'
++  | 'tel-national'
++  | 'tel-device'
++  | 'url'
++  | 'username'
++  | 'username-new'
++  | 'off'
++  | undefined;
+ 
+   /**
+    * If false, disables auto-correct.
+@@ -837,8 +837,8 @@ export interface TextInputProps
+    * Only called for multiline text inputs.
+    */
+   onContentSizeChange?:
+-    | ((e: TextInputContentSizeChangeEvent) => void)
+-    | undefined;
++  | ((e: TextInputContentSizeChangeEvent) => void)
++  | undefined;
+ 
+   /**
+    * Callback that is called when text input ends.
+@@ -859,8 +859,8 @@ export interface TextInputProps
+    * Callback that is called when a touch is released.
+    */
+   onPressOut?:
+-    | ((e: NativeSyntheticEvent<NativeTouchEvent>) => void)
+-    | undefined;
++  | ((e: NativeSyntheticEvent<NativeTouchEvent>) => void)
++  | undefined;
+ 
+   /**
+    * Callback that is called when the text input is focused
+@@ -938,7 +938,7 @@ export interface TextInputProps
+    * The start and end of the text input's selection. Set start and end to
+    * the same value to position the cursor.
+    */
+-  selection?: {start: number; end?: number | undefined} | undefined;
++  selection?: { start: number; end?: number | undefined } | undefined;
+ 
+   /**
+    * The highlight (and cursor on ios) color of the text input
+@@ -1028,11 +1028,7 @@ interface TextInputState {
+ /**
+  * @see https://reactnative.dev/docs/textinput#methods
+  */
+-declare class TextInputComponent extends React.Component<TextInputProps> {}
+-declare const TextInputBase: Constructor<NativeMethods> &
+-  Constructor<TimerMixin> &
+-  typeof TextInputComponent;
+-export class TextInput extends TextInputBase {
++export class TextInput extends React.Component<TextInputProps> {
+   /**
+    * Access the current focus state.
+    */
+@@ -1053,3 +1049,4 @@ export class TextInput extends TextInputBase {
+    */
+   setSelection: (start: number, end: number) => void;
+ }
++export interface TextInput extends NativeMethods, TimerMixin { }
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/Touchable.d.ts b/node_modules/react-native/Libraries/Components/Touchable/Touchable.d.ts
+index 3c0065c..3b43c9f 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/Touchable.d.ts
++++ b/node_modules/react-native/Libraries/Components/Touchable/Touchable.d.ts
+@@ -8,8 +8,8 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Insets} from '../../../types/public/Insets';
+-import {GestureResponderEvent} from '../../Types/CoreEventTypes';
++import { Insets } from 'react-native/types/public/Insets';
++import { GestureResponderEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ /**
+  * //FIXME: need to find documentation on which component is a TTouchable and can implement that interface
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableHighlight.d.ts b/node_modules/react-native/Libraries/Components/Touchable/TouchableHighlight.d.ts
+index e2ba567..14d1758 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableHighlight.d.ts
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableHighlight.d.ts
+@@ -8,10 +8,10 @@
+  */
+ 
+ import type * as React from 'react';
+-import {ColorValue, StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
+-import {View} from '../../Components/View/View';
+-import {TouchableWithoutFeedbackProps} from './TouchableWithoutFeedback';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++import { View } from 'react-native/Libraries/Components/View/View';
++import { TouchableWithoutFeedbackProps } from 'react-native/Libraries/Components/Touchable/TouchableWithoutFeedback';
+ 
+ /**
+  * @see https://reactnative.dev/docs/touchablehighlight#props
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableNativeFeedback.d.ts b/node_modules/react-native/Libraries/Components/Touchable/TouchableNativeFeedback.d.ts
+index 9de3953..55f6c47 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableNativeFeedback.d.ts
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableNativeFeedback.d.ts
+@@ -8,12 +8,12 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {ColorValue} from '../../StyleSheet/StyleSheet';
+-import {TouchableMixin} from './Touchable';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { TouchableMixin } from 'react-native/Libraries/Components/Touchable/Touchable';
+ 
+-import type {TVProps} from './TouchableOpacity';
+-import {TouchableWithoutFeedbackProps} from './TouchableWithoutFeedback';
++import type { TVProps } from 'react-native/Libraries/Components/Touchable/TouchableOpacity';
++import { TouchableWithoutFeedbackProps } from 'react-native/Libraries/Components/Touchable/TouchableWithoutFeedback';
+ 
+ interface BaseBackgroundPropType {
+   type: string;
+@@ -40,7 +40,7 @@ type BackgroundPropType =
+  */
+ export interface TouchableNativeFeedbackProps
+   extends TouchableWithoutFeedbackProps,
+-    TVProps {
++  TVProps {
+   /**
+    * Determines the type of background drawable that's going to be used to display feedback.
+    * It takes an object with type property and extra data depending on the type.
+@@ -69,7 +69,7 @@ export interface TouchableNativeFeedbackProps
+  *
+  * @see https://reactnative.dev/docs/touchablenativefeedback#content
+  */
+-declare class TouchableNativeFeedbackComponent extends React.Component<TouchableNativeFeedbackProps> {}
++declare class TouchableNativeFeedbackComponent extends React.Component<TouchableNativeFeedbackProps> { }
+ declare const TouchableNativeFeedbackBase: Constructor<TouchableMixin> &
+   typeof TouchableNativeFeedbackComponent;
+ export class TouchableNativeFeedback extends TouchableNativeFeedbackBase {
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.d.ts b/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.d.ts
+index d579a8d..80e37ee 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.d.ts
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableOpacity.d.ts
+@@ -8,8 +8,8 @@
+  */
+ 
+ import type * as React from 'react';
+-import {View} from '../../Components/View/View';
+-import {TouchableWithoutFeedbackProps} from './TouchableWithoutFeedback';
++import { View } from 'react-native/Libraries/Components/View/View';
++import { TouchableWithoutFeedbackProps } from 'react-native/Libraries/Components/Touchable/TouchableWithoutFeedback';
+ 
+ export interface TVProps {
+   /**
+@@ -61,7 +61,7 @@ export interface TVProps {
+  */
+ export interface TouchableOpacityProps
+   extends TouchableWithoutFeedbackProps,
+-    TVProps {
++  TVProps {
+   /**
+    * Determines what the opacity of the wrapped view should be when touch is active.
+    * Defaults to 0.2
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts
+index 572a969..72f59f9 100644
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.d.ts
+@@ -8,21 +8,21 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {TimerMixin} from '../../../types/private/TimerMixin';
+-import {Insets} from '../../../types/public/Insets';
+-import {StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { TimerMixin } from 'react-native/types/private/TimerMixin';
++import { Insets } from 'react-native/types/public/Insets';
++import { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ import {
+   GestureResponderEvent,
+   LayoutChangeEvent,
+   NativeSyntheticEvent,
+   TargetedEvent,
+-} from '../../Types/CoreEventTypes';
+-import {AccessibilityProps} from '../View/ViewAccessibility';
+-import {TouchableMixin} from './Touchable';
++} from 'react-native/Libraries/Types/CoreEventTypes';
++import { AccessibilityProps } from 'react-native/Libraries/Components/View/ViewAccessibility';
++import { TouchableMixin } from 'react-native/Libraries/Components/Touchable/Touchable';
+ 
+-export interface TouchableWithoutFeedbackPropsIOS {}
++export interface TouchableWithoutFeedbackPropsIOS { }
+ 
+ export interface TouchableWithoutFeedbackPropsAndroid {
+   /**
+@@ -38,8 +38,8 @@ export interface TouchableWithoutFeedbackPropsAndroid {
+  */
+ export interface TouchableWithoutFeedbackProps
+   extends TouchableWithoutFeedbackPropsIOS,
+-    TouchableWithoutFeedbackPropsAndroid,
+-    AccessibilityProps {
++  TouchableWithoutFeedbackPropsAndroid,
++  AccessibilityProps {
+   children?: React.ReactNode | undefined;
+ 
+   rejectResponderTermination?: boolean | undefined;
+@@ -144,8 +144,8 @@ export interface TouchableWithoutFeedbackProps
+  *
+  * @see https://reactnative.dev/docs/touchablewithoutfeedback
+  */
+-declare class TouchableWithoutFeedbackComponent extends React.Component<TouchableWithoutFeedbackProps> {}
++declare class TouchableWithoutFeedbackComponent extends React.Component<TouchableWithoutFeedbackProps> { }
+ declare const TouchableWithoutFeedbackBase: Constructor<TimerMixin> &
+   Constructor<TouchableMixin> &
+   typeof TouchableWithoutFeedbackComponent;
+-export class TouchableWithoutFeedback extends TouchableWithoutFeedbackBase {}
++export class TouchableWithoutFeedback extends TouchableWithoutFeedbackBase { }
+diff --git a/node_modules/react-native/Libraries/Components/View/View.d.ts b/node_modules/react-native/Libraries/Components/View/View.d.ts
+index 5fbb529..a65759f 100644
+--- a/node_modules/react-native/Libraries/Components/View/View.d.ts
++++ b/node_modules/react-native/Libraries/Components/View/View.d.ts
+@@ -8,9 +8,9 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../../types/private/Utilities';
+-import {ViewProps} from './ViewPropTypes';
+-import {NativeMethods} from '../../../types/public/ReactNativeTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
+ 
+ /**
+  * The most fundamental component for building UI, View is a container that supports layout with flexbox, style, some touch handling,
+@@ -18,12 +18,11 @@ import {NativeMethods} from '../../../types/public/ReactNativeTypes';
+  * View maps directly to the native view equivalent on whatever platform React is running on,
+  * whether that is a UIView, <div>, android.view, etc.
+  */
+-declare class ViewComponent extends React.Component<ViewProps> {}
+-declare const ViewBase: Constructor<NativeMethods> & typeof ViewComponent;
+-export class View extends ViewBase {
++export class View extends React.Component<ViewProps> {
+   /**
+    * Is 3D Touch / Force Touch available (i.e. will touch events include `force`)
+    * @platform ios
+    */
+   static forceTouchAvailable: boolean;
+ }
++export interface View extends NativeMethods { }
+diff --git a/node_modules/react-native/Libraries/Components/View/ViewAccessibility.d.ts b/node_modules/react-native/Libraries/Components/View/ViewAccessibility.d.ts
+index 8c7ef1e..61847a1 100644
+--- a/node_modules/react-native/Libraries/Components/View/ViewAccessibility.d.ts
++++ b/node_modules/react-native/Libraries/Components/View/ViewAccessibility.d.ts
+@@ -7,14 +7,14 @@
+  * @format
+  */
+ 
+-import {NativeSyntheticEvent} from '../../Types/CoreEventTypes';
++import { NativeSyntheticEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ /**
+  * @see https://reactnative.dev/docs/accessibility#accessibility-properties
+  */
+ export interface AccessibilityProps
+   extends AccessibilityPropsAndroid,
+-    AccessibilityPropsIOS {
++  AccessibilityPropsIOS {
+   /**
+    * When true, indicates that the view is an accessibility element.
+    * By default, all the touchable elements are accessible.
+@@ -76,15 +76,15 @@ export interface AccessibilityProps
+    * When `accessible` is true, the system will try to invoke this function when the user performs an accessibility custom action.
+    */
+   onAccessibilityAction?:
+-    | ((event: AccessibilityActionEvent) => void)
+-    | undefined;
++  | ((event: AccessibilityActionEvent) => void)
++  | undefined;
+ 
+   /**
+    * [Android] Controlling if a view fires accessibility events and if it is reported to accessibility services.
+    */
+   importantForAccessibility?:
+-    | ('auto' | 'yes' | 'no' | 'no-hide-descendants')
+-    | undefined;
++  | ('auto' | 'yes' | 'no' | 'no-hide-descendants')
++  | undefined;
+ 
+   /**
+    * A value indicating whether the accessibility elements contained within
+@@ -268,11 +268,11 @@ export interface AccessibilityPropsAndroid {
+    * @platform android
+    */
+   importantForAccessibility?:
+-    | 'auto'
+-    | 'yes'
+-    | 'no'
+-    | 'no-hide-descendants'
+-    | undefined;
++  | 'auto'
++  | 'yes'
++  | 'no'
++  | 'no-hide-descendants'
++  | undefined;
+ 
+   /**
+    * Enables the view to be screen reader focusable, not keyboard focusable.
+diff --git a/node_modules/react-native/Libraries/Components/View/ViewPropTypes.d.ts b/node_modules/react-native/Libraries/Components/View/ViewPropTypes.d.ts
+index 62803ca..4d37a4f 100644
+--- a/node_modules/react-native/Libraries/Components/View/ViewPropTypes.d.ts
++++ b/node_modules/react-native/Libraries/Components/View/ViewPropTypes.d.ts
+@@ -8,18 +8,18 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Insets} from '../../../types/public/Insets';
+-import {GestureResponderHandlers} from '../../../types/public/ReactNativeRenderer';
+-import {StyleProp} from '../../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../../StyleSheet/StyleSheetTypes';
++import { Insets } from 'react-native/types/public/Insets';
++import { GestureResponderHandlers } from 'react-native/types/public/ReactNativeRenderer';
++import { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ import {
+   BlurEvent,
+   FocusEvent,
+   LayoutChangeEvent,
+   PointerEvents,
+-} from '../../Types/CoreEventTypes';
+-import {Touchable} from '../Touchable/Touchable';
+-import {AccessibilityProps} from './ViewAccessibility';
++} from 'react-native/Libraries/Types/CoreEventTypes';
++import { Touchable } from 'react-native/Libraries/Components/Touchable/Touchable';
++import { AccessibilityProps } from 'react-native/Libraries/Components/View/ViewAccessibility';
+ 
+ /**
+  * @deprecated These properties are not implemented natively.
+@@ -130,11 +130,11 @@ export interface ViewPropsAndroid {
+  */
+ export interface ViewProps
+   extends ViewPropsAndroid,
+-    ViewPropsIOS,
+-    GestureResponderHandlers,
+-    Touchable,
+-    PointerEvents,
+-    AccessibilityProps {
++  ViewPropsIOS,
++  GestureResponderHandlers,
++  Touchable,
++  PointerEvents,
++  AccessibilityProps {
+   children?: React.ReactNode | undefined;
+   /**
+    * This defines how far a touch event can start away from the view.
+diff --git a/node_modules/react-native/Libraries/EventEmitter/NativeEventEmitter.d.ts b/node_modules/react-native/Libraries/EventEmitter/NativeEventEmitter.d.ts
+index efcacad..eddd404 100644
+--- a/node_modules/react-native/Libraries/EventEmitter/NativeEventEmitter.d.ts
++++ b/node_modules/react-native/Libraries/EventEmitter/NativeEventEmitter.d.ts
+@@ -9,7 +9,7 @@
+ 
+ import EventEmitter, {
+   EmitterSubscription,
+-} from '../vendor/emitter/EventEmitter';
++} from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ /**
+  * The React Native implementation of the IOS RCTEventEmitter which is required when creating
+diff --git a/node_modules/react-native/Libraries/EventEmitter/RCTDeviceEventEmitter.d.ts b/node_modules/react-native/Libraries/EventEmitter/RCTDeviceEventEmitter.d.ts
+index 7c5563b..c1a602b 100644
+--- a/node_modules/react-native/Libraries/EventEmitter/RCTDeviceEventEmitter.d.ts
++++ b/node_modules/react-native/Libraries/EventEmitter/RCTDeviceEventEmitter.d.ts
+@@ -10,7 +10,7 @@
+ import EventEmitter, {
+   EmitterSubscription,
+   EventSubscriptionVendor,
+-} from '../vendor/emitter/EventEmitter';
++} from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ /**
+  * Deprecated - subclass NativeEventEmitter to create granular event modules instead of
+@@ -18,7 +18,7 @@ import EventEmitter, {
+  */
+ interface DeviceEventEmitterStatic extends EventEmitter {
+   sharedSubscriber: EventSubscriptionVendor;
+-  new (): DeviceEventEmitterStatic;
++  new(): DeviceEventEmitterStatic;
+   addListener(
+     type: string,
+     listener: (data: any) => void,
+diff --git a/node_modules/react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter.d.ts b/node_modules/react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter.d.ts
+index 4170432..ba73714 100644
+--- a/node_modules/react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter.d.ts
++++ b/node_modules/react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {DeviceEventEmitterStatic} from './RCTDeviceEventEmitter';
++import { DeviceEventEmitterStatic } from 'react-native/Libraries/EventEmitter/RCTDeviceEventEmitter';
+ 
+ export interface NativeEventSubscription {
+   /**
+diff --git a/node_modules/react-native/Libraries/Image/Image.d.ts b/node_modules/react-native/Libraries/Image/Image.d.ts
+index 4ebf9eb..69582fb 100644
+--- a/node_modules/react-native/Libraries/Image/Image.d.ts
++++ b/node_modules/react-native/Libraries/Image/Image.d.ts
+@@ -8,15 +8,15 @@
+  */
+ 
+ import * as React from 'react';
+-import {Constructor} from '../../types/private/Utilities';
+-import {AccessibilityProps} from '../Components/View/ViewAccessibility';
+-import {Insets} from '../../types/public/Insets';
+-import {NativeMethods} from '../../types/public/ReactNativeTypes';
+-import {ColorValue, StyleProp} from '../StyleSheet/StyleSheet';
+-import {ImageStyle, ViewStyle} from '../StyleSheet/StyleSheetTypes';
+-import {LayoutChangeEvent, NativeSyntheticEvent} from '../Types/CoreEventTypes';
+-import {ImageResizeMode} from './ImageResizeMode';
+-import {ImageRequireSource, ImageURISource} from './ImageSource';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { AccessibilityProps } from 'react-native/Libraries/Components/View/ViewAccessibility';
++import { Insets } from 'react-native/types/public/Insets';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ImageStyle, ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++import { LayoutChangeEvent, NativeSyntheticEvent } from 'react-native/Libraries/Types/CoreEventTypes';
++import { ImageResizeMode } from 'react-native/Libraries/Image/ImageResizeMode';
++import { ImageRequireSource, ImageURISource } from 'react-native/Libraries/Image/ImageSource';
+ 
+ /**
+  * @deprecated Use `ImageProgressEventIOS` instead.
+@@ -146,8 +146,8 @@ export interface ImageResolvedAssetSource {
+  */
+ export interface ImagePropsBase
+   extends ImagePropsIOS,
+-    ImagePropsAndroid,
+-    AccessibilityProps {
++  ImagePropsAndroid,
++  AccessibilityProps {
+   /**
+    * Used to reference react managed images from native code.
+    */
+@@ -313,15 +313,15 @@ export interface ImagePropsBase
+    * See https://reactnative.dev/docs/image#referrerpolicy
+    */
+   referrerPolicy?:
+-    | 'no-referrer'
+-    | 'no-referrer-when-downgrade'
+-    | 'origin'
+-    | 'origin-when-cross-origin'
+-    | 'same-origin'
+-    | 'strict-origin'
+-    | 'strict-origin-when-cross-origin'
+-    | 'unsafe-url'
+-    | undefined;
++  | 'no-referrer'
++  | 'no-referrer-when-downgrade'
++  | 'origin'
++  | 'origin-when-cross-origin'
++  | 'same-origin'
++  | 'strict-origin'
++  | 'strict-origin-when-cross-origin'
++  | 'unsafe-url'
++  | undefined;
+ }
+ 
+ export interface ImageProps extends ImagePropsBase {
+@@ -337,9 +337,7 @@ export interface ImageSize {
+   height: number;
+ }
+ 
+-declare class ImageComponent extends React.Component<ImageProps> {}
+-declare const ImageBase: Constructor<NativeMethods> & typeof ImageComponent;
+-export class Image extends ImageBase {
++export class Image extends React.Component<ImageProps> {
+   static getSize(uri: string): Promise<ImageSize>;
+   static getSize(
+     uri: string,
+@@ -349,11 +347,11 @@ export class Image extends ImageBase {
+ 
+   static getSizeWithHeaders(
+     uri: string,
+-    headers: {[index: string]: string},
++    headers: { [index: string]: string },
+   ): Promise<ImageSize>;
+   static getSizeWithHeaders(
+     uri: string,
+-    headers: {[index: string]: string},
++    headers: { [index: string]: string },
+     success: (width: number, height: number) => void,
+     failure?: (error: any) => void,
+   ): void;
+@@ -366,7 +364,7 @@ export class Image extends ImageBase {
+   static abortPrefetch?(requestId: number): void;
+   static queryCache?(
+     urls: string[],
+-  ): Promise<{[url: string]: 'memory' | 'disk' | 'disk/memory'}>;
++  ): Promise<{ [url: string]: 'memory' | 'disk' | 'disk/memory' }>;
+ 
+   /**
+    * @see https://reactnative.dev/docs/image#resolveassetsource
+@@ -375,6 +373,7 @@ export class Image extends ImageBase {
+     source: ImageSourcePropType,
+   ): ImageResolvedAssetSource;
+ }
++export interface Image extends NativeMethods { }
+ 
+ export interface ImageBackgroundProps extends ImagePropsBase {
+   children?: React.ReactNode | undefined;
+@@ -383,7 +382,5 @@ export interface ImageBackgroundProps extends ImagePropsBase {
+   imageRef?(image: Image): void;
+ }
+ 
+-declare class ImageBackgroundComponent extends React.Component<ImageBackgroundProps> {}
+-declare const ImageBackgroundBase: Constructor<NativeMethods> &
+-  typeof ImageBackgroundComponent;
+-export class ImageBackground extends ImageBackgroundBase {}
++export class ImageBackground extends React.Component<ImageBackgroundProps> { }
++export interface ImageBackground extends NativeMethods { }
+diff --git a/node_modules/react-native/Libraries/Interaction/InteractionManager.d.ts b/node_modules/react-native/Libraries/Interaction/InteractionManager.d.ts
+index d1d72b7..aa350a8 100644
+--- a/node_modules/react-native/Libraries/Interaction/InteractionManager.d.ts
++++ b/node_modules/react-native/Libraries/Interaction/InteractionManager.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {EmitterSubscription} from '../vendor/emitter/EventEmitter';
++import { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ export type Handle = number;
+ 
+diff --git a/node_modules/react-native/Libraries/Interaction/PanResponder.d.ts b/node_modules/react-native/Libraries/Interaction/PanResponder.d.ts
+index 8a2d4f2..8f6c3c5 100644
+--- a/node_modules/react-native/Libraries/Interaction/PanResponder.d.ts
++++ b/node_modules/react-native/Libraries/Interaction/PanResponder.d.ts
+@@ -7,8 +7,8 @@
+  * @format
+  */
+ 
+-import {GestureResponderHandlers} from '../../types/public/ReactNativeRenderer';
+-import {GestureResponderEvent} from '../Types/CoreEventTypes';
++import { GestureResponderHandlers } from 'react-native/types/public/ReactNativeRenderer';
++import { GestureResponderEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ export interface PanResponderGestureState {
+   /**
+@@ -70,84 +70,84 @@ export interface PanResponderGestureState {
+  */
+ export interface PanResponderCallbacks {
+   onMoveShouldSetPanResponder?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => boolean)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => boolean)
++  | undefined;
+   onStartShouldSetPanResponder?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => boolean)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => boolean)
++  | undefined;
+   onPanResponderGrant?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+   onPanResponderMove?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+   onPanResponderRelease?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+   onPanResponderTerminate?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+ 
+   onMoveShouldSetPanResponderCapture?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => boolean)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => boolean)
++  | undefined;
+   onStartShouldSetPanResponderCapture?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => boolean)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => boolean)
++  | undefined;
+   onPanResponderReject?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+   onPanResponderStart?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+   onPanResponderEnd?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => void)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => void)
++  | undefined;
+   onPanResponderTerminationRequest?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => boolean)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => boolean)
++  | undefined;
+   onShouldBlockNativeResponder?:
+-    | ((
+-        e: GestureResponderEvent,
+-        gestureState: PanResponderGestureState,
+-      ) => boolean)
+-    | undefined;
++  | ((
++    e: GestureResponderEvent,
++    gestureState: PanResponderGestureState,
++  ) => boolean)
++  | undefined;
+ }
+ 
+ export interface PanResponderInstance {
+diff --git a/node_modules/react-native/Libraries/Linking/Linking.d.ts b/node_modules/react-native/Libraries/Linking/Linking.d.ts
+index 55d7aa3..7e7d96d 100644
+--- a/node_modules/react-native/Libraries/Linking/Linking.d.ts
++++ b/node_modules/react-native/Libraries/Linking/Linking.d.ts
+@@ -7,8 +7,8 @@
+  * @format
+  */
+ 
+-import {NativeEventEmitter} from '../EventEmitter/NativeEventEmitter';
+-import {EmitterSubscription} from '../vendor/emitter/EventEmitter';
++import { NativeEventEmitter } from 'react-native/Libraries/EventEmitter/NativeEventEmitter';
++import { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ export interface LinkingImpl extends NativeEventEmitter {
+   /**
+@@ -17,7 +17,7 @@ export interface LinkingImpl extends NativeEventEmitter {
+    */
+   addEventListener(
+     type: 'url',
+-    handler: (event: {url: string}) => void,
++    handler: (event: { url: string }) => void,
+   ): EmitterSubscription;
+ 
+   /**
+@@ -53,7 +53,7 @@ export interface LinkingImpl extends NativeEventEmitter {
+    */
+   sendIntent(
+     action: string,
+-    extras?: Array<{key: string; value: string | number | boolean}>,
++    extras?: Array<{ key: string; value: string | number | boolean }>,
+   ): Promise<void>;
+ }
+ 
+diff --git a/node_modules/react-native/Libraries/Lists/FlatList.d.ts b/node_modules/react-native/Libraries/Lists/FlatList.d.ts
+index 06c4bca..773fc22 100644
+--- a/node_modules/react-native/Libraries/Lists/FlatList.d.ts
++++ b/node_modules/react-native/Libraries/Lists/FlatList.d.ts
+@@ -13,11 +13,11 @@ import type {
+   ViewToken,
+   VirtualizedListProps,
+   ViewabilityConfig,
+-} from '@react-native/virtualized-lists';
+-import type {ScrollViewComponent} from '../Components/ScrollView/ScrollView';
+-import type {StyleProp} from '../StyleSheet/StyleSheet';
+-import type {ViewStyle} from '../StyleSheet/StyleSheetTypes';
+-import type {View} from '../Components/View/View';
++} from 'react-native/node_modules/@react-native/virtualized-lists';
++import type { ScrollViewComponent } from 'react-native/Libraries/Components/ScrollView/ScrollView';
++import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++import type { View } from 'react-native/Libraries/Components/View/View';
+ 
+ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+   /**
+@@ -34,11 +34,11 @@ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+    * - true, deprecated, use 'always' instead
+    */
+   keyboardShouldPersistTaps?:
+-    | boolean
+-    | 'always'
+-    | 'never'
+-    | 'handled'
+-    | undefined;
++  | boolean
++  | 'always'
++  | 'never'
++  | 'handled'
++  | undefined;
+ 
+   /**
+    * An array (or array-like list) of items to render. Other data types can be
+@@ -66,11 +66,11 @@ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+    * `ItemSeparatorComponent`.
+    */
+   getItemLayout?:
+-    | ((
+-        data: ArrayLike<ItemT> | null | undefined,
+-        index: number,
+-      ) => {length: number; offset: number; index: number})
+-    | undefined;
++  | ((
++    data: ArrayLike<ItemT> | null | undefined,
++    index: number,
++  ) => { length: number; offset: number; index: number })
++  | undefined;
+ 
+   /**
+    * If true, renders items next to each other horizontally instead of stacked vertically.
+@@ -115,12 +115,12 @@ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+    * Called when the viewability of rows changes, as defined by the `viewablePercentThreshold` prop.
+    */
+   onViewableItemsChanged?:
+-    | ((info: {
+-        viewableItems: Array<ViewToken<ItemT>>;
+-        changed: Array<ViewToken<ItemT>>;
+-      }) => void)
+-    | null
+-    | undefined;
++  | ((info: {
++    viewableItems: Array<ViewToken<ItemT>>;
++    changed: Array<ViewToken<ItemT>>;
++  }) => void)
++  | null
++  | undefined;
+ 
+   /**
+    * Set this true while waiting for new data from a refresh.
+@@ -168,7 +168,7 @@ export interface FlatListProps<ItemT> extends VirtualizedListProps<ItemT> {
+    *
+    * @platform android
+    */
+-  fadingEdgeLength?: number | {start: number; end: number} | undefined;
++  fadingEdgeLength?: number | { start: number; end: number } | undefined;
+ }
+ 
+ export abstract class FlatListComponent<
+@@ -178,7 +178,7 @@ export abstract class FlatListComponent<
+   /**
+    * Scrolls to the end of the content. May be janky without `getItemLayout` prop.
+    */
+-  scrollToEnd: (params?: {animated?: boolean | null | undefined}) => void;
++  scrollToEnd: (params?: { animated?: boolean | null | undefined }) => void;
+ 
+   /**
+    * Scrolls to the item at the specified index such that it is positioned in the viewable area
+@@ -239,10 +239,10 @@ export abstract class FlatListComponent<
+ 
+   getScrollableNode: () => any;
+ 
+-  setNativeProps: (props: {[key: string]: unknown}) => void;
++  setNativeProps: (props: { [key: string]: unknown }) => void;
+ }
+ 
+ export class FlatList<ItemT = any> extends FlatListComponent<
+   ItemT,
+   FlatListProps<ItemT>
+-> {}
++> { }
+diff --git a/node_modules/react-native/Libraries/Lists/SectionList.d.ts b/node_modules/react-native/Libraries/Lists/SectionList.d.ts
+index 686a609..2b9e28a 100644
+--- a/node_modules/react-native/Libraries/Lists/SectionList.d.ts
++++ b/node_modules/react-native/Libraries/Lists/SectionList.d.ts
+@@ -11,14 +11,14 @@ import type * as React from 'react';
+ import type {
+   ListRenderItemInfo,
+   VirtualizedListWithoutRenderItemProps,
+-} from '@react-native/virtualized-lists';
++} from 'react-native/node_modules/@react-native/virtualized-lists';
+ import type {
+   ScrollView,
+   ScrollViewProps,
+-} from '../Components/ScrollView/ScrollView';
+-import {NodeHandle} from '../ReactNative/RendererProxy';
+-import {StyleProp} from '../StyleSheet/StyleSheet';
+-import {ViewStyle} from '../StyleSheet/StyleSheetTypes';
++} from 'react-native/Libraries/Components/ScrollView/ScrollView';
++import { NodeHandle } from 'react-native/Libraries/ReactNative/RendererProxy';
++import { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ 
+ /**
+  * @see https://reactnative.dev/docs/sectionlist
+@@ -70,10 +70,10 @@ export interface SectionListProps<ItemT, SectionT = DefaultSectionT>
+    * Rendered in between each section.
+    */
+   SectionSeparatorComponent?:
+-    | React.ComponentType<any>
+-    | React.ReactElement
+-    | null
+-    | undefined;
++  | React.ComponentType<any>
++  | React.ReactElement
++  | null
++  | undefined;
+ 
+   /**
+    * A marker property for telling the list to re-render (since it implements PureComponent).
+@@ -93,11 +93,11 @@ export interface SectionListProps<ItemT, SectionT = DefaultSectionT>
+    * ```
+    */
+   getItemLayout?:
+-    | ((
+-        data: SectionListData<ItemT, SectionT>[] | null,
+-        index: number,
+-      ) => {length: number; offset: number; index: number})
+-    | undefined;
++  | ((
++    data: SectionListData<ItemT, SectionT>[] | null,
++    index: number,
++  ) => { length: number; offset: number; index: number })
++  | undefined;
+ 
+   /**
+    * How many items to render in the initial batch
+@@ -119,7 +119,7 @@ export interface SectionListProps<ItemT, SectionT = DefaultSectionT>
+   /**
+    * Called once when the scroll position gets within onEndReachedThreshold of the rendered content.
+    */
+-  onEndReached?: ((info: {distanceFromEnd: number}) => void) | null | undefined;
++  onEndReached?: ((info: { distanceFromEnd: number }) => void) | null | undefined;
+ 
+   /**
+    * How far from the end (in units of visible length of the list) the bottom edge of the
+@@ -141,12 +141,12 @@ export interface SectionListProps<ItemT, SectionT = DefaultSectionT>
+    * as possible and then try again after more items have been rendered.
+    */
+   onScrollToIndexFailed?:
+-    | ((info: {
+-        index: number;
+-        highestMeasuredFrameIndex: number;
+-        averageItemLength: number;
+-      }) => void)
+-    | undefined;
++  | ((info: {
++    index: number;
++    highestMeasuredFrameIndex: number;
++    averageItemLength: number;
++  }) => void)
++  | undefined;
+ 
+   /**
+    * Set this true while waiting for new data from a refresh.
+@@ -162,19 +162,19 @@ export interface SectionListProps<ItemT, SectionT = DefaultSectionT>
+    * Rendered at the top of each section. Sticky headers are not yet supported.
+    */
+   renderSectionHeader?:
+-    | ((info: {
+-        section: SectionListData<ItemT, SectionT>;
+-      }) => React.ReactElement | null)
+-    | undefined;
++  | ((info: {
++    section: SectionListData<ItemT, SectionT>;
++  }) => React.ReactElement | null)
++  | undefined;
+ 
+   /**
+    * Rendered at the bottom of each section.
+    */
+   renderSectionFooter?:
+-    | ((info: {
+-        section: SectionListData<ItemT, SectionT>;
+-      }) => React.ReactElement | null)
+-    | undefined;
++  | ((info: {
++    section: SectionListData<ItemT, SectionT>;
++  }) => React.ReactElement | null)
++  | undefined;
+ 
+   /**
+    * An array of objects with data for each section.
+@@ -185,8 +185,8 @@ export interface SectionListProps<ItemT, SectionT = DefaultSectionT>
+    * Render a custom scroll component, e.g. with a differently styled `RefreshControl`.
+    */
+   renderScrollComponent?:
+-    | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
+-    | undefined;
++  | ((props: ScrollViewProps) => React.ReactElement<ScrollViewProps>)
++  | undefined;
+ 
+   /**
+    * Note: may have bugs (missing content) in some circumstances - use at your own risk.
+@@ -253,7 +253,7 @@ export abstract class SectionListComponent<
+ export class SectionList<
+   ItemT = any,
+   SectionT = DefaultSectionT,
+-> extends SectionListComponent<SectionListProps<ItemT, SectionT>> {}
++> extends SectionListComponent<SectionListProps<ItemT, SectionT>> { }
+ 
+ /* This definition is deprecated because it extends the wrong base type */
+ export interface SectionListStatic<ItemT, SectionT = DefaultSectionT>
+diff --git a/node_modules/react-native/Libraries/Modal/Modal.d.ts b/node_modules/react-native/Libraries/Modal/Modal.d.ts
+index 9c9e1ea..5110508 100644
+--- a/node_modules/react-native/Libraries/Modal/Modal.d.ts
++++ b/node_modules/react-native/Libraries/Modal/Modal.d.ts
+@@ -8,9 +8,9 @@
+  */
+ 
+ import type * as React from 'react';
+-import {ViewProps} from '../Components/View/ViewPropTypes';
+-import {NativeSyntheticEvent} from '../Types/CoreEventTypes';
+-import {ColorValue} from '../StyleSheet/StyleSheet';
++import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
++import { NativeSyntheticEvent } from 'react-native/Libraries/Types/CoreEventTypes';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ export interface ModalBaseProps {
+   /**
+@@ -57,25 +57,25 @@ export interface ModalPropsIOS {
+    * The `presentationStyle` determines the style of modal to show
+    */
+   presentationStyle?:
+-    | 'fullScreen'
+-    | 'pageSheet'
+-    | 'formSheet'
+-    | 'overFullScreen'
+-    | undefined;
++  | 'fullScreen'
++  | 'pageSheet'
++  | 'formSheet'
++  | 'overFullScreen'
++  | undefined;
+ 
+   /**
+    * The `supportedOrientations` prop allows the modal to be rotated to any of the specified orientations.
+    * On iOS, the modal is still restricted by what's specified in your app's Info.plist's UISupportedInterfaceOrientations field.
+    */
+   supportedOrientations?:
+-    | Array<
+-        | 'portrait'
+-        | 'portrait-upside-down'
+-        | 'landscape'
+-        | 'landscape-left'
+-        | 'landscape-right'
+-      >
+-    | undefined;
++  | Array<
++    | 'portrait'
++    | 'portrait-upside-down'
++    | 'landscape'
++    | 'landscape-left'
++    | 'landscape-right'
++  >
++  | undefined;
+ 
+   /**
+    * The `onDismiss` prop allows passing a function that will be called once the modal has been dismissed.
+@@ -87,8 +87,8 @@ export interface ModalPropsIOS {
+    * The orientation provided is only 'portrait' or 'landscape'. This callback is also called on initial render, regardless of the current orientation.
+    */
+   onOrientationChange?:
+-    | ((event: NativeSyntheticEvent<any>) => void)
+-    | undefined;
++  | ((event: NativeSyntheticEvent<any>) => void)
++  | undefined;
+ 
+   /**
+    * Controls whether the modal can be dismissed by swiping down on iOS.
+@@ -119,4 +119,4 @@ export type ModalProps = ModalBaseProps &
+   ModalPropsAndroid &
+   ViewProps;
+ 
+-export class Modal extends React.Component<ModalProps> {}
++export class Modal extends React.Component<ModalProps> { }
+diff --git a/node_modules/react-native/Libraries/ReactNative/AppRegistry.d.ts b/node_modules/react-native/Libraries/ReactNative/AppRegistry.d.ts
+index f345ee7..026594a 100644
+--- a/node_modules/react-native/Libraries/ReactNative/AppRegistry.d.ts
++++ b/node_modules/react-native/Libraries/ReactNative/AppRegistry.d.ts
+@@ -8,8 +8,8 @@
+  */
+ 
+ import type * as React from 'react';
+-import type {IPerformanceLogger} from '../Utilities/IPerformanceLogger';
+-import type {ViewStyle} from '../StyleSheet/StyleSheetTypes';
++import type { IPerformanceLogger } from 'react-native/Libraries/Utilities/IPerformanceLogger';
++import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ 
+ type Task = (taskData: any) => Promise<void>;
+ type TaskProvider = () => Task;
+@@ -94,7 +94,7 @@ export namespace AppRegistry {
+ 
+   export function getRunnable(appKey: string): Runnable | undefined;
+ 
+-  export function getRegistry(): {sections: string[]; runnables: Runnable[]};
++  export function getRegistry(): { sections: string[]; runnables: Runnable[] };
+ 
+   export function setComponentProviderInstrumentationHook(
+     hook: ComponentProviderInstrumentationHook,
+diff --git a/node_modules/react-native/Libraries/ReactNative/UIManager.d.ts b/node_modules/react-native/Libraries/ReactNative/UIManager.d.ts
+index 773419b..7511572 100644
+--- a/node_modules/react-native/Libraries/ReactNative/UIManager.d.ts
++++ b/node_modules/react-native/Libraries/ReactNative/UIManager.d.ts
+@@ -12,7 +12,7 @@ import {
+   MeasureInWindowOnSuccessCallback,
+   MeasureLayoutOnSuccessCallback,
+   MeasureOnSuccessCallback,
+-} from '../../types/public/ReactNativeTypes';
++} from 'react-native/types/public/ReactNativeTypes';
+ 
+ export interface UIManagerStatic {
+   /**
+@@ -86,11 +86,11 @@ export interface UIManagerStatic {
+    *     UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+    */
+   setLayoutAnimationEnabledExperimental?:
+-    | ((value: boolean) => void)
+-    | undefined;
++  | ((value: boolean) => void)
++  | undefined;
+ 
+   getViewManagerConfig: (name: string) => {
+-    Commands: {[key: string]: number};
++    Commands: { [key: string]: number };
+   };
+ 
+   hasViewManagerConfig: (name: string) => boolean;
+diff --git a/node_modules/react-native/Libraries/ReactNative/requireNativeComponent.d.ts b/node_modules/react-native/Libraries/ReactNative/requireNativeComponent.d.ts
+index 7f90a05..ba26acc 100644
+--- a/node_modules/react-native/Libraries/ReactNative/requireNativeComponent.d.ts
++++ b/node_modules/react-native/Libraries/ReactNative/requireNativeComponent.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {HostComponent} from '../../types/public/ReactNativeTypes';
++import { HostComponent } from 'react-native/types/public/ReactNativeTypes';
+ 
+ /**
+  * Creates values that can be used like React components which represent native
+diff --git a/node_modules/react-native/Libraries/Share/Share.d.ts b/node_modules/react-native/Libraries/Share/Share.d.ts
+index a9cf70f..f2d444b 100644
+--- a/node_modules/react-native/Libraries/Share/Share.d.ts
++++ b/node_modules/react-native/Libraries/Share/Share.d.ts
+@@ -7,19 +7,19 @@
+  * @format
+  */
+ 
+-import {ColorValue} from '../StyleSheet/StyleSheet';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ export type ShareContent =
+   | {
+-      title?: string | undefined;
+-      url: string;
+-      message?: string | undefined;
+-    }
++    title?: string | undefined;
++    url: string;
++    message?: string | undefined;
++  }
+   | {
+-      title?: string | undefined;
+-      url?: string | undefined;
+-      message: string;
+-    };
++    title?: string | undefined;
++    url?: string | undefined;
++    message: string;
++  };
+ 
+ export type ShareOptions = {
+   dialogTitle?: string | undefined;
+diff --git a/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypes.d.ts b/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypes.d.ts
+index 909f73d..22ec645 100644
+--- a/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypes.d.ts
++++ b/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypes.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {OpaqueColorValue} from './StyleSheet';
++import { OpaqueColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ /**
+  * Select native platform color
+diff --git a/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypesIOS.d.ts b/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypesIOS.d.ts
+index 43720c7..bcf603b 100644
+--- a/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypesIOS.d.ts
++++ b/node_modules/react-native/Libraries/StyleSheet/PlatformColorValueTypesIOS.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {ColorValue, OpaqueColorValue} from './StyleSheet';
++import { ColorValue, OpaqueColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ type DynamicColorIOSTuple = {
+   light: ColorValue;
+diff --git a/node_modules/react-native/Libraries/StyleSheet/StyleSheet.d.ts b/node_modules/react-native/Libraries/StyleSheet/StyleSheet.d.ts
+index 17ab55d..b96f71c 100644
+--- a/node_modules/react-native/Libraries/StyleSheet/StyleSheet.d.ts
++++ b/node_modules/react-native/Libraries/StyleSheet/StyleSheet.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {ImageStyle, TextStyle, ViewStyle} from './StyleSheetTypes';
++import { ImageStyle, TextStyle, ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ 
+ export interface StyleSheetProperties {
+   hairlineWidth: number;
+@@ -16,20 +16,20 @@ export interface StyleSheetProperties {
+ 
+ type Falsy = undefined | null | false | '';
+ interface RecursiveArray<T>
+-  extends Array<T | ReadonlyArray<T> | RecursiveArray<T>> {}
++  extends Array<T | ReadonlyArray<T> | RecursiveArray<T>> { }
+ /** Keep a brand of 'T' so that calls to `StyleSheet.flatten` can take `RegisteredStyle<T>` and return `T`. */
+-type RegisteredStyle<T> = number & {__registeredStyleBrand: T};
++type RegisteredStyle<T> = number & { __registeredStyleBrand: T };
+ export type StyleProp<T> =
+   | T
+   | RegisteredStyle<T>
+   | RecursiveArray<T | RegisteredStyle<T> | Falsy>
+   | Falsy;
+ 
+-type OpaqueColorValue = symbol & {__TYPE__: 'Color'};
++type OpaqueColorValue = symbol & { __TYPE__: 'Color' };
+ export type ColorValue = string | OpaqueColorValue;
+ 
+ export namespace StyleSheet {
+-  type NamedStyles<T> = {[P in keyof T]: ViewStyle | TextStyle | ImageStyle};
++  type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
+ 
+   /**
+    * An identity function for creating style sheets.
+diff --git a/node_modules/react-native/Libraries/StyleSheet/StyleSheetTypes.d.ts b/node_modules/react-native/Libraries/StyleSheet/StyleSheetTypes.d.ts
+index a2b6d65..b725a5f 100644
+--- a/node_modules/react-native/Libraries/StyleSheet/StyleSheetTypes.d.ts
++++ b/node_modules/react-native/Libraries/StyleSheet/StyleSheetTypes.d.ts
+@@ -7,9 +7,9 @@
+  * @format
+  */
+ 
+-import {Animated} from '../Animated/Animated';
+-import {ImageResizeMode} from '../Image/ImageResizeMode';
+-import {ColorValue} from './StyleSheet';
++import { Animated } from 'react-native/Libraries/Animated/Animated';
++import { ImageResizeMode } from 'react-native/Libraries/Image/ImageResizeMode';
++import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ type FlexAlignType =
+   | 'flex-start'
+@@ -36,14 +36,14 @@ export type CursorValue = 'auto' | 'pointer';
+  */
+ export interface FlexStyle {
+   alignContent?:
+-    | 'flex-start'
+-    | 'flex-end'
+-    | 'center'
+-    | 'stretch'
+-    | 'space-between'
+-    | 'space-around'
+-    | 'space-evenly'
+-    | undefined;
++  | 'flex-start'
++  | 'flex-end'
++  | 'center'
++  | 'stretch'
++  | 'space-between'
++  | 'space-around'
++  | 'space-evenly'
++  | undefined;
+   alignItems?: FlexAlignType | undefined;
+   alignSelf?: 'auto' | FlexAlignType | undefined;
+   aspectRatio?: number | string | undefined;
+@@ -61,11 +61,11 @@ export interface FlexStyle {
+   flex?: number | undefined;
+   flexBasis?: DimensionValue | undefined;
+   flexDirection?:
+-    | 'row'
+-    | 'column'
+-    | 'row-reverse'
+-    | 'column-reverse'
+-    | undefined;
++  | 'row'
++  | 'column'
++  | 'row-reverse'
++  | 'column-reverse'
++  | undefined;
+   rowGap?: number | string | undefined;
+   gap?: number | string | undefined;
+   columnGap?: number | string | undefined;
+@@ -74,13 +74,13 @@ export interface FlexStyle {
+   flexWrap?: 'wrap' | 'nowrap' | 'wrap-reverse' | undefined;
+   height?: DimensionValue | undefined;
+   justifyContent?:
+-    | 'flex-start'
+-    | 'flex-end'
+-    | 'center'
+-    | 'space-between'
+-    | 'space-around'
+-    | 'space-evenly'
+-    | undefined;
++  | 'flex-start'
++  | 'flex-end'
++  | 'center'
++  | 'space-between'
++  | 'space-around'
++  | 'space-evenly'
++  | undefined;
+   left?: DimensionValue | undefined;
+   margin?: DimensionValue | undefined;
+   marginBottom?: DimensionValue | undefined;
+@@ -211,7 +211,7 @@ export interface FlexStyle {
+ 
+ export interface ShadowStyleIOS {
+   shadowColor?: ColorValue | undefined;
+-  shadowOffset?: Readonly<{width: number; height: number}> | undefined;
++  shadowOffset?: Readonly<{ width: number; height: number }> | undefined;
+   shadowOpacity?: AnimatableNumericValue | undefined;
+   shadowRadius?: number | undefined;
+ }
+@@ -269,30 +269,30 @@ interface MatrixTransform {
+ }
+ 
+ type MaximumOneOf<T, K extends keyof T = keyof T> = K extends keyof T
+-  ? {[P in K]: T[K]} & {[P in Exclude<keyof T, K>]?: never}
++  ? { [P in K]: T[K] } & { [P in Exclude<keyof T, K>]?: never }
+   : never;
+ 
+ export interface TransformsStyle {
+   transform?:
+-    | Readonly<
+-        MaximumOneOf<
+-          PerspectiveTransform &
+-            RotateTransform &
+-            RotateXTransform &
+-            RotateYTransform &
+-            RotateZTransform &
+-            ScaleTransform &
+-            ScaleXTransform &
+-            ScaleYTransform &
+-            TranslateXTransform &
+-            TranslateYTransform &
+-            SkewXTransform &
+-            SkewYTransform &
+-            MatrixTransform
+-        >[]
+-      >
+-    | string
+-    | undefined;
++  | Readonly<
++    MaximumOneOf<
++      PerspectiveTransform &
++      RotateTransform &
++      RotateXTransform &
++      RotateYTransform &
++      RotateZTransform &
++      ScaleTransform &
++      ScaleXTransform &
++      ScaleYTransform &
++      TranslateXTransform &
++      TranslateYTransform &
++      SkewXTransform &
++      SkewYTransform &
++      MatrixTransform
++    >[]
++  >
++  | string
++  | undefined;
+   transformOrigin?: Array<string | number> | string | undefined;
+ 
+   /**
+@@ -322,16 +322,16 @@ export interface TransformsStyle {
+ }
+ 
+ export type FilterFunction =
+-  | {brightness: number | string}
+-  | {blur: number | string}
+-  | {contrast: number | string}
+-  | {grayscale: number | string}
+-  | {hueRotate: number | string}
+-  | {invert: number | string}
+-  | {opacity: number | string}
+-  | {saturate: number | string}
+-  | {sepia: number | string}
+-  | {dropShadow: DropShadowValue | string};
++  | { brightness: number | string }
++  | { blur: number | string }
++  | { contrast: number | string }
++  | { grayscale: number | string }
++  | { hueRotate: number | string }
++  | { invert: number | string }
++  | { opacity: number | string }
++  | { saturate: number | string }
++  | { sepia: number | string }
++  | { dropShadow: DropShadowValue | string };
+ 
+ export type DropShadowValue = {
+   offsetX: number | string;
+@@ -437,9 +437,9 @@ export interface ViewStyle extends FlexStyle, ShadowStyleIOS, TransformsStyle {
+ 
+   mixBlendMode?: BlendMode | undefined;
+   experimental_backgroundImage?:
+-    | ReadonlyArray<GradientValue>
+-    | string
+-    | undefined;
++  | ReadonlyArray<GradientValue>
++  | string
++  | undefined;
+ }
+ 
+ export type FontVariant =
+@@ -501,50 +501,50 @@ export interface TextStyle extends TextStyleIOS, TextStyleAndroid, ViewStyle {
+    * values, in that case the closest one is chosen.
+    */
+   fontWeight?:
+-    | 'normal'
+-    | 'bold'
+-    | '100'
+-    | '200'
+-    | '300'
+-    | '400'
+-    | '500'
+-    | '600'
+-    | '700'
+-    | '800'
+-    | '900'
+-    | 100
+-    | 200
+-    | 300
+-    | 400
+-    | 500
+-    | 600
+-    | 700
+-    | 800
+-    | 900
+-    | 'ultralight'
+-    | 'thin'
+-    | 'light'
+-    | 'medium'
+-    | 'regular'
+-    | 'semibold'
+-    | 'condensedBold'
+-    | 'condensed'
+-    | 'heavy'
+-    | 'black'
+-    | undefined;
++  | 'normal'
++  | 'bold'
++  | '100'
++  | '200'
++  | '300'
++  | '400'
++  | '500'
++  | '600'
++  | '700'
++  | '800'
++  | '900'
++  | 100
++  | 200
++  | 300
++  | 400
++  | 500
++  | 600
++  | 700
++  | 800
++  | 900
++  | 'ultralight'
++  | 'thin'
++  | 'light'
++  | 'medium'
++  | 'regular'
++  | 'semibold'
++  | 'condensedBold'
++  | 'condensed'
++  | 'heavy'
++  | 'black'
++  | undefined;
+   letterSpacing?: number | undefined;
+   lineHeight?: number | undefined;
+   textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify' | undefined;
+   textDecorationLine?:
+-    | 'none'
+-    | 'underline'
+-    | 'line-through'
+-    | 'underline line-through'
+-    | undefined;
++  | 'none'
++  | 'underline'
++  | 'line-through'
++  | 'underline line-through'
++  | undefined;
+   textDecorationStyle?: 'solid' | 'double' | 'dotted' | 'dashed' | undefined;
+   textDecorationColor?: ColorValue | undefined;
+   textShadowColor?: ColorValue | undefined;
+-  textShadowOffset?: {width: number; height: number} | undefined;
++  textShadowOffset?: { width: number; height: number } | undefined;
+   textShadowRadius?: number | undefined;
+   textTransform?: 'none' | 'capitalize' | 'uppercase' | 'lowercase' | undefined;
+   userSelect?: 'auto' | 'none' | 'text' | 'contain' | 'all' | undefined;
+diff --git a/node_modules/react-native/Libraries/StyleSheet/processColor.d.ts b/node_modules/react-native/Libraries/StyleSheet/processColor.d.ts
+index d84a5a7..b47c0e8 100644
+--- a/node_modules/react-native/Libraries/StyleSheet/processColor.d.ts
++++ b/node_modules/react-native/Libraries/StyleSheet/processColor.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {ColorValue, OpaqueColorValue} from './StyleSheet';
++import { ColorValue, OpaqueColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet';
+ 
+ export type ProcessedColorValue = number | OpaqueColorValue;
+ 
+diff --git a/node_modules/react-native/Libraries/Text/Text.d.ts b/node_modules/react-native/Libraries/Text/Text.d.ts
+index 9133cec..63b55eb 100644
+--- a/node_modules/react-native/Libraries/Text/Text.d.ts
++++ b/node_modules/react-native/Libraries/Text/Text.d.ts
+@@ -8,16 +8,16 @@
+  */
+ 
+ import type * as React from 'react';
+-import {Constructor} from '../../types/private/Utilities';
+-import {AccessibilityProps} from '../Components/View/ViewAccessibility';
+-import {NativeMethods} from '../../types/public/ReactNativeTypes';
+-import {ColorValue, StyleProp} from '../StyleSheet/StyleSheet';
+-import {TextStyle, ViewStyle} from '../StyleSheet/StyleSheetTypes';
++import { Constructor } from 'react-native/types/private/Utilities';
++import { AccessibilityProps } from 'react-native/Libraries/Components/View/ViewAccessibility';
++import { NativeMethods } from 'react-native/types/public/ReactNativeTypes';
++import { ColorValue, StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
++import { TextStyle, ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+ import {
+   GestureResponderEvent,
+   LayoutChangeEvent,
+   TextLayoutEvent,
+-} from '../Types/CoreEventTypes';
++} from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ export interface TextPropsIOS {
+   /**
+@@ -29,18 +29,18 @@ export interface TextPropsIOS {
+    * The Dynamic Type scale ramp to apply to this element on iOS.
+    */
+   dynamicTypeRamp?:
+-    | 'caption2'
+-    | 'caption1'
+-    | 'footnote'
+-    | 'subheadline'
+-    | 'callout'
+-    | 'body'
+-    | 'headline'
+-    | 'title3'
+-    | 'title2'
+-    | 'title1'
+-    | 'largeTitle'
+-    | undefined;
++  | 'caption2'
++  | 'caption1'
++  | 'footnote'
++  | 'subheadline'
++  | 'callout'
++  | 'body'
++  | 'headline'
++  | 'title3'
++  | 'title2'
++  | 'title1'
++  | 'largeTitle'
++  | undefined;
+ 
+   /**
+    * When `true`, no visual change is made when text is pressed down. By
+@@ -52,11 +52,11 @@ export interface TextPropsIOS {
+    * Set line break strategy on iOS.
+    */
+   lineBreakStrategyIOS?:
+-    | 'none'
+-    | 'standard'
+-    | 'hangul-word'
+-    | 'push-out'
+-    | undefined;
++  | 'none'
++  | 'standard'
++  | 'hangul-word'
++  | 'push-out'
++  | undefined;
+ }
+ 
+ export interface TextPropsAndroid {
+@@ -86,13 +86,13 @@ export interface TextPropsAndroid {
+    * By default no data types are detected.
+    */
+   dataDetectorType?:
+-    | null
+-    | 'phoneNumber'
+-    | 'link'
+-    | 'email'
+-    | 'none'
+-    | 'all'
+-    | undefined;
++  | null
++  | 'phoneNumber'
++  | 'link'
++  | 'email'
++  | 'none'
++  | 'all'
++  | undefined;
+ 
+   /**
+    * Hyphenation strategy
+@@ -103,8 +103,8 @@ export interface TextPropsAndroid {
+ // https://reactnative.dev/docs/text#props
+ export interface TextProps
+   extends TextPropsIOS,
+-    TextPropsAndroid,
+-    AccessibilityProps {
++  TextPropsAndroid,
++  AccessibilityProps {
+   /**
+    * Specifies whether fonts should scale to respect Text Size accessibility settings.
+    * The default is `true`.
+@@ -216,15 +216,14 @@ export interface TextProps
+    * Defines how far your touch may move off of the button, before deactivating the button.
+    */
+   pressRetentionOffset?:
+-    | {top: number; left: number; bottom: number; right: number}
+-    | undefined;
++  | { top: number; left: number; bottom: number; right: number }
++  | undefined;
+ }
+ 
+ /**
+  * A React component for displaying text which supports nesting, styling, and touch handling.
+  */
+-declare class TextComponent extends React.Component<TextProps> {}
+-declare const TextBase: Constructor<NativeMethods> & typeof TextComponent;
+-export class Text extends TextBase {}
++export class Text extends React.Component<TextProps> { }
++export interface Text extends NativeMethods { }
+ 
+ export const unstable_TextAncestorContext: React.Context<boolean>;
+diff --git a/node_modules/react-native/Libraries/TurboModule/TurboModuleRegistry.d.ts b/node_modules/react-native/Libraries/TurboModule/TurboModuleRegistry.d.ts
+index 4bee7be..005c76f 100644
+--- a/node_modules/react-native/Libraries/TurboModule/TurboModuleRegistry.d.ts
++++ b/node_modules/react-native/Libraries/TurboModule/TurboModuleRegistry.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {TurboModule} from './RCTExport';
++import { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport';
+ 
+ export function get<T extends TurboModule>(name: string): T | null;
+ export function getEnforcing<T extends TurboModule>(name: string): T;
+diff --git a/node_modules/react-native/Libraries/Types/CoreEventTypes.d.ts b/node_modules/react-native/Libraries/Types/CoreEventTypes.d.ts
+index 1325e1d..e716a02 100644
+--- a/node_modules/react-native/Libraries/Types/CoreEventTypes.d.ts
++++ b/node_modules/react-native/Libraries/Types/CoreEventTypes.d.ts
+@@ -8,7 +8,7 @@
+  */
+ 
+ import type * as React from 'react';
+-import {HostInstance} from '../../types/public/ReactNativeTypes';
++import { HostInstance } from 'react-native/types/public/ReactNativeTypes';
+ 
+ export interface LayoutRectangle {
+   x: number;
+@@ -18,7 +18,7 @@ export interface LayoutRectangle {
+ }
+ 
+ // @see TextProps.onLayout
+-export type LayoutChangeEvent = NativeSyntheticEvent<{layout: LayoutRectangle}>;
++export type LayoutChangeEvent = NativeSyntheticEvent<{ layout: LayoutRectangle }>;
+ 
+ interface TextLayoutLine {
+   ascender: number;
+@@ -46,7 +46,7 @@ export type TextLayoutEvent = NativeSyntheticEvent<TextLayoutEventData>;
+ 
+ // Similar to React.SyntheticEvent except for nativeEvent
+ export interface NativeSyntheticEvent<T>
+-  extends React.BaseSyntheticEvent<T, HostInstance, HostInstance> {}
++  extends React.BaseSyntheticEvent<T, HostInstance, HostInstance> { }
+ 
+ export interface NativeTouchEvent {
+   /**
+@@ -240,9 +240,9 @@ export interface NativePointerEvent extends NativeMouseEvent {
+ export type PointerEvent = NativeSyntheticEvent<NativePointerEvent>;
+ 
+ export interface GestureResponderEvent
+-  extends NativeSyntheticEvent<NativeTouchEvent> {}
++  extends NativeSyntheticEvent<NativeTouchEvent> { }
+ 
+-export interface MouseEvent extends NativeSyntheticEvent<NativeMouseEvent> {}
++export interface MouseEvent extends NativeSyntheticEvent<NativeMouseEvent> { }
+ 
+ export interface TargetedEvent {
+   target: number;
+diff --git a/node_modules/react-native/Libraries/Utilities/Appearance.d.ts b/node_modules/react-native/Libraries/Utilities/Appearance.d.ts
+index 2b8428e..6bd2e2d 100644
+--- a/node_modules/react-native/Libraries/Utilities/Appearance.d.ts
++++ b/node_modules/react-native/Libraries/Utilities/Appearance.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {NativeEventSubscription} from '../EventEmitter/RCTNativeAppEventEmitter';
++import { NativeEventSubscription } from 'react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter';
+ 
+ type ColorSchemeName = 'light' | 'dark' | null | undefined;
+ 
+diff --git a/node_modules/react-native/Libraries/Utilities/BackHandler.d.ts b/node_modules/react-native/Libraries/Utilities/BackHandler.d.ts
+index 8ca8e17..1d59f01 100644
+--- a/node_modules/react-native/Libraries/Utilities/BackHandler.d.ts
++++ b/node_modules/react-native/Libraries/Utilities/BackHandler.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {NativeEventSubscription} from '../EventEmitter/RCTNativeAppEventEmitter';
++import { NativeEventSubscription } from 'react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter';
+ 
+ export type BackPressEventName = 'hardwareBackPress';
+ 
+diff --git a/node_modules/react-native/Libraries/Utilities/DevSettings.d.ts b/node_modules/react-native/Libraries/Utilities/DevSettings.d.ts
+index 9040ee0..95b6ac1 100644
+--- a/node_modules/react-native/Libraries/Utilities/DevSettings.d.ts
++++ b/node_modules/react-native/Libraries/Utilities/DevSettings.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {NativeEventEmitter} from '../EventEmitter/NativeEventEmitter';
++import { NativeEventEmitter } from 'react-native/Libraries/EventEmitter/NativeEventEmitter';
+ 
+ /**
+  * The DevSettings module exposes methods for customizing settings for developers in development.
+diff --git a/node_modules/react-native/Libraries/Utilities/Dimensions.d.ts b/node_modules/react-native/Libraries/Utilities/Dimensions.d.ts
+index cca9d81..a3dead9 100644
+--- a/node_modules/react-native/Libraries/Utilities/Dimensions.d.ts
++++ b/node_modules/react-native/Libraries/Utilities/Dimensions.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {EmitterSubscription} from '../vendor/emitter/EventEmitter';
++import { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+ // Used by Dimensions below
+ export interface ScaledSize {
+@@ -54,7 +54,7 @@ export interface Dimensions {
+    * This should only be called from native code by sending the didUpdateDimensions event.
+    * @param dims Simple string-keyed object of dimensions to set
+    */
+-  set(dims: {[key: string]: any}): void;
++  set(dims: { [key: string]: any }): void;
+ 
+   /**
+    * Add an event listener for dimension changes
+diff --git a/node_modules/react-native/src/types/globals.d.ts b/node_modules/react-native/src/types/globals.d.ts
+index a8f6b20..f7b8fc1 100644
+--- a/node_modules/react-native/src/types/globals.d.ts
++++ b/node_modules/react-native/src/types/globals.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import type {ErrorUtils} from '../../Libraries/vendor/core/ErrorUtils';
++import type { ErrorUtils } from 'react-native/Libraries/vendor/core/ErrorUtils';
+ 
+ declare global {
+   interface NodeRequire {
+@@ -94,7 +94,7 @@ declare global {
+ 
+   var DOMRect: {
+     prototype: DOMRect;
+-    new (x?: number, y?: number, width?: number, height?: number): DOMRect;
++    new(x?: number, y?: number, width?: number, height?: number): DOMRect;
+     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect/fromRect_static) */
+     fromRect(other?: DOMRectInit): DOMRect;
+   };
+@@ -165,7 +165,7 @@ declare global {
+ 
+   var Blob: {
+     prototype: Blob;
+-    new (blobParts?: Array<Blob | string>, options?: BlobOptions): Blob;
++    new(blobParts?: Array<Blob | string>, options?: BlobOptions): Blob;
+   };
+ 
+   interface FilePropertyBag extends BlobPropertyBag {
+@@ -179,24 +179,24 @@ declare global {
+ 
+   var File: {
+     prototype: File;
+-    new (fileParts: BlobPart[], name: string, options?: FilePropertyBag): File;
++    new(fileParts: BlobPart[], name: string, options?: FilePropertyBag): File;
+   };
+ 
+   type FormDataValue =
+     | string
+-    | {name?: string | undefined; type?: string | undefined; uri: string};
++    | { name?: string | undefined; type?: string | undefined; uri: string };
+ 
+   type FormDataPart =
+     | {
+-        string: string;
+-        headers: {[name: string]: string};
+-      }
++      string: string;
++      headers: { [name: string]: string };
++    }
+     | {
+-        uri: string;
+-        headers: {[name: string]: string};
+-        name?: string | undefined;
+-        type?: string | undefined;
+-      };
++      uri: string;
++      headers: { [name: string]: string };
++      name?: string | undefined;
++      type?: string | undefined;
++    };
+ 
+   class FormData {
+     append(key: string, value: any): void;
+@@ -231,7 +231,7 @@ declare global {
+ 
+   var Headers: {
+     prototype: Headers;
+-    new (init?: HeadersInit_): Headers;
++    new(init?: HeadersInit_): Headers;
+   };
+ 
+   /**
+@@ -288,7 +288,7 @@ declare global {
+ 
+   var Request: {
+     prototype: Request;
+-    new (input: Request | string, init?: RequestInit): Request;
++    new(input: Request | string, init?: RequestInit): Request;
+   };
+ 
+   type RequestInfo = Request | string;
+@@ -312,7 +312,7 @@ declare global {
+ 
+   var Response: {
+     prototype: Response;
+-    new (body?: BodyInit_ | null, init?: ResponseInit): Response;
++    new(body?: BodyInit_ | null, init?: ResponseInit): Response;
+     error(): Response;
+     json(data: any, init?: ResponseInit): Response;
+     redirect: (url: string | URL, status?: number) => Response;
+@@ -386,7 +386,7 @@ declare global {
+ 
+   var XMLHttpRequest: {
+     prototype: XMLHttpRequest;
+-    new (): XMLHttpRequest;
++    new(): XMLHttpRequest;
+     readonly DONE: 4;
+     readonly HEADERS_RECEIVED: 2;
+     readonly LOADING: 3;
+@@ -430,7 +430,7 @@ declare global {
+ 
+   interface XMLHttpRequestUpload
+     extends EventTarget,
+-      XMLHttpRequestEventTarget {
++    XMLHttpRequestEventTarget {
+     addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
+       type: K,
+       listener: (
+@@ -449,7 +449,7 @@ declare global {
+ 
+   var XMLHttpRequestUpload: {
+     prototype: XMLHttpRequestUpload;
+-    new (): XMLHttpRequestUpload;
++    new(): XMLHttpRequestUpload;
+   };
+ 
+   type XMLHttpRequestResponseType =
+@@ -470,7 +470,7 @@ declare global {
+ 
+   var URL: {
+     prototype: URL;
+-    new (url: string | URL, base?: string | URL): URL;
++    new(url: string | URL, base?: string | URL): URL;
+     createObjectURL(obj: Blob): string;
+     revokeObjectURL(url: string): void;
+   };
+@@ -487,7 +487,7 @@ declare global {
+ 
+   var URLSearchParams: {
+     prototype: URLSearchParams;
+-    new (
++    new(
+       init?: string[][] | Record<string, string> | string | URLSearchParams,
+     ): URLSearchParams;
+   };
+@@ -541,11 +541,11 @@ declare global {
+ 
+   var WebSocket: {
+     prototype: WebSocket;
+-    new (
++    new(
+       uri: string,
+       protocols?: string | string[] | null,
+       options?: {
+-        headers: {[headerName: string]: string};
++        headers: { [headerName: string]: string };
+         [optionName: string]: any;
+       } | null,
+     ): WebSocket;
+@@ -580,10 +580,10 @@ declare global {
+       options?:
+         | boolean
+         | {
+-            capture?: boolean | undefined;
+-            once?: boolean | undefined;
+-            passive?: boolean | undefined;
+-          },
++          capture?: boolean | undefined;
++          once?: boolean | undefined;
++          passive?: boolean | undefined;
++        },
+     ) => void;
+ 
+     dispatchEvent(event: Event): boolean;
+@@ -594,8 +594,8 @@ declare global {
+       options?:
+         | boolean
+         | {
+-            capture?: boolean | undefined;
+-          },
++          capture?: boolean | undefined;
++        },
+     ) => void;
+   }
+ 
+@@ -629,14 +629,14 @@ declare global {
+     onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
+     onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null;
+     onloadend:
+-      | ((this: FileReader, ev: ProgressEvent<FileReader>) => any)
+-      | null;
++    | ((this: FileReader, ev: ProgressEvent<FileReader>) => any)
++    | null;
+     onloadstart:
+-      | ((this: FileReader, ev: ProgressEvent<FileReader>) => any)
+-      | null;
++    | ((this: FileReader, ev: ProgressEvent<FileReader>) => any)
++    | null;
+     onprogress:
+-      | ((this: FileReader, ev: ProgressEvent<FileReader>) => any)
+-      | null;
++    | ((this: FileReader, ev: ProgressEvent<FileReader>) => any)
++    | null;
+     readonly readyState: number;
+     readonly result: string | ArrayBuffer;
+     abort(): void;
+@@ -660,7 +660,7 @@ declare global {
+ 
+   var FileReader: {
+     prototype: FileReader;
+-    new (): FileReader;
++    new(): FileReader;
+     readonly DONE: 2;
+     readonly EMPTY: 0;
+     readonly LOADING: 1;
+diff --git a/node_modules/react-native/types/index.d.ts b/node_modules/react-native/types/index.d.ts
+index 65ded64..c8393f1 100644
+--- a/node_modules/react-native/types/index.d.ts
++++ b/node_modules/react-native/types/index.d.ts
+@@ -70,94 +70,94 @@
+ /// <reference path="modules/Devtools.d.ts" />
+ /// <reference path="../src/types/globals.d.ts" />
+ 
+-export * from '../Libraries/ActionSheetIOS/ActionSheetIOS';
+-export * from '../Libraries/Alert/Alert';
+-export * from '../Libraries/Animated/Animated';
+-export * from '../Libraries/Animated/Easing';
+-export * from '../Libraries/Animated/useAnimatedValue';
+-export * from '../Libraries/AppState/AppState';
+-export * from '../Libraries/BatchedBridge/NativeModules';
+-export * from '../Libraries/Components/AccessibilityInfo/AccessibilityInfo';
+-export * from '../Libraries/Components/ActivityIndicator/ActivityIndicator';
+-export * from '../Libraries/Components/Clipboard/Clipboard';
+-export * from '../Libraries/Components/DrawerAndroid/DrawerLayoutAndroid';
+-export * from '../Libraries/Components/Keyboard/Keyboard';
+-export * from '../Libraries/Components/Keyboard/KeyboardAvoidingView';
+-export * from '../Libraries/Components/LayoutConformance/LayoutConformance';
+-export * from '../Libraries/Components/Pressable/Pressable';
+-export * from '../Libraries/Components/ProgressBarAndroid/ProgressBarAndroid';
+-export * from '../Libraries/Components/RefreshControl/RefreshControl';
+-export * from '../Libraries/Components/SafeAreaView/SafeAreaView';
+-export * from '../Libraries/Components/ScrollView/ScrollView';
+-export * from '../Libraries/Components/StatusBar/StatusBar';
+-export * from '../Libraries/Components/Switch/Switch';
+-export * from '../Libraries/Components/TextInput/InputAccessoryView';
+-export * from '../Libraries/Components/TextInput/TextInput';
+-export * from '../Libraries/Components/ToastAndroid/ToastAndroid';
+-export * from '../Libraries/Components/Touchable/Touchable';
+-export * from '../Libraries/Components/Touchable/TouchableHighlight';
+-export * from '../Libraries/Components/Touchable/TouchableNativeFeedback';
+-export * from '../Libraries/Components/Touchable/TouchableOpacity';
+-export * from '../Libraries/Components/Touchable/TouchableWithoutFeedback';
+-export * from '../Libraries/Components/View/View';
+-export * from '../Libraries/Components/View/ViewAccessibility';
+-export * from '../Libraries/Components/View/ViewPropTypes';
+-export * from '../Libraries/Components/Button';
+-export * from '../Libraries/Core/registerCallableModule';
+-export * from '../Libraries/EventEmitter/NativeEventEmitter';
+-export * from '../Libraries/EventEmitter/RCTDeviceEventEmitter';
+-export * from '../Libraries/EventEmitter/RCTNativeAppEventEmitter';
+-export * from '../Libraries/Image/Image';
+-export * from '../Libraries/Image/ImageResizeMode';
+-export * from '../Libraries/Image/ImageSource';
+-export * from '../Libraries/Interaction/InteractionManager';
+-export * from '../Libraries/Interaction/PanResponder';
+-export * from '../Libraries/LayoutAnimation/LayoutAnimation';
+-export * from '../Libraries/Linking/Linking';
+-export * from '../Libraries/Lists/FlatList';
+-export * from '../Libraries/Lists/SectionList';
+-export * from '@react-native/virtualized-lists';
+-export * from '../Libraries/LogBox/LogBox';
+-export * from '../Libraries/Modal/Modal';
+-export * as Systrace from '../Libraries/Performance/Systrace';
+-export * from '../Libraries/PermissionsAndroid/PermissionsAndroid';
+-export * from '../Libraries/PushNotificationIOS/PushNotificationIOS';
+-export * from '../Libraries/ReactNative/AppRegistry';
+-export * from '../Libraries/ReactNative/I18nManager';
+-export * from '../Libraries/ReactNative/RendererProxy';
+-export * from '../Libraries/ReactNative/RootTag';
+-export * from '../Libraries/ReactNative/UIManager';
+-export * from '../Libraries/ReactNative/requireNativeComponent';
+-export * from '../Libraries/Settings/Settings';
+-export * from '../Libraries/Share/Share';
+-export * from '../Libraries/StyleSheet/PlatformColorValueTypesIOS';
+-export * from '../Libraries/StyleSheet/PlatformColorValueTypes';
+-export * from '../Libraries/StyleSheet/StyleSheet';
+-export * from '../Libraries/StyleSheet/StyleSheetTypes';
+-export * from '../Libraries/StyleSheet/processColor';
+-export * from '../Libraries/Text/Text';
+-export * from '../Libraries/TurboModule/RCTExport';
+-export * as TurboModuleRegistry from '../Libraries/TurboModule/TurboModuleRegistry';
+-export * as CodegenTypes from '../Libraries/Types/CodegenTypesNamespace';
+-export * from '../Libraries/Types/CoreEventTypes';
+-export * from '../Libraries/Utilities/Appearance';
+-export * from '../Libraries/Utilities/BackHandler';
+-export * from '../src/private/devsupport/devmenu/DevMenu';
+-export * from '../Libraries/Utilities/DevSettings';
+-export * from '../Libraries/Utilities/Dimensions';
+-export * from '../Libraries/Utilities/PixelRatio';
+-export * from '../Libraries/Utilities/Platform';
+-export * from '../Libraries/Vibration/Vibration';
+-export * from '../Libraries/vendor/core/ErrorUtils';
++export * from 'react-native/Libraries/ActionSheetIOS/ActionSheetIOS';
++export * from 'react-native/Libraries/Alert/Alert';
++export * from 'react-native/Libraries/Animated/Animated';
++export * from 'react-native/Libraries/Animated/Easing';
++export * from 'react-native/Libraries/Animated/useAnimatedValue';
++export * from 'react-native/Libraries/AppState/AppState';
++export * from 'react-native/Libraries/BatchedBridge/NativeModules';
++export * from 'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo';
++export * from 'react-native/Libraries/Components/ActivityIndicator/ActivityIndicator';
++export * from 'react-native/Libraries/Components/Clipboard/Clipboard';
++export * from 'react-native/Libraries/Components/DrawerAndroid/DrawerLayoutAndroid';
++export * from 'react-native/Libraries/Components/Keyboard/Keyboard';
++export * from 'react-native/Libraries/Components/Keyboard/KeyboardAvoidingView';
++export * from 'react-native/Libraries/Components/LayoutConformance/LayoutConformance';
++export * from 'react-native/Libraries/Components/Pressable/Pressable';
++export * from 'react-native/Libraries/Components/ProgressBarAndroid/ProgressBarAndroid';
++export * from 'react-native/Libraries/Components/RefreshControl/RefreshControl';
++export * from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
++export * from 'react-native/Libraries/Components/ScrollView/ScrollView';
++export * from 'react-native/Libraries/Components/StatusBar/StatusBar';
++export * from 'react-native/Libraries/Components/Switch/Switch';
++export * from 'react-native/Libraries/Components/TextInput/InputAccessoryView';
++export * from 'react-native/Libraries/Components/TextInput/TextInput';
++export * from 'react-native/Libraries/Components/ToastAndroid/ToastAndroid';
++export * from 'react-native/Libraries/Components/Touchable/Touchable';
++export * from 'react-native/Libraries/Components/Touchable/TouchableHighlight';
++export * from 'react-native/Libraries/Components/Touchable/TouchableNativeFeedback';
++export * from 'react-native/Libraries/Components/Touchable/TouchableOpacity';
++export * from 'react-native/Libraries/Components/Touchable/TouchableWithoutFeedback';
++export * from 'react-native/Libraries/Components/View/View';
++export * from 'react-native/Libraries/Components/View/ViewAccessibility';
++export * from 'react-native/Libraries/Components/View/ViewPropTypes';
++export * from 'react-native/Libraries/Components/Button';
++export * from 'react-native/Libraries/Core/registerCallableModule';
++export * from 'react-native/Libraries/EventEmitter/NativeEventEmitter';
++export * from 'react-native/Libraries/EventEmitter/RCTDeviceEventEmitter';
++export * from 'react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter';
++export * from 'react-native/Libraries/Image/Image';
++export * from 'react-native/Libraries/Image/ImageResizeMode';
++export * from 'react-native/Libraries/Image/ImageSource';
++export * from 'react-native/Libraries/Interaction/InteractionManager';
++export * from 'react-native/Libraries/Interaction/PanResponder';
++export * from 'react-native/Libraries/LayoutAnimation/LayoutAnimation';
++export * from 'react-native/Libraries/Linking/Linking';
++export * from 'react-native/Libraries/Lists/FlatList';
++export * from 'react-native/Libraries/Lists/SectionList';
++export * from 'react-native/node_modules/@react-native/virtualized-lists';
++export * from 'react-native/Libraries/LogBox/LogBox';
++export * from 'react-native/Libraries/Modal/Modal';
++export * as Systrace from 'react-native/Libraries/Performance/Systrace';
++export * from 'react-native/Libraries/PermissionsAndroid/PermissionsAndroid';
++export * from 'react-native/Libraries/PushNotificationIOS/PushNotificationIOS';
++export * from 'react-native/Libraries/ReactNative/AppRegistry';
++export * from 'react-native/Libraries/ReactNative/I18nManager';
++export * from 'react-native/Libraries/ReactNative/RendererProxy';
++export * from 'react-native/Libraries/ReactNative/RootTag';
++export * from 'react-native/Libraries/ReactNative/UIManager';
++export * from 'react-native/Libraries/ReactNative/requireNativeComponent';
++export * from 'react-native/Libraries/Settings/Settings';
++export * from 'react-native/Libraries/Share/Share';
++export * from 'react-native/Libraries/StyleSheet/PlatformColorValueTypesIOS';
++export * from 'react-native/Libraries/StyleSheet/PlatformColorValueTypes';
++export * from 'react-native/Libraries/StyleSheet/StyleSheet';
++export * from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
++export * from 'react-native/Libraries/StyleSheet/processColor';
++export * from 'react-native/Libraries/Text/Text';
++export * from 'react-native/Libraries/TurboModule/RCTExport';
++export * as TurboModuleRegistry from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
++export * as CodegenTypes from 'react-native/Libraries/Types/CodegenTypesNamespace';
++export * from 'react-native/Libraries/Types/CoreEventTypes';
++export * from 'react-native/Libraries/Utilities/Appearance';
++export * from 'react-native/Libraries/Utilities/BackHandler';
++export * from 'react-native/src/private/devsupport/devmenu/DevMenu';
++export * from 'react-native/Libraries/Utilities/DevSettings';
++export * from 'react-native/Libraries/Utilities/Dimensions';
++export * from 'react-native/Libraries/Utilities/PixelRatio';
++export * from 'react-native/Libraries/Utilities/Platform';
++export * from 'react-native/Libraries/Vibration/Vibration';
++export * from 'react-native/Libraries/vendor/core/ErrorUtils';
+ export {
+   EmitterSubscription,
+   EventSubscription,
+-} from '../Libraries/vendor/emitter/EventEmitter';
++} from 'react-native/Libraries/vendor/emitter/EventEmitter';
+ 
+-export * from './public/DeprecatedPropertiesAlias';
+-export * from './public/Insets';
+-export * from './public/ReactNativeRenderer';
+-export * from './public/ReactNativeTypes';
++export * from 'react-native/types/public/DeprecatedPropertiesAlias';
++export * from 'react-native/types/public/Insets';
++export * from 'react-native/types/public/ReactNativeRenderer';
++export * from 'react-native/types/public/ReactNativeTypes';
+ 
+-export {default as codegenNativeCommands} from '../Libraries/Utilities/codegenNativeCommands';
+-export {default as codegenNativeComponent} from '../Libraries/Utilities/codegenNativeComponent';
++export { default as codegenNativeCommands } from 'react-native/Libraries/Utilities/codegenNativeCommands';
++export { default as codegenNativeComponent } from 'react-native/Libraries/Utilities/codegenNativeComponent';
+diff --git a/node_modules/react-native/types/public/ReactNativeRenderer.d.ts b/node_modules/react-native/types/public/ReactNativeRenderer.d.ts
+index eb136cb..582a64e 100644
+--- a/node_modules/react-native/types/public/ReactNativeRenderer.d.ts
++++ b/node_modules/react-native/types/public/ReactNativeRenderer.d.ts
+@@ -7,7 +7,7 @@
+  * @format
+  */
+ 
+-import {GestureResponderEvent} from '../../Libraries/Types/CoreEventTypes';
++import { GestureResponderEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+ 
+ /**
+  * Gesture recognition on mobile devices is much more complicated than web.
+@@ -44,15 +44,15 @@ export interface GestureResponderHandlers {
+    * Does this view want to become responder on the start of a touch?
+    */
+   onStartShouldSetResponder?:
+-    | ((event: GestureResponderEvent) => boolean)
+-    | undefined;
++  | ((event: GestureResponderEvent) => boolean)
++  | undefined;
+ 
+   /**
+    * Called for every touch move on the View when it is not the responder: does this view want to "claim" touch responsiveness?
+    */
+   onMoveShouldSetResponder?:
+-    | ((event: GestureResponderEvent) => boolean)
+-    | undefined;
++  | ((event: GestureResponderEvent) => boolean)
++  | undefined;
+ 
+   /**
+    * If the View returns true and attempts to become the responder, one of the following will happen:
+@@ -92,8 +92,8 @@ export interface GestureResponderHandlers {
+    *  Should this view release the responder? Returning true allows release
+    */
+   onResponderTerminationRequest?:
+-    | ((event: GestureResponderEvent) => boolean)
+-    | undefined;
++  | ((event: GestureResponderEvent) => boolean)
++  | undefined;
+ 
+   /**
+    * The responder has been taken from the View.
+@@ -116,8 +116,8 @@ export interface GestureResponderHandlers {
+    * it should have a onStartShouldSetResponderCapture handler which returns true.
+    */
+   onStartShouldSetResponderCapture?:
+-    | ((event: GestureResponderEvent) => boolean)
+-    | undefined;
++  | ((event: GestureResponderEvent) => boolean)
++  | undefined;
+ 
+   /**
+    * onStartShouldSetResponder and onMoveShouldSetResponder are called with a bubbling pattern,
+@@ -133,8 +133,8 @@ export interface GestureResponderHandlers {
+    * it should have a onStartShouldSetResponderCapture handler which returns true.
+    */
+   onMoveShouldSetResponderCapture?:
+-    | ((event: GestureResponderEvent) => boolean)
+-    | undefined;
++  | ((event: GestureResponderEvent) => boolean)
++  | undefined;
+ }
+ 
+ /**

@@ -353,15 +353,17 @@ export interface Appointment {
 // ============ Assessment Types ============
 
 export interface AssessmentQuestion {
-    id: string;
-    text: string;
-    type: 'scale' | 'multiple_choice' | 'text';
-    options?: string[];
+    _id: string;
+    questionText: string;
+    inputType: 'scale' | 'select' | 'text';
+    category?: string;
+    options?: { _id: string; value: string | number; label: string }[];
 }
 
 export interface AssessmentSubmission {
     assessmentType: string;
     responses: { questionId: string; answer: number | string }[];
+    completedAt?: string;
 }
 
 export interface AssessmentResult {

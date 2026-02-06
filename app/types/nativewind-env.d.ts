@@ -29,4 +29,7 @@ declare module "react-native" {
     interface ImageBackgroundProps {
         className?: string;
     }
+    interface SafeAreaViewProps {
+        className?: string;
+    }
 }

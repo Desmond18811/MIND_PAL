@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const OTPVerificationScreen = ({ navigation, route }) => {
+const OTPVerificationScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const insets = useSafeAreaInsets();
     const [otp, setOtp] = useState(['', '', '', '']);
     const [timer, setTimer] = useState(60);
@@ -38,13 +38,13 @@ const OTPVerificationScreen = ({ navigation, route }) => {
         setOtp(newOtp);
 
         if (value && index < 3) {
-            inputRefs.current[index + 1]?.focus();
+            (inputRefs.current[index + 1] as any)?.focus();
         }
     };
 
     const handleKeyPress = (e: any, index: number) => {
         if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus();
+            (inputRefs.current[index - 1] as any)?.focus();
         }
     };
 
@@ -109,7 +109,7 @@ const OTPVerificationScreen = ({ navigation, route }) => {
                             {otp.map((digit, index) => (
                                 <TextInput
                                     key={index}
-                                    ref={ref => inputRefs.current[index] = ref}
+                                    ref={ref => { inputRefs.current[index] = ref; }}
                                     className={`w-14 h-14 rounded-[20px] border-2 text-2xl font-bold text-center text-[#4A3B32] ${digit ? 'border-[#8EAA79] bg-[#F5FAF2]' : 'border-[#E0E0E0] bg-white'}`}
                                     value={digit}
                                     onChangeText={(value) => handleOtpChange(value.replace(/[^0-9]/g, ''), index)}

@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const FingerprintSetupScreen = ({ navigation, route }) => {
+const FingerprintSetupScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const [fingerprintEnabled, setFingerprintEnabled] = useState(false);
 
     const handleEnableFingerprint = () => {

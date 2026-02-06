@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import "../global.css";
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(50)).current;
 

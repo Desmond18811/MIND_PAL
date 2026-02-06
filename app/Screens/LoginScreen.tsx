@@ -17,7 +17,7 @@ import api from '../services/api';
 import Logo from '../assets/logo.svg';
 import "../global.css";
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation }: { navigation: any }) => {
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

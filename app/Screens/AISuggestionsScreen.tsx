@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const AISuggestionsScreen = ({ navigation }) => {
+const AISuggestionsScreen = ({ navigation }: { navigation: any }) => {
     const [activeTab, setActiveTab] = useState('all');
     const fadeAnim = React.useRef(new Animated.Value(0)).current;
     const slideAnim = React.useRef(new Animated.Value(50)).current;

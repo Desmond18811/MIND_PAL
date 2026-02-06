@@ -18,15 +18,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import "../global.css";
 
+import { AssessmentQuestion } from '../types/types';
+
 const { height } = Dimensions.get('window');
 
-const AssessmentScreen = ({ navigation }) => {
-  const [questions, setQuestions] = useState([]);
+const AssessmentScreen = ({ navigation }: { navigation: any }) => {
+  const [questions, setQuestions] = useState<AssessmentQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [fadeAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
@@ -44,10 +46,10 @@ const AssessmentScreen = ({ navigation }) => {
 
   const fetchQuestions = async () => {
     try {
-      const questions = await api.assessment.getQuestions();
+      const response = await api.assessment.getQuestions();
 
-      if (questions && questions.length > 0) {
-        setQuestions(questions);
+      if (response && response.data && response.data.length > 0) {
+        setQuestions(response.data);
       } else {
         throw new Error('No questions found');
       }
@@ -59,14 +61,14 @@ const AssessmentScreen = ({ navigation }) => {
     }
   };
 
-  const handleAnswer = (questionId, value) => {
+  const handleAnswer = (questionId: string, value: any) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: value,
     }));
   };
 
-  const validateAnswer = (question, answer) => {
+  const validateAnswer = (question: AssessmentQuestion, answer: any) => {
     if (!answer || answer.toString().trim() === '') {
       return false;
     }
@@ -138,6 +140,7 @@ const AssessmentScreen = ({ navigation }) => {
     try {
       // Format submission data
       const submissionData = {
+        assessmentType: 'initial', // Added required field
         responses: Object.entries(answers).map(([questionId, answer]) => ({
           questionId,
           answer: String(answer), // Ensure string format
@@ -172,7 +175,7 @@ const AssessmentScreen = ({ navigation }) => {
     }
   };
 
-  const renderScaleOptions = (question) => {
+  const renderScaleOptions = (question: AssessmentQuestion) => {
     return (
       <View className="w-full">
         <View className="flex-row justify-between mb-4 px-2">
@@ -180,19 +183,19 @@ const AssessmentScreen = ({ navigation }) => {
           <Text className="text-sm text-dark-brown font-medium">High</Text>
         </View>
         <View className="flex-row justify-between px-2">
-          {question.options.map((option) => (
+          {question.options?.map((option) => (
             <TouchableOpacity
               key={option._id}
               className={`w-12 h-12 rounded-full border-2 justify-center items-center ${answers[question._id] === option.value
-                  ? 'bg-primary-green border-primary-green'
-                  : 'bg-white border-light-gray'
+                ? 'bg-primary-green border-primary-green'
+                : 'bg-white border-light-gray'
                 }`}
               onPress={() => handleAnswer(question._id, option.value)}
             >
               <Text
                 className={`text-lg font-bold ${answers[question._id] === option.value
-                    ? 'text-white'
-                    : 'text-text-dark'
+                  ? 'text-white'
+                  : 'text-text-dark'
                   }`}
               >
                 {option.value}
@@ -279,20 +282,20 @@ const AssessmentScreen = ({ navigation }) => {
             <View className="flex-1 mb-5">
               {question.inputType === 'select' && (
                 <View className="w-full">
-                  {question.options.map((option) => (
+                  {question.options?.map((option) => (
                     <TouchableOpacity
                       key={option._id}
                       className={`bg-white p-5 rounded-xl mb-3 border-2 shadow-sm ${currentAnswer === option.value
-                          ? 'bg-primary-green border-primary-green'
-                          : 'border-light-gray'
+                        ? 'bg-primary-green border-primary-green'
+                        : 'border-light-gray'
                         }`}
                       onPress={() => handleAnswer(question._id, option.value)}
                       activeOpacity={0.7}
                     >
                       <Text
                         className={`text-base text-center font-medium ${currentAnswer === option.value
-                            ? 'text-white font-semibold'
-                            : 'text-text-dark'
+                          ? 'text-white font-semibold'
+                          : 'text-text-dark'
                           }`}
                       >
                         {option.label}

@@ -12,7 +12,7 @@ import "../global.css";
 
 const { width, height } = Dimensions.get('window');
 
-const ComputingScoreScreen = ({ navigation, route }) => {
+const ComputingScoreScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const [progress, setProgress] = useState(0);
     const spinValue = useRef(new Animated.Value(0)).current;
     const pulseValue = useRef(new Animated.Value(1)).current;

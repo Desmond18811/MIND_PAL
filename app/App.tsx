@@ -39,6 +39,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
+        {/* initial flow and boarding. */}
         <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />

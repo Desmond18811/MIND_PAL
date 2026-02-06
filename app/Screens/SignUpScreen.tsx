@@ -17,7 +17,7 @@ import api from '../services/api';
 import Logo from '../assets/logo.svg';
 import "../global.css";
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = ({ navigation }: { navigation: any }) => {
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

@@ -10,17 +10,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const PasswordSetupScreen = ({ navigation, route }) => {
+const PasswordSetupScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const requirements = [
-        { id: 1, text: 'Must have at least 8 characters', check: (p) => p.length >= 8 },
-        { id: 2, text: 'At least one uppercase letter', check: (p) => /[A-Z]/.test(p) },
-        { id: 3, text: 'At least one number', check: (p) => /[0-9]/.test(p) },
-        { id: 4, text: 'At least one special character', check: (p) => /[!@#$%^&*]/.test(p) },
+        { id: 1, text: 'Must have at least 8 characters', check: (p: string) => p.length >= 8 },
+        { id: 2, text: 'At least one uppercase letter', check: (p: string) => /[A-Z]/.test(p) },
+        { id: 3, text: 'At least one number', check: (p: string) => /[0-9]/.test(p) },
+        { id: 4, text: 'At least one special character', check: (p: string) => /[!@#$%^&*]/.test(p) },
     ];
 
     const passwordStrength = () => {

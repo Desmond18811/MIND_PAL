@@ -11,9 +11,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const ProfileSetupScreen = ({ navigation, route }) => {
+const ProfileSetupScreen = ({ navigation, route }: { navigation: any, route: any }) => {
     const [nickname, setNickname] = useState('');
-    const [selectedGender, setSelectedGender] = useState(null);
+    const [selectedGender, setSelectedGender] = useState<string | null>(null);
     const [selectedAvatar, setSelectedAvatar] = useState(0);
 
     const genderOptions = [

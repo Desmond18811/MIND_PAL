@@ -10,8 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const MeditationSetupScreen = ({ navigation, route }) => {
-    const [selectedPreferences, setSelectedPreferences] = useState([]);
+const MeditationSetupScreen = ({ navigation, route }: { navigation: any, route: any }) => {
+    const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
 
     const preferences = [
         { id: 'new_meditation', label: 'New to meditation', icon: '🧘' },
@@ -22,7 +22,7 @@ const MeditationSetupScreen = ({ navigation, route }) => {
         { id: 'build_habit', label: 'Build a habit', icon: '📅' },
     ];
 
-    const togglePreference = (id) => {
+    const togglePreference = (id: string) => {
         setSelectedPreferences(prev =>
             prev.includes(id)
                 ? prev.filter(p => p !== id)
@@ -81,15 +81,15 @@ const MeditationSetupScreen = ({ navigation, route }) => {
                         <TouchableOpacity
                             key={pref.id}
                             className={`flex-row items-center bg-white p-4 rounded-2xl gap-3 border-2 ${selectedPreferences.includes(pref.id)
-                                    ? 'border-primary-green bg-green-50'
-                                    : 'border-transparent'
+                                ? 'border-primary-green bg-green-50'
+                                : 'border-transparent'
                                 }`}
                             onPress={() => togglePreference(pref.id)}
                         >
                             <Text className="text-2xl">{pref.icon}</Text>
                             <Text className={`flex-1 text-base ${selectedPreferences.includes(pref.id)
-                                    ? 'text-dark-brown font-semibold'
-                                    : 'text-text-dark'
+                                ? 'text-dark-brown font-semibold'
+                                : 'text-text-dark'
                                 }`}>
                                 {pref.label}
                             </Text>

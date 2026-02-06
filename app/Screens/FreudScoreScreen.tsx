@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
-const FreudScoreScreen = ({ navigation }) => {
+const FreudScoreScreen = ({ navigation }: { navigation: any }) => {
     const [score, setScore] = useState(80);
     const [includeAISuggestions, setIncludeAISuggestions] = useState(true);
     const [fadeAnim] = useState(new Animated.Value(0));

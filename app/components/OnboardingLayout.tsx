@@ -80,7 +80,7 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
                     <View
                         className="h-full rounded-full"
                         style={{
-                            width: progressWidth,
+                            width: progressWidth as any,
                             backgroundColor: nextButtonColor
                         }}
                     />
