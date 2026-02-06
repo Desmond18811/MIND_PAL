@@ -11,8 +11,8 @@ module.exports = {
       colors: {
         // MindPal custom colors
         'primary-green': '#8EBA6B',
-        'dark-brown': '#6D482F',
-        'light-beige': '#F3EDE4',
+        'dark-brown': '#4B2E1E', // Updated to verified MindPal brown
+        'light-beige': '#FBF7F2', // Updated to verified MindPal bg
         'text-dark': '#333333',
         'text-light': '#FFFFFF',
         'placeholder': '#A0A0A0',
@@ -20,11 +20,11 @@ module.exports = {
         'border-green': '#8DC63F',
         'error-red': '#FF0000',
         'success-green': '#4CAF50',
-        'orange': '#FF8C42',
+        'orange': '#F7931E', // Updated to verified MindPal orange
         'purple': '#9B8BB4',
         'beige': '#F5F5DC',
-        'brown': '#4F3422',
-        'brown-light': '#8B6A56',
+        'brown': '#4B2E1E', // Updated
+        'brown-light': '#7A6A5E', // Updated to verified MindPal light brown
       },
     },
   },

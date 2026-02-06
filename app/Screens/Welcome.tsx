@@ -1,86 +1,52 @@
-import React from 'react';
-import { Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Logo from '../assets/logo.svg';
-import "../global.css";
+import { View, Text, TouchableOpacity } from "react-native";
+import { ArrowRight } from "lucide-react-native";
+import Logo from "../assets/logo.svg";
+import Welcome from "../assets/illustration.svg";
 
-const { width, height } = Dimensions.get('window');
-
-// Assuming illustration.png is the robot character
-const WelcomeIllustration = require('../assets/illustration.png');
-
-const WelcomeScreen = ({ navigation }: { navigation: any }) => {
-  const handleGetStarted = () => {
-    navigation.navigate('Onboarding');
-  };
-
-  const handleSigninLink = () => {
-    navigation.navigate('SignIn');
-  };
-
-  const insets = useSafeAreaInsets();
-
+export default function WelcomeScreen() {
   return (
-    <View
-      className="flex-1 bg-[#FDFDF5] items-center justify-between"
-      style={{
-        paddingTop: insets.top + 10,
-        paddingBottom: insets.bottom + 20
-      }}
-    >
-      {/* Top Section */}
-      <View className="items-center w-full px-8">
+    <View className="flex-1 bg-[#F7F4F2] px-6 pt-[60px] pb-10">
+      {/* Top Section: Logo & Titles */}
+      <View className="items-center mb-10">
         {/* Logo */}
-        <View className="mb-6">
-          {typeof Logo === 'function' ? (
-            <Logo width={60} height={60} />
-          ) : (
-            // Fallback if SVG transformer isn't working (e.g. restart needed)
-            <View style={{ width: 60, height: 60, backgroundColor: '#4F3422', borderRadius: 30, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>MP</Text>
-            </View>
-          )}
+        <View className="w-20 h-20 rounded-full bg-[#5C4033] items-center justify-center mb-5">
+          <Logo width={60} height={60} />
         </View>
-
         {/* Title */}
-        <Text className="text-3xl font-bold text-[#4A3B32] text-center mb-4">
+        <Text className="text-[28px] font-bold text-[#3D2817] mb-3 text-center">
           Welcome to MindPal!!
         </Text>
-
         {/* Subtitle */}
-        <Text className="text-base text-[#666666] text-center leading-6 font-medium">
-          Your mindful mental health AI companion{'\n'}for everyone, anywhere 🌿
+        <Text className="text-[15px] text-[#6B5A4A] text-center leading-[22px] px-5">
+          Your mindful mental health AI companion{"\n"}
+          for everyone, anywhere 🌿
         </Text>
       </View>
-
-      {/* Center Illustration */}
-      <View className="flex-1 justify-center items-center w-full my-4">
-        <Image
-          source={WelcomeIllustration}
-          className="w-full h-full"
-          style={{ width: width * 0.9, height: width * 0.9 }}
-          resizeMode="contain"
-        />
+      {/* Middle Section: Illustration */}
+      <View className="flex-1 items-center justify-center my-5">
+        <Welcome width={300} height={300} />
       </View>
-
-      {/* Bottom Section */}
-      <View className="w-full px-8 pb-4 items-center gap-6">
-        {/* Get Started Button */}
-        <TouchableOpacity
-          className="w-full bg-[#4A3B32] rounded-full py-4 flex-row justify-center items-center shadow-sm active:opacity-90"
-          onPress={handleGetStarted}
-        >
-          <Text className="text-white text-lg font-bold mr-2">Get Started</Text>
-          <Text className="text-white text-xl">→</Text>
+      {/* Bottom Section: Buttons */}
+      <View className="items-center gap-4 my-20">
+        {/* CTA Button */}
+        <TouchableOpacity className="flex-row items-center justify-center bg-[#5C4033] py-4 px-8 rounded-[30px] gap-2 w-full max-w-[280px] shadow-[0_4px_8px_rgba(0,0,0,0.15)]">
+          <Text className="text-white text-[17px] font-semibold">
+            Get Started
+          </Text>
+          <ArrowRight size={20} color="#fff" strokeWidth={2.5} />
         </TouchableOpacity>
-
-        {/* Sign In Link */}
-        <Text className="text-sm text-[#4A3B32]">
-          Already have an account? <Text className="text-[#FF8C42] font-bold" onPress={handleSigninLink}>Sign In.</Text>
-        </Text>
+        {/* Sign In */}
+        <View className="flex-row items-center mt-2">
+          <Text className="text-sm text-[#6B5A4A]">
+            Already have an account?{" "}
+          </Text>
+          <TouchableOpacity>
+            <Text className="text-sm text-[#E67E22] font-semibold">
+              Sign In.
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
-};
-
-export default WelcomeScreen;
+}

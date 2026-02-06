@@ -14,7 +14,7 @@ const OnboardingScreenThree = ({ navigation }: { navigation: any }) => {
     >
       <Text className="text-3xl font-bold text-center text-[#4A3B32] leading-tight mb-2">
         AI Mental{' '}
-        <Text className="text-[#85B26E]">Journaling</Text> & Therapy Chatbot
+        <Text className="text-[#6D6D6D]">Journaling</Text> & Therapy Chatbot
       </Text>
     </OnboardingLayout>
   );
