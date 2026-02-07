@@ -25,9 +25,13 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  /* Hardcoded Test Credentials */
+  // Set 1: Test User / usertest@gmail.com / password123
+  // Set 2: Test User 2 / testuser2@gmail.com / password123
+
+  const [name, setName] = useState('Test User');
+  const [email, setEmail] = useState('usertest@gmail.com');
+  const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
@@ -63,6 +67,23 @@ const SignUpScreen = () => {
     }
 
     setLoading(true);
+
+    // Hardcoded check for Test Users
+    if (
+      (email === 'usertest@gmail.com' && password === 'password123') ||
+      (email === 'testuser2@gmail.com' && password === 'password123')
+    ) {
+      setTimeout(() => {
+        setLoading(false);
+        // Auto-login to Home for test users
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Assessment' }],
+        });
+      }, 1000);
+      return;
+    }
+
     try {
       const response = await api.auth.register({
         email: email.trim().toLowerCase(),

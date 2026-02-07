@@ -25,8 +25,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const LoginScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  /* Hardcoded Test Credentials */
+  // Set 1: usertest@gmail.com / password123
+  // Set 2: testuser2@gmail.com / password123
+
+  const [email, setEmail] = useState('usertest@gmail.com');
+  const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -56,6 +60,22 @@ const LoginScreen = () => {
     }
 
     setLoading(true);
+
+    // Hardcoded check for Test Users
+    if (
+      (email === 'usertest@gmail.com' && password === 'password123') ||
+      (email === 'testuser2@gmail.com' && password === 'password123')
+    ) {
+      setTimeout(() => {
+        setLoading(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+      }, 1000);
+      return;
+    }
+
     try {
       const response = await api.auth.login({
         email: email.trim().toLowerCase(),
