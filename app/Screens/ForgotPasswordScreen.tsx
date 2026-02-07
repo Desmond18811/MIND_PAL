@@ -7,22 +7,24 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import "../global.css";
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
   const insets = useSafeAreaInsets();
-  const [resetMethod, setResetMethod] = useState<'2fa' | 'password'>('password'); // Defaulting to email ('password' refers to email in this context based on UI)
+  const [selectedMethod, setSelectedMethod] = useState<'2fa' | 'password' | 'google'>('password');
   const [loading, setLoading] = useState(false);
 
   const handleSendPassword = async () => {
     setLoading(true);
     try {
-      // Simulate API call to send OTP/Link
+      // Simulate API call
       setTimeout(() => {
-        // Navigation to verification screen
         navigation.navigate('OTPVerification');
         setLoading(false);
       }, 1500);
@@ -32,85 +34,118 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
     }
   };
 
+  const methods = [
+    {
+      id: '2fa',
+      title: 'Use 2FA',
+      icon: 'lock-closed',
+      color: '#A8C789', // Greenish
+      bgColor: '#E6E8D6', // Light Green
+    },
+    {
+      id: 'password',
+      title: 'Password',
+      icon: 'key', // Using key or similar
+      color: '#4A3B32', // Brown
+      bgColor: '#EFE5DA', // Light Beige
+    },
+    {
+      id: 'google',
+      title: 'Google Authenticator',
+      icon: 'logo-google',
+      color: '#A8C789',
+      bgColor: '#E6E8D6',
+    },
+  ];
+
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#F9F9F9]">
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-      {/* Green Header */}
-      <View
-        className="bg-[#A8C789] w-full items-center pt-8 pb-12 rounded-b-[40px] absolute top-0 z-0"
-        style={{ paddingTop: insets.top + 20, height: 220 }}
-      >
-        <View className="w-full px-6 flex-row items-center justify-between">
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center"
-          >
-            <Ionicons name="chevron-back" size={24} color="white" />
-          </TouchableOpacity>
-          <Text className="text-white text-lg font-bold">Forgot Password</Text>
-          <View className="w-10" />
-        </View>
+      {/* Header with Back Button */}
+      <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 24 }} className="flex-row items-center justify-between mb-6">
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="w-12 h-12 rounded-full border border-gray-200 bg-white items-center justify-center"
+        >
+          <Ionicons name="chevron-back" size={24} color="#4A3B32" />
+        </TouchableOpacity>
+        <View />
+        <View className="w-12" />
       </View>
+
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingTop: 180, paddingHorizontal: 24, paddingBottom: 40 }}
+        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="bg-white rounded-t-[30px] pt-6">
-          <Text className="text-3xl font-bold text-[#4A3B32] mb-4 text-center">Forgot Password</Text>
-          <Text className="text-base text-[#4A3B32] text-center opacity-70 leading-6 mb-10">
-            Select which contact details should we use to reset your password
-          </Text>
+        <Text className="text-3xl font-[Urbanist-Bold] text-[#4A3B32] mb-4 text-left">Forgot Password</Text>
+        <Text className="text-base text-[#4A3B32] text-left opacity-70 leading-6 mb-10 font-[Urbanist-Medium]">
+          Select contact details where you want to reset your password.
+        </Text>
 
-          {/* Options */}
-          <View className="gap-5 mb-10">
-            <TouchableOpacity
-              className={`flex-row items-center p-4 rounded-[20px] border-2 ${resetMethod === '2fa' ? 'border-[#8EAA79] bg-[#F5FAF2]' : 'border-[#E0E0E0] bg-white'}`}
-              onPress={() => setResetMethod('2fa')}
-              activeOpacity={0.9}
-            >
-              <View className={`w-14 h-14 rounded-full justify-center items-center mr-4 ${resetMethod === '2fa' ? 'bg-[#D3E5CC]' : 'bg-gray-100'}`}>
-                <Ionicons name="chatbubble-ellipses" size={24} color={resetMethod === '2fa' ? '#4A3B32' : '#A0A0A0'} />
-              </View>
-              <View className="flex-1">
-                <Text className="text-xs text-[#8EAA79] font-semibold mb-0.5">via SMS:</Text>
-                <Text className="text-base font-bold text-[#4A3B32]">+1 111 ******99</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className={`flex-row items-center p-4 rounded-[20px] border-2 ${resetMethod === 'password' ? 'border-[#8EAA79] bg-[#F5FAF2]' : 'border-[#E0E0E0] bg-white'}`}
-              onPress={() => setResetMethod('password')}
-              activeOpacity={0.9}
-            >
-              <View className={`w-14 h-14 rounded-full justify-center items-center mr-4 ${resetMethod === 'password' ? 'bg-[#D3E5CC]' : 'bg-gray-100'}`}>
-                <Ionicons name="mail" size={24} color={resetMethod === 'password' ? '#4A3B32' : '#A0A0A0'} />
-              </View>
-              <View className="flex-1">
-                <Text className="text-xs text-[#8EAA79] font-semibold mb-0.5">via Email:</Text>
-                <Text className="text-base font-bold text-[#4A3B32]">pri...ya@gmail.com</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
+        {/* Options */}
+        <View className="gap-6 mb-10">
+          {/* 2FA Option */}
           <TouchableOpacity
-            className="bg-[#4A3B32] rounded-full py-4 flex-row justify-center items-center shadow-md active:opacity-90"
-            onPress={handleSendPassword}
-            disabled={loading}
+            onPress={() => setSelectedMethod('2fa')}
+            className={`flex-row items-center p-4 rounded-[30px] bg-white border-2 ${selectedMethod === '2fa' ? 'border-[#9BB168]' : 'border-transparent'} shadow-sm`}
+            style={{ height: 100 }}
           >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <>
-                <Text className="text-white text-lg font-bold mr-2">Continue</Text>
-                <Ionicons name="arrow-forward" size={20} color="white" />
-              </>
-            )}
+            <View className="w-16 h-16 rounded-full bg-[#9BB168] justify-center items-center mr-6">
+              <Ionicons name="lock-closed" size={30} color="#4A3B32" />
+            </View>
+            <Text className="text-xl font-[Urbanist-Bold] text-[#4A3B32]">Use 2FA</Text>
+          </TouchableOpacity>
+
+
+          {/* Password Option (Selected Style mockup based on image) */}
+          <TouchableOpacity
+            onPress={() => setSelectedMethod('password')}
+            className={`flex-row items-center p-4 rounded-[30px] bg-white border-2 ${selectedMethod === 'password' ? 'border-[#9BB168]' : 'border-transparent'} shadow-sm`}
+            style={{ height: 100 }}
+          >
+            <View className="w-16 h-16 rounded-full bg-[#E6E8D6] justify-center items-center mr-6 relative overflow-hidden">
+              {/* Visual styling to mimic the quadrant circle in image if needed, for now standard icon */}
+              <View className="absolute top-0 right-0 w-8 h-8 bg-[#9BB168]" />
+              <View className="absolute bottom-0 left-0 w-8 h-8 bg-[#4A3B32]" />
+            </View>
+            <Text className="text-xl font-[Urbanist-Bold] text-[#4A3B32]">Password</Text>
+          </TouchableOpacity>
+
+          {/* Google Auth Option */}
+          <TouchableOpacity
+            onPress={() => setSelectedMethod('google')}
+            className={`flex-row items-center p-4 rounded-[30px] bg-white border-2 ${selectedMethod === 'google' ? 'border-[#9BB168]' : 'border-transparent'} shadow-sm`}
+            style={{ height: 100 }}
+          >
+            <View className="w-16 h-16 rounded-full bg-[#E6E8D6] justify-center items-center mr-6 relative overflow-hidden">
+              {/* Visual styling to mimic the hourglass/triangle shape in image */}
+              <View className="absolute top-0 w-full h-1/2 bg-[#9BB168] opacity-80" style={{ transform: [{ rotate: '45deg' }] }} />
+              <View className="absolute bottom-0 w-full h-1/2 bg-[#4A3B32] opacity-100" style={{ transform: [{ rotate: '45deg' }, { translateY: 10 }] }} />
+            </View>
+            <Text className="text-xl font-[Urbanist-Bold] text-[#4A3B32] flex-1">Google Authenticator</Text>
           </TouchableOpacity>
 
         </View>
+
+
+        <TouchableOpacity
+          className="bg-[#4A3B32] rounded-full py-5 flex-row justify-center items-center shadow-md active:opacity-90 mt-4"
+          onPress={handleSendPassword}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <Text className="text-white text-lg font-[Urbanist-Bold] mr-2">Send Password</Text>
+              <Ionicons name="lock-closed-outline" size={20} color="white" />
+            </>
+          )}
+        </TouchableOpacity>
+
       </ScrollView>
     </View>
   );

@@ -30,14 +30,6 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
 }) => {
     const insets = useSafeAreaInsets();
 
-    // Progress Bar Width calculation
-    // The design shows a segmented/continuous bar. 
-    // Let's make it a single bar that fills up or segments.
-    // Design reference: "Step One" image shows a segmented bar with first part filled.
-    // Actually, looking at the code in OnboardingScreen (previous), it was:
-    // <View className="w-[30%] h-full bg-[#A27562] rounded-md" /> 
-    // Let's implement dynamic width.
-
     const progressWidth = `${(currentStep / totalSteps) * 100}%`;
 
     return (
@@ -73,10 +65,7 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
             >
                 {/* Progress Bar */}
                 <View className="w-24 h-1.5 bg-[#E0E0E0] rounded-full mb-8 overflow-hidden self-center">
-                    {/* Design variant: The mockup shows a centered small bar? OR a wide bar? */}
-                    {/* Looking at the mockup again (via user's verbal description or code): */}
-                    {/* Previously: w-4/5 h-1.5 ... w-[30%] filled. */}
-                    {/* Let's stick to a clean centered progress indicator. */}
+
                     <View
                         className="h-full rounded-full"
                         style={{

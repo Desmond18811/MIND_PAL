@@ -1,23 +1,74 @@
-import React from 'react';
-import { Text } from 'react-native';
-import OnboardingLayout from '../components/OnboardingLayout';
+import React from "react";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { ArrowRight } from "lucide-react-native";
+import Svg, { Path } from "react-native-svg";
+import Background4 from "../assets/background4.svg";
 
-const OnboardingScreenFour = ({ navigation }: { navigation: any }) => {
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+export default function OnboardingScreenFour() {
+  const navigation = useNavigation();
+
   return (
-    <OnboardingLayout
-      backgroundColor="#FFF4E0" // Light Yellow
-      imageSource={require('../assets/resources.png')}
-      stepText="Step Four"
-      currentStep={4}
-      totalSteps={5}
-      onNext={() => navigation.navigate('OnboardingFive')}
-    >
-      <Text className="text-3xl font-bold text-center text-[#4A3B32] leading-tight mb-2">
-        Mindful <Text className="text-[#FFCE5C]">Resources</Text>{'\n'}
-        That Makes You Happy
-      </Text>
-    </OnboardingLayout>
-  );
-};
+    <View className="flex-1 bg-[#FFF5E1]">
+      {/* SVG Background */}
+      <View className="absolute top-0 left-0 right-0 z-0">
+        <Background4 width={SCREEN_WIDTH} height={SCREEN_WIDTH * 1.5} />
+      </View>
 
-export default OnboardingScreenFour;
+      {/* Header */}
+      <View className="absolute top-16 left-0 right-0 items-center z-20">
+        <View className="px-6 py-2 rounded-full border border-[#5C4033] bg-[#FFF5E1]/90">
+          <Text className="text-[#5C4033] font-semibold text-sm tracking-wide">Step Four</Text>
+        </View>
+      </View>
+
+      {/* Main Illustration Area - Spacer to push content down behind white section */}
+      <View className="flex-1" />
+
+      {/* White Bottom Section */}
+      <View className="absolute bottom-0 left-0 right-0 z-20" style={{ height: 280 }}>
+        {/* Curved Top */}
+        <Svg
+          height="100"
+          width={SCREEN_WIDTH}
+          viewBox={`0 0 ${SCREEN_WIDTH} 100`}
+          style={{ position: "absolute", top: -99 }}
+        >
+          <Path
+            d={`M 0 100 L 0 40 Q ${SCREEN_WIDTH / 2} -40 ${SCREEN_WIDTH} 40 L ${SCREEN_WIDTH} 100 Z`}
+            fill="#FFFFFF"
+          />
+        </Svg>
+
+        {/* Main White Content */}
+        <View className="flex-1 bg-white px-8 pt-4 pb-10">
+          {/* Progress Bar */}
+          <View className="w-2/3 self-center h-2 bg-[#EFE5DA] rounded-full mb-8 overflow-hidden">
+            {/* ~90% width for step 4 */}
+            <View className="h-full w-[90%] bg-[#5C4033] rounded-full" />
+          </View>
+
+          {/* Title */}
+          <Text className="text-[28px] font-bold text-[#3D2817] text-center mb-1 leading-tight">
+            Mindful <Text className="text-[#FFC107]">Resources</Text> That
+          </Text>
+          <Text className="text-[28px] font-bold text-[#3D2817] text-center mb-10 leading-tight">
+            Makes You Happy
+          </Text>
+
+          {/* Next Button */}
+          <View className="items-center">
+            <TouchableOpacity
+              className="w-16 h-16 rounded-full bg-[#5C4033] items-center justify-center shadow-lg"
+              onPress={() => navigation.navigate('OnboardingFive')}
+            >
+              <ArrowRight size={28} color="#fff" strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}

@@ -1,9 +1,11 @@
+import 'react-native-reanimated';
 import "./global.css";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
+import { useFonts, Urbanist_400Regular, Urbanist_500Medium, Urbanist_600SemiBold, Urbanist_700Bold } from '@expo-google-fonts/urbanist';
+import * as SplashScreen from 'expo-splash-screen';
 
 import WelcomeScreen from './Screens/Welcome';
 import OnboardingScreen from './Screens/OnboardingScreen';
@@ -34,8 +36,26 @@ import MindfulnessActivitiesScreen from './Screens/MindfulnessActivitiesScreen';
 
 const Stack = createNativeStackNavigator();
 
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    'Urbanist-Regular': Urbanist_400Regular,
+    'Urbanist-Medium': Urbanist_500Medium,
+    'Urbanist-SemiBold': Urbanist_600SemiBold,
+    'Urbanist-Bold': Urbanist_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>

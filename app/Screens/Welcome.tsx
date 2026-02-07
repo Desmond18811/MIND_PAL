@@ -2,8 +2,21 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { ArrowRight } from "lucide-react-native";
 import Logo from "../assets/logo.svg";
 import Welcome from "../assets/illustration.svg";
+import { useNavigation } from "@react-navigation/native";
+
 
 export default function WelcomeScreen() {
+
+  const navigation = useNavigation()
+
+  const handleGetStarted = () => {
+    navigation.navigate('Onboarding')
+  }
+
+  const handleSignIn = () => {
+    navigation.navigate('SignIn')
+  }
+
   return (
     <View className="flex-1 bg-[#F7F4F2] px-6 pt-[60px] pb-10">
       {/* Top Section: Logo & Titles */}
@@ -24,12 +37,14 @@ export default function WelcomeScreen() {
       </View>
       {/* Middle Section: Illustration */}
       <View className="flex-1 items-center justify-center my-5">
-        <Welcome width={300} height={300} />
+        <Welcome width={300} height={490} />
       </View>
       {/* Bottom Section: Buttons */}
       <View className="items-center gap-4 my-20">
         {/* CTA Button */}
-        <TouchableOpacity className="flex-row items-center justify-center bg-[#5C4033] py-4 px-8 rounded-[30px] gap-2 w-full max-w-[280px] shadow-[0_4px_8px_rgba(0,0,0,0.15)]">
+        <TouchableOpacity className="flex-row items-center justify-center bg-[#5C4033] py-4 px-8 rounded-[30px] gap-2 w-full max-w-[280px] shadow-[0_4px_8px_rgba(0,0,0,0.15)]"
+          onPress={handleGetStarted}
+        >
           <Text className="text-white text-[17px] font-semibold">
             Get Started
           </Text>
@@ -40,7 +55,9 @@ export default function WelcomeScreen() {
           <Text className="text-sm text-[#6B5A4A]">
             Already have an account?{" "}
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleSignIn}
+          >
             <Text className="text-sm text-[#E67E22] font-semibold">
               Sign In.
             </Text>
