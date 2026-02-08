@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Dimensions, StatusBar, FlatList, NativeSyntheticEvent, NativeScrollEvent, PanResponder } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Dimensions, StatusBar, FlatList, NativeSyntheticEvent, NativeScrollEvent, PanResponder, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -20,12 +20,16 @@ import FairSvg from '../assets/fair.svg';
 import GoodSvg from '../assets/good.svg';
 // @ts-ignore
 import ExcellentSvg from '../assets/excellent .svg'; // Note the space in filename
+// @ts-ignore
+import IllustrationSvg from '../assets/symptoms .svg';
+
+import VerticalSlider from './VerticalSlider';
 
 import "../global.css";
 
 const { width, height } = Dimensions.get('window');
 
-type QuestionType = 'list' | 'cards' | 'wheel' | 'ruler' | 'mood' | 'binary_image' | 'radio_cards' | 'vertical_slider' | 'grid';
+type QuestionType = 'list' | 'cards' | 'wheel' | 'ruler' | 'mood' | 'binary_image' | 'radio_cards' | 'vertical_slider' | 'grid' | 'search_list' | 'symptoms' | 'stress_scale' | 'voice_analysis' | 'expression_analysis';
 
 interface Option {
   id: string;
@@ -39,6 +43,7 @@ interface Question {
   id: number;
   type: QuestionType;
   title: string;
+  description?: string; // For adding extra text
   options?: Option[];
   min?: number;
   max?: number;
@@ -136,17 +141,54 @@ const questions: Question[] = [
       { id: 'skip', label: 'Prefer not to say', icon: 'close-outline' },
     ]
   },
-  // Placeholders for 10-14
-  ...Array.from({ length: 5 }, (_, i) => ({
-    id: i + 10,
-    type: 'list' as QuestionType,
-    title: `Question ${i + 10}`,
+  {
+    id: 10,
+    type: 'search_list',
+    title: "Please specify your medications!",
     options: [
-      { id: 'opt1', label: 'Option 1' },
-      { id: 'opt2', label: 'Option 2' },
-      { id: 'opt3', label: 'Option 3' },
-    ],
-  })),
+      { id: 'abilify', label: 'Abilify' },
+      { id: 'abilify_maintena', label: 'Abilify Maintena' },
+      { id: 'abiraterone', label: 'Abiraterone' },
+      { id: 'acetaminophen', label: 'Acetaminophen' },
+      { id: 'axpelliarmus', label: 'Axpelliarmus' },
+      { id: 'aspirin', label: 'Aspirin' },
+      { id: 'ibuprofen', label: 'Ibuprofen' },
+    ]
+  },
+  {
+    id: 11,
+    type: 'symptoms',
+    title: "Do you have other mental health symptoms?",
+    options: [
+      { id: 'social_withdrawal', label: 'Social Withdrawal' },
+      { id: 'feeling_numbness', label: 'Feeling Numbness' },
+      { id: 'feeling_sad', label: 'Feeling Sad' },
+      { id: 'depressed', label: 'Depressed' },
+      { id: 'angry', label: 'Angry' },
+      { id: 'anxious', label: 'Anxious' },
+      { id: 'hopeless', label: 'Hopeless' },
+      { id: 'irritable', label: 'Irritable' },
+    ]
+  },
+  {
+    id: 12,
+    type: 'stress_scale',
+    title: "How would you rate your stress level?",
+    min: 1,
+    max: 5,
+  },
+  {
+    id: 13,
+    type: 'voice_analysis',
+    title: "AI Sound Analysis",
+    description: "Please say the following words below. Don’t worry, we don’t steal your voice data."
+  },
+  {
+    id: 14,
+    type: 'expression_analysis',
+    title: "Expression Analysis",
+    description: "Freely write down anything that's on your mind. Dr Freud.ai is here to listen..."
+  },
 ];
 
 const ITEM_HEIGHT = 60;
@@ -289,6 +331,20 @@ const AssessmentScreen = () => {
   // Sleep State
   const [sleepValue, setSleepValue] = useState(2); // 0 to 4 (5 states)
 
+  // Medications Search State
+  const [searchText, setSearchText] = useState('');
+  const [selectedMedications, setSelectedMedications] = useState<string[]>([]);
+
+  // Stress Level State
+  const [stressLevel, setStressLevel] = useState(3);
+
+  // Expression Analysis State
+  const [expressionText, setExpressionText] = useState('');
+
+  // Symptoms State
+  const [symptomInput, setSymptomInput] = useState('');
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+
   const wheelScrollRef = useRef<FlatList>(null);
   const rulerScrollRef = useRef<ScrollView>(null);
 
@@ -323,6 +379,13 @@ const AssessmentScreen = () => {
     if (currentQuestion.type === 'vertical_slider') {
       setAnswers(prev => ({ ...prev, [currentQuestion.id]: 'fair' }));
     }
+    if (currentQuestion.type === 'stress_scale') {
+      setStressLevel(3);
+      setAnswers(prev => ({ ...prev, [currentQuestion.id]: '3' }));
+    }
+    if (currentQuestion.type === 'search_list') {
+      setSelectedMedications([]);
+    }
   }, [currentStep, currentQuestion]);
 
   const handleSelect = (optionId: string) => {
@@ -333,10 +396,8 @@ const AssessmentScreen = () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Home' }],
-      });
+      // Navigate to Avatar Selection after assessment completion
+      navigation.navigate('AvatarSelection', { assessmentAnswers: answers });
     }
   };
 
@@ -555,85 +616,275 @@ const AssessmentScreen = () => {
     );
   };
 
-  // --- Vertical Slider (Sleep Quality) ---
-  const renderVerticalSlider = () => {
-    // 5 levels: Excellent(0), Good(1), Fair(2), Poor(3), Worst(4)
-    // Note: In vertical sliders, usually top is value 0 or max.
-    // Let's visualize it: Top = Excellent, Bottom = Worst.
 
-    const options = currentQuestion.options || [];
-    // const currentLevel = options[sleepValue]; // index maps to options array
+
+  // --- Search List (Medications) ---
+  const renderSearchList = () => {
+    const filteredOptions = currentQuestion.options?.filter(opt =>
+      opt.label.toLowerCase().includes(searchText.toLowerCase())
+    ) || [];
+
+    const toggleMedication = (id: string) => {
+      const newSelection = selectedMedications.includes(id)
+        ? selectedMedications.filter(m => m !== id)
+        : [...selectedMedications, id];
+
+      setSelectedMedications(newSelection);
+      setAnswers({ ...answers, [currentQuestion.id]: newSelection });
+    };
 
     return (
-      <View className="flex-1 flex-row items-center justify-between px-4">
-        {/* Left Labels */}
-        <View className="h-[400px] justify-between items-start py-4">
-          {options.map((opt, i) => (
-            <View key={i} className="h-12 justify-center">
-              <Text className={`font-[Urbanist-Bold] text-lg ${sleepValue === i ? 'text-[#4A3B32]' : 'text-gray-300'}`}>
-                {opt.label}
-              </Text>
-              <Text className={`font-[Urbanist-Medium] text-xs ${sleepValue === i ? 'text-gray-600' : 'text-gray-300'}`}>
-                {opt.subLabel}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Slider Track */}
-        <View className="h-[400px] items-center justify-center relative w-12">
-          {/* Track Line */}
-          <View className="w-4 h-full bg-[#F0EAE2] rounded-full absolute" />
-          {/* Active Line (from bottom/top depending on logic, let's just use thumb) */}
-
-          {/* Ticks/Touch Targets */}
-          {/* We overlay a transparent touchable area or use buttons */}
-          <View className="h-full justify-between absolute py-4">
-            {options.map((_, i) => (
-              <TouchableOpacity
-                key={i}
-                onPress={() => {
-                  setSleepValue(i);
-                  setAnswers({ ...answers, [currentQuestion.id]: options[i].id });
-                }}
-                className="w-12 h-12 items-center justify-center"
-              >
-                {/* Invisible touch target mostly, maybe a small dot */}
-                <View className={`w-2 h-2 rounded-full ${sleepValue === i ? 'bg-transparent' : 'bg-[#D0C0B0]'}`} />
-              </TouchableOpacity>
+      <View className="flex-1">
+        {/* Search Bar */}
+        <View className="flex-row items-center bg-[#EDE8E4] rounded-full px-4 py-3 mb-6">
+          <View className="w-8 h-8 rounded-full bg-[#E67E22] items-center justify-center mr-2">
+            <Text className="text-white font-bold">A</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-1 mr-2">
+            {['B', 'C', '...', 'X', 'Y', 'Z'].map(char => (
+              <Text key={char} className="text-[#4A3B32] font-[Urbanist-Bold] mx-2 opacity-50">{char}</Text>
             ))}
-          </View>
-
-          {/* The Thumb - Absolute positioned based on value */}
-          <View
-            className="w-12 h-12 bg-[#E67E22] rounded-full absolute border-4 border-[#FDF6F0] shadow-lg items-center justify-center"
-            style={{
-              top: (sleepValue / 4) * 352 + 24 - 24 // approximate math: height is 400. 5 steps. 
-              // 0 -> 0%, 4 -> 100%
-            }}
-          >
-            <Ionicons name="resize" size={16} color="white" style={{ transform: [{ rotate: '90deg' }] }} />
-          </View>
+          </ScrollView>
+          <TextInput
+            placeholder=""
+            value={searchText}
+            onChangeText={setSearchText}
+            className="flex-1 h-full"
+          />
+          <Ionicons name="search" size={20} color="#4A3B32" />
         </View>
 
-        {/* Right Icons */}
-        <View className="h-[400px] justify-between items-end py-4">
-          {options.map((opt, i) => {
-            const Icon = opt.svg;
+        <View className="flex-1">
+          {filteredOptions.map(option => {
+            const isSelected = selectedMedications.includes(option.id);
             return (
-              <View
-                key={i}
-                className={`h-12 w-12 items-center justify-center rounded-full transition-all ${sleepValue === i ? 'bg-opacity-100' : 'opacity-40'}`}
-                style={{ transform: [{ scale: sleepValue === i ? 1.1 : 1 }] }}
+              <TouchableOpacity
+                key={option.id}
+                onPress={() => toggleMedication(option.id)}
+                className={`flex-row items-center justify-between p-5 mb-3 rounded-[24px] ${isSelected ? 'bg-[#9BB168]' : 'bg-white shadow-sm'}`}
               >
-                {Icon && <Icon width={48} height={48} />}
-              </View>
+                <Text className={`text-lg font-[Urbanist-Bold] ${isSelected ? 'text-white' : 'text-[#4A3B32]'}`}>
+                  {option.label}
+                </Text>
+                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${isSelected ? 'border-white' : 'border-[#4A3B32]'}`}>
+                  {isSelected && <View className="w-3 h-3 bg-white rounded-full" />}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Selected Pills */}
+        <View className="flex-row flex-wrap mt-4 gap-2 justify-center">
+          <Text className="text-[#4A3B32] mr-2 self-center">Selected:</Text>
+          {selectedMedications.map(id => {
+            const label = currentQuestion.options?.find(o => o.id === id)?.label;
+            return (
+              <TouchableOpacity key={id} onPress={() => toggleMedication(id)} className="bg-[#EFE5DA] rounded-full px-3 py-1 flex-row items-center">
+                <Text className="text-[#4A3B32] text-xs font-bold mr-1">{label}</Text>
+                <Ionicons name="close" size={14} color="#4A3B32" />
+              </TouchableOpacity>
             );
           })}
         </View>
       </View>
     );
   };
+
+  // --- Symptoms ---
+  const renderSymptoms = () => {
+    const mostCommon = ['depressed', 'angry'];
+
+    const toggleSymptom = (id: string) => {
+      const newSelection = selectedSymptoms.includes(id)
+        ? selectedSymptoms.filter(s => s !== id)
+        : [...selectedSymptoms, id];
+      setSelectedSymptoms(newSelection);
+      setAnswers({ ...answers, [currentQuestion.id]: newSelection });
+    };
+
+    const addSymptomFromInput = () => {
+      if (symptomInput.trim()) {
+        const newSymptom = symptomInput.trim().toLowerCase().replace(/\s+/g, '_');
+        if (!selectedSymptoms.includes(newSymptom)) {
+          const newSelection = [...selectedSymptoms, newSymptom];
+          setSelectedSymptoms(newSelection);
+          setAnswers({ ...answers, [currentQuestion.id]: newSelection });
+        }
+        setSymptomInput('');
+      }
+    };
+
+    return (
+      <View className="flex-1">
+        {/* Illustration */}
+        <View className="items-center mb-6">
+          <IllustrationSvg width={200} height={180} />
+        </View>
+
+        {/* Symptom Input Box */}
+        <View className="bg-[#F5F3EF] rounded-[24px] p-4 mb-6 min-h-[150px]">
+          {/* Selected Chips */}
+          <View className="flex-row flex-wrap gap-2 mb-4">
+            {selectedSymptoms.map(id => {
+              const option = currentQuestion.options?.find(o => o.id === id);
+              const label = option?.label || id.replace(/_/g, ' ');
+              return (
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => toggleSymptom(id)}
+                  className="bg-[#EDE8E4] rounded-full px-4 py-2 flex-row items-center"
+                >
+                  <Text className="text-[#4A3B32] font-[Urbanist-Medium] mr-1">{label}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Text Input */}
+          <TextInput
+            placeholder="Type a symptom..."
+            placeholderTextColor="#B0A090"
+            className="text-lg font-[Urbanist-Medium] text-[#4A3B32]"
+            value={symptomInput}
+            onChangeText={setSymptomInput}
+            onSubmitEditing={addSymptomFromInput}
+            returnKeyType="done"
+          />
+
+          {/* Counter */}
+          <View className="flex-row justify-end items-center mt-4">
+            <Ionicons name="copy-outline" size={16} color="#B0A090" style={{ marginRight: 4 }} />
+            <Text className="text-[#B0A090] font-[Urbanist-Medium]">{selectedSymptoms.length}/10</Text>
+          </View>
+        </View>
+
+        {/* Most Common */}
+        <View className="flex-row items-center gap-2">
+          <Text className="text-[#4A3B32] font-[Urbanist-Medium]">Most Common:</Text>
+          {mostCommon.map(id => {
+            const option = currentQuestion.options?.find(o => o.id === id);
+            const label = option?.label || id;
+            const isSelected = selectedSymptoms.includes(id);
+            return (
+              <TouchableOpacity
+                key={id}
+                onPress={() => toggleSymptom(id)}
+                className={`rounded-full px-4 py-2 flex-row items-center ${isSelected ? 'bg-[#E67E22]' : 'bg-[#E67E22]'}`}
+              >
+                <Text className="text-white font-[Urbanist-Medium] mr-1">{label}</Text>
+                <Ionicons name="close" size={14} color="white" />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  // --- Stress Scale (1-5) ---
+  const renderStressScale = () => {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-[140px] font-[Urbanist-Bold] text-[#4A3B32] mb-10">
+          {stressLevel}
+        </Text>
+
+        <View className="flex-row w-full justify-between px-4 bg-white rounded-full p-2 mb-10">
+          {[1, 2, 3, 4, 5].map(num => (
+            <TouchableOpacity
+              key={num}
+              onPress={() => {
+                setStressLevel(num);
+                setAnswers({ ...answers, [currentQuestion.id]: num.toString() });
+              }}
+              className={`w-14 h-14 rounded-full items-center justify-center ${stressLevel === num ? 'bg-[#E67E22]' : 'bg-transparent'}`}
+            >
+              <Text className={`text-xl font-[Urbanist-Bold] ${stressLevel === num ? 'text-white' : 'text-[#4A3B32]'}`}>
+                {num}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text className="text-xl text-[#4A3B32] font-[Urbanist-Medium] text-center">
+          {stressLevel === 1 ? 'Not Stressed At All' :
+            stressLevel === 5 ? 'You Are Extremely Stressed Out.' :
+              'Moderately Stressed'}
+        </Text>
+      </View>
+    );
+  };
+
+  // --- Voice Analysis ---
+  const renderVoiceAnalysis = () => (
+    <View className="flex-1 items-center justify-start pt-4">
+      <Text className="text-gray-500 text-center px-10 mb-8 leading-6 font-[Urbanist-Medium]">
+        {currentQuestion.description}
+      </Text>
+
+      {/* Sound Waves Visualization - Concentric Green Circles */}
+      <View className="items-center justify-center mb-12" style={{ height: 280 }}>
+        {/* Outermost ring */}
+        <View className="w-[280px] h-[280px] rounded-full bg-[#E8EDD8] absolute" />
+        {/* Second ring */}
+        <View className="w-[220px] h-[220px] rounded-full bg-[#D4DFC4] absolute" />
+        {/* Third ring */}
+        <View className="w-[160px] h-[160px] rounded-full bg-[#B8C9A0] absolute" />
+        {/* Fourth ring */}
+        <View className="w-[100px] h-[100px] rounded-full bg-[#9BB168] absolute" />
+        {/* Center dot */}
+        <View className="w-[50px] h-[50px] rounded-full bg-[#4A3B32]" />
+      </View>
+
+      {/* Prompt Text */}
+      <View className="px-6">
+        <View className="flex-row flex-wrap justify-center items-baseline">
+          <View className="bg-[#FDF0E8] rounded-lg px-2 py-1 mr-2">
+            <Text className="text-2xl font-[Urbanist-Bold] text-[#E67E22]">I believe in</Text>
+          </View>
+          <Text className="text-2xl font-[Urbanist-Bold] text-[#4A3B32] italic">Dr. Freud,</Text>
+        </View>
+        <Text className="text-2xl font-[Urbanist-Bold] text-[#4A3B32] text-center mt-2 italic">with all my heart.</Text>
+      </View>
+    </View>
+  );
+
+  // --- Expression Analysis (Text Input) ---
+  const renderExpressionAnalysis = () => (
+    <View className="flex-1">
+      <Text className="text-gray-500 text-center px-6 mb-8 font-[Urbanist-Medium]">
+        {currentQuestion.description}
+      </Text>
+
+      <View className="bg-white rounded-[30px] p-6 border-2 border-[#EFE5DA] mb-8 min-h-[200px] relative shadow-sm">
+        <TextInput
+          multiline
+          placeholder="I don't want to be alive anymore..."
+          placeholderTextColor="#C0B8A8"
+          className="text-2xl font-[Urbanist-Bold] leading-10"
+          style={{ color: expressionText.length > 0 ? '#4A3B32' : '#C0B8A8' }}
+          value={expressionText}
+          onChangeText={text => {
+            setExpressionText(text);
+            setAnswers({ ...answers, [currentQuestion.id]: text });
+          }}
+          maxLength={250}
+        />
+        <View className="absolute bottom-6 right-6 flex-row items-center">
+          <Ionicons name="copy-outline" size={16} color="#B0A090" style={{ marginRight: 4 }} />
+          <Text className="text-gray-400 font-[Urbanist-Bold]">{expressionText.length}/250</Text>
+        </View>
+      </View>
+
+      <View className="items-center">
+        <TouchableOpacity className="bg-[#9BB168] flex-row items-center px-6 py-4 rounded-full">
+          <Ionicons name="mic" size={20} color="white" style={{ marginRight: 8 }} />
+          <Text className="text-white font-[Urbanist-Bold]">Use voice Instead</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   // --- Grid Question (Medications) ---
   const renderGrid = () => {
@@ -822,23 +1073,44 @@ const AssessmentScreen = () => {
           )}
           {currentQuestion.type === 'binary_image' && renderBinaryImage()}
           {currentQuestion.type === 'radio_cards' && renderRadioCards()}
-          {currentQuestion.type === 'vertical_slider' && renderVerticalSlider()}
+          {currentQuestion.type === 'vertical_slider' && (
+            <VerticalSlider
+              currentQuestion={currentQuestion}
+              answers={answers}
+              setAnswers={setAnswers}
+              sleepValue={sleepValue}
+              setSleepValue={setSleepValue}
+            />
+          )}
           {currentQuestion.type === 'grid' && renderGrid()}
+          {currentQuestion.type === 'search_list' && renderSearchList()}
+          {currentQuestion.type === 'symptoms' && renderSymptoms()}
+          {currentQuestion.type === 'stress_scale' && renderStressScale()}
+          {currentQuestion.type === 'voice_analysis' && renderVoiceAnalysis()}
+          {currentQuestion.type === 'expression_analysis' && renderExpressionAnalysis()}
         </ScrollView>
       )}
 
       {/* Footer / Continue Button (Conditional for some types) */}
       <View className="px-6 pb-10 pt-4 bg-[#FBFBF9]" style={{ paddingBottom: insets.bottom + 40 }}>
-        <TouchableOpacity
-          className={`rounded-full py-5 flex-row justify-center items-center shadow-lg ${answers[currentQuestion.id] ? 'bg-[#4A3B32]' : 'bg-[#E0E0E0]'}`}
-          onPress={handleNext}
-          disabled={!answers[currentQuestion.id]}
-        >
-          <Text className={`text-lg font-[Urbanist-Bold] mr-2 ${answers[currentQuestion.id] ? 'text-white' : 'text-gray-500'}`}>
-            Continue
-          </Text>
-          <Ionicons name="arrow-forward" size={20} color={answers[currentQuestion.id] ? 'white' : 'gray'} />
-        </TouchableOpacity>
+        {(() => {
+          // Screens that can always proceed (optional or have defaults)
+          const alwaysEnabled = ['symptoms', 'stress_scale', 'voice_analysis', 'expression_analysis', 'vertical_slider'];
+          const canProceed = alwaysEnabled.includes(currentQuestion.type) || !!answers[currentQuestion.id];
+
+          return (
+            <TouchableOpacity
+              className={`rounded-full py-5 flex-row justify-center items-center shadow-lg ${canProceed ? 'bg-[#4A3B32]' : 'bg-[#E0E0E0]'}`}
+              onPress={handleNext}
+              disabled={!canProceed}
+            >
+              <Text className={`text-lg font-[Urbanist-Bold] mr-2 ${canProceed ? 'text-white' : 'text-gray-500'}`}>
+                Continue
+              </Text>
+              <Ionicons name="arrow-forward" size={20} color={canProceed ? 'white' : 'gray'} />
+            </TouchableOpacity>
+          );
+        })()}
       </View>
     </View>
   );

@@ -21,6 +21,7 @@ import ResetPasswordScreen from './Screens/ResetPasswordScreen'
 import AssessmentScreen from './Screens/AssessmentScreen';
 
 // Profile Setup Flow Screens
+import AvatarSelectionScreen from './Screens/AvatarSelectionScreen';
 import ProfileSetupScreen from './Screens/ProfileSetupScreen';
 import PasswordSetupScreen from './Screens/PasswordSetupScreen';
 import OTPVerificationScreen from './Screens/OTPVerificationScreen';
@@ -60,7 +61,7 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer>
         {/* initial flow and boarding. */}
-        <Stack.Navigator initialRouteName="Assessment" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="AvatarSelection" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           <Stack.Screen name="OnboardingTwo" component={OnboardingScreenTwo} />
@@ -75,6 +76,7 @@ export default function App() {
           <Stack.Screen name="Assessment" component={AssessmentScreen} />
 
           {/* Profile Setup Flow */}
+          <Stack.Screen name="AvatarSelection" component={AvatarSelectionScreen} />
           <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
           <Stack.Screen name="PasswordSetup" component={PasswordSetupScreen} />
           <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
