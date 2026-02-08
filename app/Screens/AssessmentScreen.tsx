@@ -1,380 +1,450 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-  Dimensions,
-  ActivityIndicator,
-  Alert,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  Animated,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../services/api';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Dimensions, StatusBar, FlatList, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import Svg, { Path } from 'react-native-svg';
+// @ts-ignore
+import MaleSvg from '../assets/male.svg';
+// @ts-ignore
+import FemaleSvg from '../assets/female.svg';
+import "../global.css";
 
+const { width, height } = Dimensions.get('window');
 
-import { AssessmentQuestion } from '../types/types';
+type QuestionType = 'list' | 'cards' | 'wheel' | 'ruler';
 
-const { height } = Dimensions.get('window');
+interface Option {
+  id: string;
+  label: string;
+  svg?: React.FC<any>;
+}
 
-const AssessmentScreen = ({ navigation }: { navigation: any }) => {
-  const [questions, setQuestions] = useState<AssessmentQuestion[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fadeAnim] = useState(new Animated.Value(0));
+interface Question {
+  id: number;
+  type: QuestionType;
+  title: string;
+  options?: Option[];
+  min?: number;
+  max?: number;
+  unit?: string;
+}
+
+const questions: Question[] = [
+  {
+    id: 1,
+    type: 'list',
+    title: "What's your health goal for today?",
+    options: [
+      { id: 'stress', label: 'I wanna reduce stress' },
+      { id: 'ai_therapy', label: 'I wanna try AI Therapy' },
+      { id: 'trauma', label: 'I want to cope with trauma' },
+      { id: 'better_person', label: 'I want to be a better person' },
+      { id: 'try_app', label: 'Just trying out the app, mate!' },
+    ],
+  },
+  {
+    id: 2,
+    type: 'cards',
+    title: "What's your official gender?",
+    options: [
+      { id: 'male', label: 'I am Male', svg: MaleSvg },
+      { id: 'female', label: 'I am Female', svg: FemaleSvg },
+    ],
+  },
+  {
+    id: 3,
+    type: 'wheel',
+    title: "What's your age?",
+    min: 16,
+    max: 100,
+  },
+  {
+    id: 4,
+    type: 'ruler',
+    title: "What's your weight?",
+    min: 40,
+    max: 200,
+    unit: 'kg',
+  },
+  // Placeholders for 5-14
+  ...Array.from({ length: 10 }, (_, i) => ({
+    id: i + 5,
+    type: 'list' as QuestionType,
+    title: `Question ${i + 5}`,
+    options: [
+      { id: 'opt1', label: 'Option 1' },
+      { id: 'opt2', label: 'Option 2' },
+      { id: 'opt3', label: 'Option 3' },
+    ],
+  })),
+];
+
+const ITEM_HEIGHT = 60;
+const RULER_ITEM_WIDTH = 50;
+
+const AssessmentScreen = () => {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, any>>({});
+
+  const [currentAge, setCurrentAge] = useState(18);
+  const [currentWeight, setCurrentWeight] = useState(60);
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
+
+  const wheelScrollRef = useRef<FlatList>(null);
+  const rulerScrollRef = useRef<ScrollView>(null);
+
+  const currentQuestion = questions[currentStep];
+  const progress = ((currentStep + 1) / questions.length) * 100;
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
-
-  useEffect(() => {
-    // Animate question appearance
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [currentQuestionIndex]);
-
-  const fetchQuestions = async () => {
-    try {
-      const response = await api.assessment.getQuestions();
-
-      if (response && response.data && response.data.length > 0) {
-        setQuestions(response.data);
+    if (currentQuestion.type === 'wheel') {
+      const saved = answers[currentQuestion.id];
+      if (saved) {
+        setCurrentAge(parseInt(saved));
       } else {
-        throw new Error('No questions found');
+        setAnswers(prev => ({ ...prev, [currentQuestion.id]: '18' }));
+        setCurrentAge(18);
       }
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-      setError('Failed to load assessment questions.');
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const handleAnswer = (questionId: string, value: any) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  const validateAnswer = (question: AssessmentQuestion, answer: any) => {
-    if (!answer || answer.toString().trim() === '') {
-      return false;
-    }
-
-    // Additional validation for text inputs
-    if (question.inputType === 'text') {
-      const trimmedAnswer = answer.toString().trim();
-      if (question.questionText.toLowerCase().includes('age')) {
-        const age = parseInt(trimmedAnswer);
-        return age >= 13 && age <= 120; // Reasonable age range
+    if (currentQuestion.type === 'ruler') {
+      const saved = answers[currentQuestion.id];
+      if (!saved) {
+        setAnswers(prev => ({ ...prev, [currentQuestion.id]: '60 kg' }));
+        setCurrentWeight(60);
+      } else {
+        // Parse saved weight
+        const match = saved.match(/(\d+)/);
+        if (match) setCurrentWeight(parseInt(match[1]));
       }
-      if (question.questionText.toLowerCase().includes('weight')) {
-        const weight = parseFloat(trimmedAnswer);
-        return weight > 0 && weight <= 1000; // Reasonable weight range
-      }
-      return trimmedAnswer.length >= 1;
     }
+  }, [currentStep, currentQuestion]);
 
-    return true;
+  const handleSelect = (optionId: string) => {
+    setAnswers({ ...answers, [currentQuestion.id]: optionId });
   };
 
   const handleNext = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    const currentAnswer = answers[currentQuestion._id];
-
-    if (!validateAnswer(currentQuestion, currentAnswer)) {
-      let errorMessage = 'Please provide a valid answer before continuing.';
-
-      if (currentQuestion.inputType === 'text') {
-        if (currentQuestion.questionText.toLowerCase().includes('age')) {
-          errorMessage = 'Please enter a valid age (13-120 years).';
-        } else if (currentQuestion.questionText.toLowerCase().includes('weight')) {
-          errorMessage = 'Please enter a valid weight.';
-        }
-      }
-
-      Alert.alert('Invalid Input', errorMessage);
-      return;
-    }
-
-    // Animate out current question
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1);
-      } else {
-        submitAssessment();
-      }
-    });
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => {
-        setCurrentQuestionIndex((prev) => prev - 1);
+    if (currentStep < questions.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
       });
     }
   };
 
-  const submitAssessment = async () => {
-    setSubmitting(true);
-    try {
-      // Format submission data
-      const submissionData = {
-        assessmentType: 'initial', // Added required field
-        responses: Object.entries(answers).map(([questionId, answer]) => ({
-          questionId,
-          answer: String(answer), // Ensure string format
-        })),
-        completedAt: new Date().toISOString()
-      };
-
-      const result = await api.assessment.submit(submissionData);
-
-      if (result) {
-        Alert.alert(
-          'Assessment Complete',
-          'Thank you for completing the assessment! Your personalized profile is ready.',
-          [
-            {
-              text: 'Go to Dashboard',
-              onPress: () => {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'Home' }],
-                });
-              }
-            }
-          ]
-        );
-      }
-    } catch (error: any) {
-      console.error('Error submitting assessment:', error);
-      Alert.alert('Submission Failed', error.message || 'Failed to submit assessment.');
-    } finally {
-      setSubmitting(false);
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      navigation.goBack();
     }
   };
 
-  const renderScaleOptions = (question: AssessmentQuestion) => {
+  // --- Age Wheel Picker ---
+  const renderAgeWheel = () => {
+    const min = currentQuestion.min || 16;
+    const max = currentQuestion.max || 100;
+    const range = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+    const data = ['', '', ...range, '', ''];
+
+    const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = event.nativeEvent.contentOffset.y;
+      const index = Math.round(y / ITEM_HEIGHT);
+      const value = range[index];
+      if (value) {
+        setCurrentAge(value);
+        setAnswers(prev => ({ ...prev, [currentQuestion.id]: value.toString() }));
+      }
+    };
+
     return (
-      <View className="w-full">
-        <View className="flex-row justify-between mb-4 px-2">
-          <Text className="text-sm text-dark-brown font-medium">Low</Text>
-          <Text className="text-sm text-dark-brown font-medium">High</Text>
-        </View>
-        <View className="flex-row justify-between px-2">
-          {question.options?.map((option) => (
-            <TouchableOpacity
-              key={option._id}
-              className={`w-12 h-12 rounded-full border-2 justify-center items-center ${answers[question._id] === option.value
-                ? 'bg-primary-green border-primary-green'
-                : 'bg-white border-light-gray'
-                }`}
-              onPress={() => handleAnswer(question._id, option.value)}
-            >
-              <Text
-                className={`text-lg font-bold ${answers[question._id] === option.value
-                  ? 'text-white'
-                  : 'text-text-dark'
-                  }`}
-              >
-                {option.value}
-              </Text>
-            </TouchableOpacity>
-          ))}
+      <View className="flex-1 items-center justify-center py-10">
+        <View className="h-[300px] w-full items-center justify-center relative">
+          {/* Selection Green Pill Background - Outline Only */}
+          <View
+            className="absolute border-[2px] border-[#9BB168] rounded-full z-0 pointer-events-none bg-transparent"
+            style={{
+              width: 120, // Reduced width for distinct button shape
+              height: ITEM_HEIGHT + 10,
+              top: '50%',
+              marginTop: -(ITEM_HEIGHT + 10) / 2
+            }}
+          />
+
+          <FlatList
+            ref={wheelScrollRef}
+            data={data}
+            extraData={currentAge} // CRITICAL: Ensures re-render on selection change
+            keyExtractor={(item, index) => index.toString()}
+            showsVerticalScrollIndicator={false}
+            snapToInterval={ITEM_HEIGHT}
+            decelerationRate="fast"
+            onMomentumScrollEnd={onScroll}
+            onScrollEndDrag={onScroll}
+            scrollEventThrottle={16}
+            getItemLayout={(data, index) => (
+              { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
+            )}
+            initialScrollIndex={0}
+            renderItem={({ item, index }) => {
+              if (item === '') return <View style={{ height: ITEM_HEIGHT }} />;
+              const isSelected = item === currentAge;
+              return (
+                <View style={{ height: ITEM_HEIGHT, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                  <Text className={`text-4xl font-[Urbanist-Bold] ${isSelected ? 'text-[#9BB168]' : 'text-[#E0E0E0]'}`}>
+                    {item}
+                  </Text>
+                </View>
+              );
+            }}
+          />
         </View>
       </View>
     );
   };
 
-  const renderQuestion = () => {
-    if (loading) {
-      return (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#8EBA6B" />
-          <Text className="mt-4 text-base text-dark-brown">Loading assessment...</Text>
-        </View>
-      );
-    }
+  // --- Horizontal Ruler (Weight) ---
+  const renderWeightRuler = () => {
+    const min = 40;
+    const max = 200;
+    const pixelPerKg = RULER_ITEM_WIDTH;
 
-    if (error || !questions.length) {
-      return (
-        <View className="flex-1 justify-center items-center px-5">
-          <Text className="text-lg text-[#FF0000] text-center mb-5">
-            {error || 'No questions available.'}
-          </Text>
-          <TouchableOpacity
-            className="bg-primary-green px-5 py-2.5 rounded-lg"
-            onPress={() => {
-              setError(null);
-              setLoading(true);
-              fetchQuestions();
-            }}
-          >
-            <Text className="text-white text-base font-semibold">Retry</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    const question = questions[currentQuestionIndex];
-    const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-    const currentAnswer = answers[question._id];
+    const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const x = event.nativeEvent.contentOffset.x;
+      const val = Math.round(x / pixelPerKg) + min;
+      if (val >= min && val <= max && val !== currentWeight) {
+        setCurrentWeight(val);
+        setAnswers(prev => ({ ...prev, [currentQuestion.id]: `${val} ${weightUnit}` }));
+      }
+    };
 
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: 20 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <Animated.View style={{ flex: 1, minHeight: height * 0.7, opacity: fadeAnim }}>
-            {/* Progress Section */}
-            <View className="mb-8">
-              <View className="h-2 w-full bg-light-gray rounded overflow-hidden mb-2">
-                <Animated.View
-                  className="h-full bg-primary-green rounded"
-                  style={{ width: `${progress}%` }}
-                />
-              </View>
-              <Text className="text-sm text-dark-brown font-medium">
-                {`Question ${currentQuestionIndex + 1} of ${questions.length}`}
-              </Text>
-            </View>
-
-            {/* Question Section */}
-            <View className="mb-8">
-              <Text className="text-3xl font-bold text-dark-brown mb-2">Health Assessment</Text>
-              <Text className="text-xl text-text-dark leading-7 mb-4">{question.questionText}</Text>
-
-              {question.category && (
-                <View className="self-start bg-primary-green px-3 py-1 rounded-xl">
-                  <Text className="text-xs text-white font-semibold">
-                    {question.category.replace('-', ' ').toUpperCase()}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* Answer Section */}
-            <View className="flex-1 mb-5">
-              {question.inputType === 'select' && (
-                <View className="w-full">
-                  {question.options?.map((option) => (
-                    <TouchableOpacity
-                      key={option._id}
-                      className={`bg-white p-5 rounded-xl mb-3 border-2 shadow-sm ${currentAnswer === option.value
-                        ? 'bg-primary-green border-primary-green'
-                        : 'border-light-gray'
-                        }`}
-                      onPress={() => handleAnswer(question._id, option.value)}
-                      activeOpacity={0.7}
-                    >
-                      <Text
-                        className={`text-base text-center font-medium ${currentAnswer === option.value
-                          ? 'text-white font-semibold'
-                          : 'text-text-dark'
-                          }`}
-                      >
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-
-              {question.inputType === 'scale' && renderScaleOptions(question)}
-
-              {question.inputType === 'text' && (
-                <View className="w-full">
-                  <TextInput
-                    className="bg-white p-5 rounded-xl border-2 border-light-gray text-base text-text-dark shadow-sm"
-                    placeholder={
-                      question.questionText.toLowerCase().includes('age')
-                        ? "Enter your age"
-                        : question.questionText.toLowerCase().includes('weight')
-                          ? "Enter your weight"
-                          : "Type your answer here..."
-                    }
-                    placeholderTextColor="#A0A0A0"
-                    value={currentAnswer || ''}
-                    onChangeText={(text) => handleAnswer(question._id, text)}
-                    keyboardType={
-                      question.questionText.toLowerCase().includes('age') ||
-                        question.questionText.toLowerCase().includes('weight')
-                        ? 'numeric'
-                        : 'default'
-                    }
-                    autoCapitalize="sentences"
-                    autoCorrect={!question.questionText.toLowerCase().includes('age') &&
-                      !question.questionText.toLowerCase().includes('weight')}
-                  />
-                </View>
-              )}
-            </View>
-          </Animated.View>
-        </ScrollView>
-
-        {/* Navigation Buttons */}
-        <View className="flex-row justify-between px-5 py-5 bg-light-beige border-t border-light-gray">
+      <View className="flex-1 items-center justify-center w-full">
+        {/* Unit Toggle */}
+        <View className="flex-row bg-white rounded-full p-1 mb-10 w-[200px] shadow-sm border border-gray-100">
           <TouchableOpacity
-            className={`px-6 py-3 rounded-xl min-w-[100px] items-center bg-light-gray ${currentQuestionIndex === 0 ? 'opacity-50' : ''
-              }`}
-            onPress={handlePrevious}
-            disabled={currentQuestionIndex === 0}
+            className={`flex-1 py-3 rounded-full items-center ${weightUnit === 'kg' ? 'bg-[#E67E22]' : 'bg-transparent'}`}
+            onPress={() => setWeightUnit('kg')}
           >
-            <Text className={`text-base font-semibold ${currentQuestionIndex === 0 ? 'text-placeholder' : 'text-text-dark'
-              }`}>
-              ← Back
-            </Text>
+            <Text className={`font-[Urbanist-Bold] ${weightUnit === 'kg' ? 'text-white' : 'text-[#4A3B32]'}`}>kg</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            className={`px-6 py-3 rounded-xl min-w-[100px] items-center bg-dark-brown ${!validateAnswer(question, currentAnswer) ? 'opacity-50' : ''
-              }`}
-            onPress={handleNext}
-            disabled={!validateAnswer(question, currentAnswer) || submitting}
+            className={`flex-1 py-3 rounded-full items-center ${weightUnit === 'lbs' ? 'bg-[#E67E22]' : 'bg-transparent'}`}
+            onPress={() => setWeightUnit('lbs')}
           >
-            {submitting ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <Text className="text-base font-semibold text-white">
-                {currentQuestionIndex < questions.length - 1 ? 'Next →' : 'Submit'}
-              </Text>
-            )}
+            <Text className={`font-[Urbanist-Bold] ${weightUnit === 'lbs' ? 'text-white' : 'text-[#4A3B32]'}`}>lbs</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+
+        {/* Large Value Display */}
+        <View className="flex-row items-end mb-10">
+          <Text className="text-[80px] font-[Urbanist-Bold] text-[#4A3B32] leading-none">
+            {weightUnit === 'lbs' ? Math.round(currentWeight * 2.20462) : currentWeight}
+          </Text>
+          <Text className="text-3xl font-[Urbanist-Medium] text-gray-400 mb-4 ml-2">
+            {weightUnit}
+          </Text>
+        </View>
+
+        {/* Central Indicator Line - Longer green line */}
+        <View
+          className="h-[140px] w-[6px] bg-[#9BB168] rounded-full absolute z-10 pointer-events-none"
+          style={{
+            top: '50%',
+            marginTop: -10 // Adjust to vertically align with ruler ticks
+          }}
+        />
+
+        {/* Scrollable Ruler */}
+        <ScrollView
+          ref={rulerScrollRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={pixelPerKg}
+          decelerationRate="fast"
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingHorizontal: width / 2 }}
+        >
+          {Array.from({ length: max - min + 1 }).map((_, i) => {
+            const val = min + i;
+            // Also color the tick itself if selected
+            const isSelected = val === currentWeight;
+            return (
+              <View key={i} style={{ width: pixelPerKg, alignItems: 'center', justifyContent: 'flex-start', height: 120 }}>
+                {/* Dynamic styling for the tick itself based on selection */}
+                <View
+                  className={`w-[3px] rounded-full ${isSelected ? 'bg-[#9BB168] h-[100px] w-[4px]' : 'bg-[#D0C0B0] h-[60px]'}`}
+                />
+                <Text className={`font-[Urbanist-Medium] mt-4 text-xs ${isSelected ? 'text-[#9BB168] font-bold' : 'text-[#B0A090]'}`}>
+                  {val}
+                </Text>
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
+    );
+  };
+
+  // --- List Type Question ---
+  const renderListQuestion = () => (
+    <View className="gap-4">
+      {currentQuestion.options?.map((option) => {
+        const isSelected = answers[currentQuestion.id] === option.id;
+        return (
+          <TouchableOpacity
+            key={option.id}
+            onPress={() => handleSelect(option.id)}
+            className={`flex-row items-center p-5 rounded-[20px] shadow-sm ${isSelected ? 'bg-[#9BB168]' : 'bg-white'}`}
+          >
+            <Text className={`flex-1 text-lg font-[Urbanist-SemiBold] ${isSelected ? 'text-white' : 'text-[#4A3B32]'}`}>
+              {option.label}
+            </Text>
+            <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${isSelected ? 'border-white bg-white' : 'border-[#4A3B32] bg-transparent'}`}>
+              {isSelected && <View className="w-3 h-3 bg-[#9BB168] rounded-full" />}
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+
+  // --- Cards Type Question ---
+  const renderCardsQuestion = () => {
+    // Helper to handle skip
+    const handleSkip = () => {
+      setAnswers({ ...answers, [currentQuestion.id]: 'skipped' });
+      // Use setTimeout to ensure state update before moving next
+      setTimeout(() => {
+        if (currentStep < questions.length - 1) {
+          setCurrentStep(currentStep + 1);
+        } else {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          });
+        }
+      }, 50);
+    };
+
+    return (
+      <View className="gap-6">
+        {currentQuestion.options?.map((option) => {
+          const isSelected = answers[currentQuestion.id] === option.id;
+          const SvgComponent = option.svg;
+
+          return (
+            <TouchableOpacity
+              key={option.id}
+              onPress={() => handleSelect(option.id)}
+              className="rounded-[30px] overflow-hidden shadow-sm border-2"
+              style={{
+                height: 180,
+                backgroundColor: isSelected ? '#9BB168' : 'white',
+                borderColor: isSelected ? '#9BB168' : '#F3F4F6'
+              }}
+            >
+              <View className="flex-row h-full">
+                <View className="flex-1 p-6 justify-between">
+                  <Text className={`text-xl font-[Urbanist-Bold] ${isSelected ? 'text-white' : 'text-[#4A3B32]'}`}>
+                    {option.label}
+                  </Text>
+                  <Ionicons
+                    name={option.id === 'male' ? 'male' : 'female'}
+                    size={24}
+                    color={isSelected ? 'white' : '#4A3B32'}
+                  />
+                </View>
+                <View className="w-1/2 h-full justify-end items-end relative">
+                  {SvgComponent && (
+                    <View style={{ position: 'absolute', bottom: -10, right: -10 }}>
+                      <SvgComponent width={140} height={140} />
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+        <TouchableOpacity
+          onPress={handleSkip}
+          className="bg-[#E6E8D6] rounded-full py-4 mt-2 flex-row justify-center items-center"
+        >
+          <Text className="text-[#9BB168] font-[Urbanist-Bold] mr-2">Prefer to skip, thanks</Text>
+          <Ionicons name="close" size={20} color="#9BB168" />
+        </TouchableOpacity>
+      </View>
     );
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
-      {renderQuestion()}
-    </SafeAreaView>
+    <View className="flex-1 bg-[#FBFBF9]">
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+
+      {/* Header */}
+      <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 24 }} className="flex-row items-center justify-between mb-2">
+        <TouchableOpacity
+          onPress={handleBack}
+          className="w-12 h-12 rounded-full border border-[#4A3B32] items-center justify-center"
+        >
+          <Ionicons name="chevron-back" size={24} color="#4A3B32" />
+        </TouchableOpacity>
+
+        {/* Right side: Assessment Title + Numbering Badge */}
+        <View className="items-end">
+          <Text className="text-xl font-[Urbanist-Bold] text-[#4A3B32] mb-1">Assessment</Text>
+          <View className="bg-[#EFE5DA] px-2 py-0.5 rounded-full">
+            <Text className="text-[#4A3B32] font-[Urbanist-Bold] text-xs">
+              {currentStep + 1} of {questions.length}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Title */}
+      <Text className="text-3xl font-[Urbanist-Bold] text-[#4A3B32] text-center mt-6 mb-8 px-6 leading-tight">
+        {currentQuestion.title}
+      </Text>
+
+      {/* Content Area - Different rendering based on type */}
+      {currentQuestion.type === 'wheel' || currentQuestion.type === 'ruler' ? (
+        // For wheel and ruler, render directly without ScrollView to avoid nesting
+        <View className="flex-1">
+          {currentQuestion.type === 'wheel' && renderAgeWheel()}
+          {currentQuestion.type === 'ruler' && renderWeightRuler()}
+        </View>
+      ) : (
+        // For list and cards, use ScrollView
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
+        >
+          {currentQuestion.type === 'list' && renderListQuestion()}
+          {currentQuestion.type === 'cards' && renderCardsQuestion()}
+        </ScrollView>
+      )}
+
+      {/* Footer / Continue Button */}
+      <View className="px-6 pb-10 pt-4 bg-[#FBFBF9]" style={{ paddingBottom: insets.bottom + 40 }}>
+        <TouchableOpacity
+          className={`rounded-full py-5 flex-row justify-center items-center shadow-lg ${answers[currentQuestion.id] ? 'bg-[#4A3B32]' : 'bg-[#E0E0E0]'}`}
+          onPress={handleNext}
+          disabled={!answers[currentQuestion.id]}
+        >
+          <Text className={`text-lg font-[Urbanist-Bold] mr-2 ${answers[currentQuestion.id] ? 'text-white' : 'text-gray-500'}`}>
+            Continue
+          </Text>
+          <Ionicons name="arrow-forward" size={20} color={answers[currentQuestion.id] ? 'white' : 'gray'} />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
