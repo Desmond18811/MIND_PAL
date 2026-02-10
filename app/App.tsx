@@ -19,6 +19,8 @@ import HomeScreen from './Screens/HomeScreen';
 import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './Screens/ResetPasswordScreen'
 import AssessmentScreen from './Screens/AssessmentScreen';
+import OTPSetupScreen from './Screens/OTPSetupScreen';
+import NotificationSetupScreen from './Screens/NotificationSetupScreen';
 
 // Profile Setup Flow Screens
 import AvatarSelectionScreen from './Screens/AvatarSelectionScreen';
@@ -61,7 +63,7 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer>
         {/* initial flow and boarding. */}
-        <Stack.Navigator initialRouteName="AvatarSelection" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           <Stack.Screen name="OnboardingTwo" component={OnboardingScreenTwo} />
@@ -79,8 +81,10 @@ export default function App() {
           <Stack.Screen name="AvatarSelection" component={AvatarSelectionScreen} />
           <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
           <Stack.Screen name="PasswordSetup" component={PasswordSetupScreen} />
+          <Stack.Screen name="OTPSetup" component={OTPSetupScreen} />
           <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
           <Stack.Screen name="FingerprintSetup" component={FingerprintSetupScreen} />
+          <Stack.Screen name="NotificationSetup" component={NotificationSetupScreen} />
           <Stack.Screen name="MeditationSetup" component={MeditationSetupScreen} />
           <Stack.Screen name="ComputingScore" component={ComputingScoreScreen} />
           <Stack.Screen name="FreudScoreResult" component={FreudScoreResultScreen} />

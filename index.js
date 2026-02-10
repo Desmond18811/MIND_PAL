@@ -3,7 +3,9 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server } from 'socket.io';
-import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit'; // Keep existing import
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 import connectToDatabase from './database/mongodb.js';
 import { initializeSocketHandlers } from './handlers/socketHandlers.js';
 import { initializeCronJobs } from './jobs/cronJobs.js';
@@ -136,6 +138,10 @@ app.get('/', (req, res) => {
     }
   });
 });
+
+// Swagger Documentation
+const swaggerDocument = YAML.load('./openapi.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes);

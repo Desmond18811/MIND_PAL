@@ -1,0 +1,1318 @@
+openapi: 3.0.0
+info:
+  title: MindPal API
+  description: Complete documentation of all API endpoints for the MindPal Mental Health Application.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  example: securePassword123
+                name:
+                  type: string
+                  example: John Doe
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: User login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  example: securePassword123
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+
+  /auth/forgot-password:
+    post:
+      tags: [Authentication]
+      summary: Request password reset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        "200":
+          description: Password reset email sent
+
+  /auth/reset-password:
+    post:
+      tags: [Authentication]
+      summary: Reset password with token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        "200":
+          description: Password reset successful
+
+  /auth/verify-2fa:
+    post:
+      tags: [Authentication]
+      summary: Verify 2FA code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                code:
+                  type: string
+      responses:
+        "200":
+          description: 2FA verification successful
+
+  # Profile
+  /profile:
+    post:
+      tags: [Profile]
+      summary: Create profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+                gender:
+                  type: string
+                timezone:
+                  type: string
+                goals:
+                  type: array
+                  items:
+                    type: string
+                notificationPreferences:
+                  type: object
+                  properties:
+                    dailyReminders:
+                      type: boolean
+                    weeklyReports:
+                      type: boolean
+      responses:
+        "201":
+          description: Profile created
+
+    get:
+      tags: [Profile]
+      summary: Get user profile
+      responses:
+        "200":
+          description: User profile details
+
+    put:
+      tags: [Profile]
+      summary: Update profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                avatar:
+                  type: string
+                  description: base64 image data
+      responses:
+        "200":
+          description: Profile updated
+
+    delete:
+      tags: [Profile]
+      summary: Delete profile
+      responses:
+        "200":
+          description: Profile deleted
+
+  /profile/options:
+    get:
+      tags: [Profile]
+      summary: Get profile field options
+      responses:
+        "200":
+          description: Profile options
+
+  # Serenity AI Chat
+  /serenity/chat:
+    post:
+      tags: [Serenity AI Chat]
+      summary: Send message to Serenity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                sessionId:
+                  type: string
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      sessionId:
+                        type: string
+                      message:
+                        type: string
+                      sentiment:
+                        type: object
+                      timestamp:
+                        type: string
+                        format: date-time
+
+  /serenity/sessions:
+    get:
+      tags: [Serenity AI Chat]
+      summary: Get all chat sessions
+      responses:
+        "200":
+          description: List of sessions
+
+  /serenity/session/{id}:
+    get:
+      tags: [Serenity AI Chat]
+      summary: Get specific session
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session details
+
+  /serenity/session:
+    post:
+      tags: [Serenity AI Chat]
+      summary: Create new session
+      responses:
+        "201":
+          description: Session created
+
+  /serenity/insights:
+    get:
+      tags: [Serenity AI Chat]
+      summary: Get AI-generated insights
+      responses:
+        "200":
+          description: Insights data
+
+  /serenity/suggestions:
+    get:
+      tags: [Serenity AI Chat]
+      summary: Get activity suggestions
+      parameters:
+        - in: query
+          name: mood
+          schema:
+            type: string
+        - in: query
+          name: timeOfDay
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Suggestions list
+
+  /serenity/permissions:
+    get:
+      tags: [Serenity AI Chat]
+      summary: Get data permissions
+      responses:
+        "200":
+          description: User permissions
+
+    post:
+      tags: [Serenity AI Chat]
+      summary: Update permissions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: object
+                  properties:
+                    analyzeMood:
+                      type: boolean
+                    analyzeSleepData:
+                      type: boolean
+                    analyzeJournals:
+                      type: boolean
+      responses:
+        "200":
+          description: Permissions updated
+
+  /serenity/permissions/grant-all:
+    post:
+      tags: [Serenity AI Chat]
+      summary: Grant all permissions
+      responses:
+        "200":
+          description: All permissions granted
+
+  /serenity/permissions/revoke-all:
+    post:
+      tags: [Serenity AI Chat]
+      summary: Revoke all permissions
+      responses:
+        "200":
+          description: All permissions revoked
+
+  # Voice
+  /voice/upload:
+    post:
+      tags: [Voice]
+      summary: Upload voice note for transcription
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                sessionId:
+                  type: string
+                language:
+                  type: string
+                generateAudio:
+                  type: string
+      responses:
+        "200":
+          description: Transcription successful
+
+  /voice/transcribe:
+    post:
+      tags: [Voice]
+      summary: Transcribe audio only
+      responses:
+        "200":
+          description: Transcription result
+
+  /voice/synthesize:
+    post:
+      tags: [Voice]
+      summary: Convert text to speech
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                voice:
+                  type: string
+                speed:
+                  type: number
+      responses:
+        "200":
+          description: Audio content
+
+  /voice/analyze/{sessionId}:
+    get:
+      tags: [Voice]
+      summary: Analyze voice patterns
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Analysis result
+
+  # Mood
+  /mood:
+    post:
+      tags: [Mood]
+      summary: Record mood entry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moodValue:
+                  type: integer
+                moodLabel:
+                  type: string
+                factors:
+                  type: array
+                  items:
+                    type: string
+                notes:
+                  type: string
+      responses:
+        "201":
+          description: Mood recorded
+
+  /mood/history:
+    get:
+      tags: [Mood]
+      summary: Get mood history
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mood history
+
+  # Journal
+  /journal:
+    post:
+      tags: [Journal]
+      summary: Create journal entry
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                moodBefore:
+                  type: integer
+                moodAfter:
+                  type: integer
+                tags:
+                  type: string
+                audio:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Journal created
+
+  /journal/stats:
+    get:
+      tags: [Journal]
+      summary: Get journal analytics
+      responses:
+        "200":
+          description: Journal stats
+
+  /journal/{id}:
+    get:
+      tags: [Journal]
+      summary: Get specific entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Journal entry
+
+  /journal/{id}/audio:
+    get:
+      tags: [Journal]
+      summary: Stream journal audio
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Audio stream
+
+  # Sleep
+  /sleep/sessions/start:
+    post:
+      tags: [Sleep]
+      summary: Start sleep session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startTime:
+                  type: string
+                  format: date-time
+                environment:
+                  type: object
+                  properties:
+                    temperature:
+                      type: integer
+                    noise:
+                      type: string
+      responses:
+        "200":
+          description: Session started
+
+  /sleep/sessions/end:
+    post:
+      tags: [Sleep]
+      summary: End sleep session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                endTime:
+                  type: string
+                  format: date-time
+                qualityRating:
+                  type: integer
+                dreams:
+                  type: array
+                  items:
+                    type: string
+                interruptions:
+                  type: integer
+      responses:
+        "200":
+          description: Session ended
+
+  /sleep/stats:
+    get:
+      tags: [Sleep]
+      summary: Get sleep statistics
+      responses:
+        "200":
+          description: Sleep stats
+
+  /sleep/schedule:
+    put:
+      tags: [Sleep]
+      summary: Set sleep schedule
+      responses:
+        "200":
+          description: Schedule updated
+    get:
+      tags: [Sleep]
+      summary: Get sleep schedule
+      responses:
+        "200":
+          description: Current schedule
+
+  # Goals
+  /goals:
+    get:
+      tags: [Goals]
+      summary: Get all goals
+      responses:
+        "200":
+          description: List of goals
+    post:
+      tags: [Goals]
+      summary: Create goal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                targetDate:
+                  type: string
+                  format: date
+                milestones:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        "201":
+          description: Goal created
+
+  /goals/{id}:
+    put:
+      tags: [Goals]
+      summary: Update goal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Goal updated
+    delete:
+      tags: [Goals]
+      summary: Delete goal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Goal deleted
+
+  /goals/{id}/milestones:
+    post:
+      tags: [Goals]
+      summary: Add milestone
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Milestone added
+
+  /goals/{id}/milestones/{milestoneId}/complete:
+    patch:
+      tags: [Goals]
+      summary: Complete milestone
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: milestoneId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Milestone completed
+
+  /goals/stats:
+    get:
+      tags: [Goals]
+      summary: Get goal statistics
+      responses:
+        "200":
+          description: Goal stats
+
+  # Meditation
+  /meditation/content:
+    get:
+      tags: [Meditation]
+      summary: Get meditation content
+      security: []
+      responses:
+        "200":
+          description: Content list
+    post:
+      tags: [Meditation]
+      summary: Create content (admin)
+      responses:
+        "201":
+          description: Content created
+
+  /meditation/sessions/start:
+    post:
+      tags: [Meditation]
+      summary: Start meditation session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contentId:
+                  type: string
+                type:
+                  type: string
+                duration:
+                  type: integer
+      responses:
+        "200":
+          description: Session started
+
+  /meditation/sessions/end:
+    post:
+      tags: [Meditation]
+      summary: End meditation session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                completed:
+                  type: boolean
+                moodAfter:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Session ended
+
+  /meditation/progress:
+    get:
+      tags: [Meditation]
+      summary: Get user progress
+      responses:
+        "200":
+          description: Progress data
+
+  /meditation/recommendations:
+    get:
+      tags: [Meditation]
+      summary: Get recommendations
+      responses:
+        "200":
+          description: Recommendations
+
+  # Community
+  /community/feed:
+    get:
+      tags: [Community]
+      summary: Get community feed
+      responses:
+        "200":
+          description: Feed items
+
+  /community/posts:
+    post:
+      tags: [Community]
+      summary: Create post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                isAnonymous:
+                  type: boolean
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: Post created
+
+  /community/posts/{id}/like:
+    post:
+      tags: [Community]
+      summary: Like/unlike post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Like status updated
+
+  /community/posts/{id}/comments:
+    post:
+      tags: [Community]
+      summary: Add comment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Comment added
+    get:
+      tags: [Community]
+      summary: Get comments
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Comments list
+
+  # Therapists
+  /therapists:
+    get:
+      tags: [Therapists]
+      summary: Search/list therapists
+      security: []
+      parameters:
+        - in: query
+          name: specialization
+          schema:
+            type: string
+        - in: query
+          name: location
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of therapists
+
+  /therapists/{id}:
+    get:
+      tags: [Therapists]
+      summary: Get therapist profile
+      security: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Therapist profile
+
+    post:
+      tags: [Therapists]
+      summary: Rate therapist
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Rating submitted
+
+  /therapists/register:
+    post:
+      tags: [Therapists]
+      summary: Register as therapist
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                licenseNumber:
+                  type: string
+                specializations:
+                  type: array
+                  items:
+                    type: string
+                bio:
+                  type: string
+                hourlyRate:
+                  type: number
+      responses:
+        "201":
+          description: Therapist registered
+
+  /therapists/profile/me:
+    get:
+      tags: [Therapists]
+      summary: Get own profile
+      responses:
+        "200":
+          description: Profile details
+
+  /therapists/profile:
+    put:
+      tags: [Therapists]
+      summary: Update profile
+      responses:
+        "200":
+          description: Profile updated
+
+  /therapists/availability:
+    put:
+      tags: [Therapists]
+      summary: Set availability
+      responses:
+        "200":
+          description: Availability updated
+
+  /therapists/stats/me:
+    get:
+      tags: [Therapists]
+      summary: Get own stats
+      responses:
+        "200":
+          description: Stats data
+
+  # Appointments
+  /appointments/slots:
+    get:
+      tags: [Appointments]
+      summary: Get available slots
+      responses:
+        "200":
+          description: Slots list
+
+  /appointments/book:
+    post:
+      tags: [Appointments]
+      summary: Book appointment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slotId:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        "201":
+          description: Appointment booked
+
+  /appointments/my-appointments:
+    get:
+      tags: [Appointments]
+      summary: Get user's appointments
+      responses:
+        "200":
+          description: Appointments list
+
+  # Assessments
+  /assessment/questions:
+    get:
+      tags: [Assessments]
+      summary: Get assessment questions
+      responses:
+        "200":
+          description: Questions list
+
+  /assessment/submit:
+    post:
+      tags: [Assessments]
+      summary: Submit assessment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assessmentType:
+                  type: string
+                responses:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        "200":
+          description: Assessment submitted
+
+  # Pal Score
+  /freud-score:
+    get:
+      tags: [Pal Score]
+      summary: Get current Pal score
+      responses:
+        "200":
+          description: Score data
+
+  /freud-score/history:
+    get:
+      tags: [Pal Score]
+      summary: Get score history
+      responses:
+        "200":
+          description: History data
+
+  /freud-score/insights:
+    get:
+      tags: [Pal Score]
+      summary: Get score insights
+      responses:
+        "200":
+          description: Insights data
+
+  # Resources
+  /resources:
+    get:
+      tags: [Resources]
+      summary: Get resources
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resource list
+
+  /resources/daily-pick:
+    get:
+      tags: [Resources]
+      summary: Get daily recommendation
+      responses:
+        "200":
+          description: Recommendation
+
+  /resources/{id}/speak:
+    get:
+      tags: [Resources]
+      summary: Read article aloud
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Audio stream
+
+  /resources/{id}/play:
+    get:
+      tags: [Resources]
+      summary: Get playback info
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Playback info
+
+  /resources/{id}/view:
+    post:
+      tags: [Resources]
+      summary: Track view
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: View tracked
+
+  # Stress
+  /stress/analyze-face:
+    post:
+      tags: [Stress]
+      summary: Analyze facial expression
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Analysis result
+
+  /stress/history:
+    get:
+      tags: [Stress]
+      summary: Get stress history
+      responses:
+        "200":
+          description: History data
+
+  # Notifications
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Get notifications
+      responses:
+        "200":
+          description: Notifications list
+
+  /notifications/{id}/read:
+    put:
+      tags: [Notifications]
+      summary: Mark as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Notification marked as read
+
+  /notifications/settings:
+    put:
+      tags: [Notifications]
+      summary: Update settings
+      responses:
+        "200":
+          description: Settings updated
+
+  # Chatbot (Legacy)
+  /chatbot/session:
+    post:
+      tags: [Chatbot Legacy]
+      summary: Start session
+      responses:
+        "200":
+          description: Session started
+
+  /chatbot/history:
+    get:
+      tags: [Chatbot Legacy]
+      summary: Get chat history
+      responses:
+        "200":
+          description: Chat history
+
+  /chatbot/message:
+    post:
+      tags: [Chatbot Legacy]
+      summary: Send message
+      responses:
+        "200":
+          description: Message sent
+
+  /chatbot/message/{sessionId}:
+    get:
+      tags: [Chatbot Legacy]
+      summary: Get last response
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Last response
+
+  # Search
+  /search:
+    get:
+      tags: [Search]
+      summary: Global search
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+
+  /search/suggestions:
+    get:
+      tags: [Search]
+      summary: Get search suggestions
+      responses:
+        "200":
+          description: Suggestions
+
+  # Utility
+  /utility/health:
+    get:
+      tags: [Utility]
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Status ok
+
+  /utility/version:
+    get:
+      tags: [Utility]
+      summary: Get API version
+      security: []
+      responses:
+        "200":
+          description: Version info
+
+  # Help
+  /help/faqs:
+    get:
+      tags: [Help]
+      summary: Get FAQs
+      security: []
+      responses:
+        "200":
+          description: FAQs list
+
+  /help/emergency:
+    get:
+      tags: [Help]
+      summary: Get emergency resources
+      security: []
+      responses:
+        "200":
+          description: Emergency info

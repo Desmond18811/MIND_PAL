@@ -21,7 +21,7 @@ import GoodSvg from '../assets/good.svg';
 // @ts-ignore
 import ExcellentSvg from '../assets/excellent .svg'; // Note the space in filename
 // @ts-ignore
-import IllustrationSvg from '../assets/symptoms .svg';
+import IllustrationSvg from '../assets/symptoms.svg';
 
 import VerticalSlider from './VerticalSlider';
 
@@ -396,8 +396,10 @@ const AssessmentScreen = () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Navigate to Avatar Selection after assessment completion
-      navigation.navigate('AvatarSelection', { assessmentAnswers: answers });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'AvatarSelection' }],
+      });
     }
   };
 

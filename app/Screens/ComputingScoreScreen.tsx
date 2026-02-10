@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+// ComputingScoreScreen.tsx
+import React, { useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -13,134 +14,174 @@ import "../global.css";
 const { width, height } = Dimensions.get('window');
 
 const ComputingScoreScreen = ({ navigation, route }: { navigation: any, route: any }) => {
-    const [progress, setProgress] = useState(0);
-    const spinValue = useRef(new Animated.Value(0)).current;
-    const pulseValue = useRef(new Animated.Value(1)).current;
+    const pulse1 = useRef(new Animated.Value(1)).current;
+    const pulse2 = useRef(new Animated.Value(1)).current;
+    const pulse3 = useRef(new Animated.Value(1)).current;
+    const pulse4 = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
-        // Spin animation
-        Animated.loop(
-            Animated.timing(spinValue, {
-                toValue: 1,
-                duration: 2000,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            })
-        ).start();
-
-        // Pulse animation
+        // Top-left circle pulse animation
         Animated.loop(
             Animated.sequence([
-                Animated.timing(pulseValue, {
-                    toValue: 1.1,
-                    duration: 1000,
+                Animated.timing(pulse1, {
+                    toValue: 1.15,
+                    duration: 3000,
                     easing: Easing.inOut(Easing.ease),
                     useNativeDriver: true,
                 }),
-                Animated.timing(pulseValue, {
+                Animated.timing(pulse1, {
                     toValue: 1,
-                    duration: 1000,
+                    duration: 3000,
                     easing: Easing.inOut(Easing.ease),
                     useNativeDriver: true,
                 }),
             ])
         ).start();
 
-        // Progress simulation
-        const interval = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(interval);
-                    return 100;
-                }
-                return prev + 2;
-            });
-        }, 100);
+        // Top-right circle pulse animation
+        Animated.loop(
+            Animated.sequence([
+                Animated.delay(750),
+                Animated.timing(pulse2, {
+                    toValue: 1.12,
+                    duration: 2800,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(pulse2, {
+                    toValue: 1,
+                    duration: 2800,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start();
+
+        // Bottom-left circle pulse animation
+        Animated.loop(
+            Animated.sequence([
+                Animated.delay(500),
+                Animated.timing(pulse3, {
+                    toValue: 1.18,
+                    duration: 3200,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(pulse3, {
+                    toValue: 1,
+                    duration: 3200,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start();
+
+        // Bottom-right circle pulse animation
+        Animated.loop(
+            Animated.sequence([
+                Animated.delay(1000),
+                Animated.timing(pulse4, {
+                    toValue: 1.1,
+                    duration: 2600,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(pulse4, {
+                    toValue: 1,
+                    duration: 2600,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start();
 
         // Navigate after computing
         const timer = setTimeout(() => {
+            const score = Math.floor(Math.random() * 101);
             navigation.replace('FreudScoreResult', {
                 ...route.params,
-                score: Math.floor(Math.random() * 50) + 50,
+                score,
             });
-        }, 5500);
+        }, 6000);
 
         return () => {
-            clearInterval(interval);
             clearTimeout(timer);
         };
     }, []);
 
-    const spin = spinValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg'],
-    });
-
-    const progressMessages = [
-        'Analyzing your responses...',
-        'Computing your mental health score...',
-        'Generating personalized insights...',
-        'Almost there...',
-    ];
-
-    const currentMessage = progressMessages[Math.floor(progress / 25)];
-
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3EDE4' }}>
-            <StatusBar barStyle="dark-content" backgroundColor="#F3EDE4" />
+        <View className="flex-1" style={{ backgroundColor: '#6B4423' }}>
+            <StatusBar barStyle="light-content" backgroundColor="#6B4423" />
+            <SafeAreaView className="flex-1" edges={['top']}>
 
-            <View className="flex-1 justify-center items-center px-10">
-                {/* Computing Animation */}
+                {/* Top-left decorative circle */}
                 <Animated.View
-                    className="w-[200px] h-[200px] justify-center items-center mb-10"
-                    style={{ transform: [{ scale: pulseValue }] }}
-                >
-                    <Animated.View
-                        className="absolute w-[200px] h-[200px] rounded-full border-4 border-transparent border-t-dark-brown border-r-dark-brown"
-                        style={{ transform: [{ rotate: spin }] }}
-                    >
-                        <View className="absolute top-0 left-1/2 -ml-2 -mt-2 w-4 h-4 rounded-full bg-dark-brown" />
-                    </Animated.View>
+                    style={{
+                        position: 'absolute',
+                        top: -80,
+                        left: -80,
+                        width: 280,
+                        height: 280,
+                        borderRadius: 140,
+                        backgroundColor: '#5A3A1E',
+                        transform: [{ scale: pulse1 }],
+                    }}
+                />
 
-                    <View className="w-[150px] h-[150px] rounded-full bg-dark-brown justify-center items-center">
-                        <View className="w-20 h-20 rounded-full bg-white/20 justify-center items-center">
-                            <Text className="text-5xl">🧠</Text>
-                        </View>
-                    </View>
-                </Animated.View>
+                {/* Top-right decorative circle */}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        top: -60,
+                        right: -100,
+                        width: 300,
+                        height: 300,
+                        borderRadius: 150,
+                        backgroundColor: '#5A3A1E',
+                        transform: [{ scale: pulse2 }],
+                    }}
+                />
 
-                {/* Title */}
-                <Text className="text-2xl font-bold text-dark-brown mb-2 text-center">Computing Data...</Text>
-                <Text className="text-sm text-placeholder text-center mb-8">{currentMessage}</Text>
+                {/* Bottom-left decorative circle */}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        bottom: -100,
+                        left: -80,
+                        width: 320,
+                        height: 320,
+                        borderRadius: 160,
+                        backgroundColor: '#5A3A1E',
+                        transform: [{ scale: pulse3 }],
+                    }}
+                />
 
-                {/* Progress Bar */}
-                <View className="w-full flex-row items-center gap-4">
-                    <View className="flex-1 h-2.5 bg-light-gray rounded-md overflow-hidden">
-                        <View
-                            className="h-full bg-primary-green rounded-md"
-                            style={{ width: `${progress}%` }}
-                        />
-                    </View>
-                    <Text className="text-sm font-semibold text-dark-brown min-w-[45px] text-right">{progress}%</Text>
+                {/* Bottom-right decorative circle */}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        bottom: -80,
+                        right: -100,
+                        width: 280,
+                        height: 280,
+                        borderRadius: 140,
+                        backgroundColor: '#5A3A1E',
+                        transform: [{ scale: pulse4 }],
+                    }}
+                />
+
+                {/* Content - Centered */}
+                <View className="flex-1 justify-center items-center px-8">
+                    <Text className="text-4xl font-[Urbanist-Bold] text-white text-center mb-6">
+                        Compiling Data...
+                    </Text>
+                    <Text className="text-base text-white/70 font-[Urbanist-Regular] text-center leading-6 px-4">
+                        Please wait... We're calculating the data{'\n'}based on your assessment.
+                    </Text>
                 </View>
 
-                {/* Decorative Elements */}
-                <View className="absolute inset-0">
-                    <View
-                        className="absolute w-3 h-3 rounded-full bg-dark-brown opacity-20"
-                        style={{ top: height * 0.15, left: width * 0.15 }}
-                    />
-                    <View
-                        className="absolute w-3 h-3 rounded-full bg-dark-brown opacity-20"
-                        style={{ top: height * 0.25, right: width * 0.1 }}
-                    />
-                    <View
-                        className="absolute w-3 h-3 rounded-full bg-dark-brown opacity-20"
-                        style={{ bottom: height * 0.2, left: width * 0.2 }}
-                    />
-                </View>
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </View>
     );
 };
 
