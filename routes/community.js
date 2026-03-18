@@ -3,15 +3,19 @@
 import express from 'express';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import authenticate from '../middleware/auth.js';
 
 const router = express.Router();
+
+// All routes require authentication
+router.use(authenticate);
 
 // Create a new post
 router.post('/posts', async (req, res) => {
     // Explanation: Creates a new community post
     try {
         const { content } = req.body;
-        const post = new Post({ userId: req.user.userId, content });
+        const post = new Post({ userId: req.user._id, content });
         await post.save();
         res.status(201).json({ message: 'Post created', post });
     } catch (err) {
@@ -38,7 +42,7 @@ router.put('/posts/:id', async (req, res) => {
         const { content } = req.body;
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: 'Post not found' });
-        if (post.userId.toString() !== req.user.userId) {
+        if (post.userId.toString() !== req.user._id) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
         post.content = content;
@@ -56,7 +60,7 @@ router.delete('/posts/:id', async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: 'Post not found' });
-        if (post.userId.toString() !== req.user.userId) {
+        if (post.userId.toString() !== req.user._id) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
         await Post.findByIdAndDelete(req.params.id);
@@ -70,7 +74,7 @@ router.delete('/posts/:id', async (req, res) => {
 router.get('/notifications', async (req, res) => {
     // Explanation: Retrieves notifications for community interactions (placeholder)
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         res.json(user.notifications.filter(n => n.message.includes('community')));
     } catch (err) {
         res.status(500).json({ error: err.message });

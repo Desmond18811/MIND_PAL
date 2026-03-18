@@ -50,7 +50,7 @@ router.post('/book', (req, res) => {
         message: 'Appointment booked successfully',
         data: {
             appointmentId: 'appt_' + Math.random().toString(36).substr(2, 9),
-            userId: req.user.userId,
+            userId: req.user._id,
             slotId,
             status: 'confirmed',
             bookedAt: new Date()

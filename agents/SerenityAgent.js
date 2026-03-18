@@ -437,6 +437,13 @@ class SerenityAgent {
     async generateUserInsights() {
         const hasAnyPermission = Object.values(this.permissions).some(p => p);
 
+        if (process.env.ENABLE_ML_INSIGHTS !== 'true') {
+            return {
+                success: false,
+                message: "ML Insights feature is currently disabled."
+            };
+        }
+
         if (!hasAnyPermission) {
             return {
                 success: false,

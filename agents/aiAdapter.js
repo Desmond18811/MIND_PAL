@@ -172,17 +172,32 @@ async function generateGeminiResponse(systemPrompt, messages, maxTokens, tempera
 
 /**
  * Hugging Face response generation
+ * Uses chatCompletion for Llama 4 Instruct models (handles prompt template automatically)
+ * Falls back to textGeneration for other models
  */
 async function generateHuggingFaceResponse(systemPrompt, messages, maxTokens, temperature) {
-    const model = process.env.HUGGINGFACE_MODEL || 'mistralai/Mistral-7B-Instruct-v0.2';
+    const model = process.env.HUGGINGFACE_MODEL || 'meta-llama/Llama-4-Scout-17B-16E-Instruct';
 
-    // Format conversation for instruction-following model
-    const prompt = `<s>[INST] ${systemPrompt}
+    // For Llama 3/4 Instruct models, use chatCompletion API
+    // This automatically handles the prompt template (<|begin_of_text|>, etc.)
+    if (model.includes('Llama-3') || model.includes('Llama-4') || model.includes('Instruct')) {
+        const chatMessages = [
+            { role: 'system', content: systemPrompt },
+            ...messages
+        ];
 
-Current conversation:
-${messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n')}
+        const response = await hfClient.chatCompletion({
+            model,
+            messages: chatMessages,
+            max_tokens: maxTokens,
+            temperature
+        });
 
-Respond as Serenity, the AI mental health companion: [/INST]`;
+        return response.choices[0].message.content.trim();
+    }
+
+    // Fallback: textGeneration for non-chat models (Mistral, etc.)
+    const prompt = `<s>[INST] ${systemPrompt}\n\nCurrent conversation:\n${messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n')}\n\nRespond as Serenity, the AI mental health companion: [/INST]`;
 
     const response = await hfClient.textGeneration({
         model,
@@ -190,7 +205,8 @@ Respond as Serenity, the AI mental health companion: [/INST]`;
         parameters: {
             max_new_tokens: maxTokens,
             temperature,
-            return_full_text: false
+            return_full_text: false,
+            stop: ['</s>']
         }
     });
 

@@ -34,6 +34,7 @@ import therapistRoutes from './routes/therapistRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
 import serenityRoutes from './routes/serenityRoutes.js';
 import voiceRoutes from './routes/voiceRoutes.js';
+import datasetRoutes from './routes/datasetRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -89,7 +90,26 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(express.json());
+// [DEBUG] Log all incoming requests to identify source of malformed JSON
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.url} - IP: ${req.ip}`);
+  next();
+});
+
+// JSON Body Parser with Error Handling
+app.use((req, res, next) => {
+  express.json()(req, res, (err) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+      console.error('⚠️ Malformed JSON detected:', err.message);
+      console.error('📝 Raw Body (if available):', err.body); // err.body might not be populated by all body-parser versions on error
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid JSON payload provided'
+      });
+    }
+    next();
+  });
+});
 
 // Enhanced MongoDB Connection
 const connectDB = async () => {
@@ -168,6 +188,7 @@ app.use('/api/appointments', appointmentRoutes);
 // Serenity AI Routes
 app.use('/api/serenity', serenityRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/dataset', datasetRoutes);
 
 // 404 Handler
 app.use((req, res) => {

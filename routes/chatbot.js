@@ -2,14 +2,18 @@
 // Import Express and ChatSession model
 import express from 'express';
 import ChatSession from '../models/ChatSession.js';
+import authenticate from '../middleware/auth.js';
 
 const router = express.Router();
+
+// All routes require authentication
+router.use(authenticate);
 
 // Start a new chat session
 router.post('/session', async (req, res) => {
     // Explanation: Creates a new chatbot session for the user
     try {
-        const session = new ChatSession({ userId: req.user.userId, messages: [] });
+        const session = new ChatSession({ userId: req.user._id, messages: [] });
         await session.save();
         res.status(201).json({ message: 'Chat session started', sessionId: session._id });
     } catch (err) {
@@ -21,7 +25,7 @@ router.post('/session', async (req, res) => {
 router.get('/history', async (req, res) => {
     // Explanation: Retrieves all chat sessions for the user
     try {
-        const sessions = await ChatSession.find({ userId: req.user.userId });
+        const sessions = await ChatSession.find({ userId: req.user._id });
         res.json(sessions);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -35,7 +39,7 @@ router.post('/message', async (req, res) => {
         const { sessionId, content } = req.body;
         const session = await ChatSession.findById(sessionId);
         if (!session) return res.status(404).json({ error: 'Session not found' });
-        if (session.userId.toString() !== req.user.userId) {
+        if (session.userId.toString() !== req.user._id) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
         session.messages.push({ sender: 'user', content, timestamp: new Date() });

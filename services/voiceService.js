@@ -59,7 +59,9 @@ async function initGoogleClients() {
             const { TextToSpeechClient } = await import('@google-cloud/text-to-speech');
             speechClient = new SpeechClient();
             ttsClient = new TextToSpeechClient();
-            console.log('🎤 Google Cloud Speech services initialized');
+            if (process.env.ENABLE_VOICE_LOGGING === 'true') {
+                console.log('🎤 Google Cloud Speech services initialized');
+            }
             return true;
         } catch (error) {
             console.warn('⚠️ Failed to initialize Google Cloud Speech:', error.message);
@@ -73,7 +75,9 @@ async function initGoogleClients() {
 
 // Log ElevenLabs status
 if (hasElevenLabsKey) {
-    console.log('🔊 ElevenLabs TTS initialized (Rachel voice)');
+    if (process.env.ENABLE_VOICE_LOGGING === 'true') {
+        console.log('🔊 ElevenLabs TTS initialized (Rachel voice)');
+    }
 } else {
     console.warn('⚠️ ElevenLabs API key not found. Will use Google TTS or mock.');
 }

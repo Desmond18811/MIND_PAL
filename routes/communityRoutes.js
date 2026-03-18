@@ -44,7 +44,7 @@ router.get('/feed', async (req, res) => {
                 };
             }
             // Add userLiked flag
-            post.userLiked = post.likes.some(id => id.toString() === req.user.userId);
+            post.userLiked = post.likes.some(id => id.toString() === req.user._id);
             delete post.likes; // Don't send full like list
             return post;
         });
@@ -77,7 +77,7 @@ router.post('/posts', async (req, res) => {
         const sentiment = await analyzeTextSentiment(content);
 
         const post = new Post({
-            userId: req.user.userId,
+            userId: req.user._id,
             content,
             isAnonymous: !!isAnonymous,
             tags: tags || [],
@@ -122,7 +122,7 @@ router.post('/posts/:id/like', async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post not found' });
 
-        const userId = req.user.userId;
+        const userId = req.user._id;
         const index = post.likes.indexOf(userId);
 
         if (index === -1) {
@@ -156,7 +156,7 @@ router.post('/posts/:id/comments', async (req, res) => {
 
         const comment = new Comment({
             postId: req.params.id,
-            userId: req.user.userId,
+            userId: req.user._id,
             content,
             isAnonymous: !!isAnonymous
         });

@@ -2,14 +2,18 @@
 // Import Express and User model
 import express from 'express';
 import User from '../models/User.js';
+import authenticate from '../middleware/auth.js';
 
 const router = express.Router();
+
+// All routes require authentication
+router.use(authenticate);
 
 // Get notifications
 router.get('/', async (req, res) => {
     // Explanation: Retrieves the user's notifications
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         res.json(user.notifications);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -20,7 +24,7 @@ router.get('/', async (req, res) => {
 router.put('/:id/read', async (req, res) => {
     // Explanation: Marks a specific notification as read
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         const notification = user.notifications.id(req.params.id);
         if (!notification) return res.status(404).json({ error: 'Notification not found' });
         notification.read = true;

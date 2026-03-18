@@ -1,5 +1,6 @@
 import MoodEntry from '../models/MoodEntry.js';
 import mongoose from 'mongoose';
+import { updateScore } from './palScoreController.js';
 
 // Record a mood entry
 export const recordMood = async (req, res) => {
@@ -7,7 +8,7 @@ export const recordMood = async (req, res) => {
     session.startTransaction();
 
     try {
-        const { mood, factors, notes, activities } = req.body;
+        const { moodValue, moodLabel, factors, notes, activities } = req.body;
         const userId = req.user._id;
 
         // Check if mood already recorded today
@@ -16,7 +17,7 @@ export const recordMood = async (req, res) => {
 
         const existingEntry = await MoodEntry.findOne({
             userId,
-            date: { $gte: today }
+            datetime: { $gte: today }
         }).session(session);
 
         if (existingEntry) {
@@ -27,7 +28,8 @@ export const recordMood = async (req, res) => {
 
         const entry = await MoodEntry.create([{
             userId,
-            mood,
+            moodValue,
+            moodLabel,
             factors,
             notes,
             activities
@@ -37,7 +39,7 @@ export const recordMood = async (req, res) => {
         await updateScore(userId, {
             type: 'check-in',
             _id: entry[0]._id,
-            moodValue: mood,
+            moodValue: moodValue,
             activities
         });
 
@@ -74,13 +76,13 @@ export const getMoodHistory = async (req, res) => {
 
         const history = await MoodEntry.find({
             userId,
-            date: dateFilter
-        }).sort({ date: 1 });
+            datetime: dateFilter
+        }).sort({ datetime: 1 });
 
         // Calculate statistics
         const stats = {
             averageMood: history.length > 0 ?
-                history.reduce((sum, entry) => sum + entry.mood, 0) / history.length : null,
+                history.reduce((sum, entry) => sum + entry.moodValue, 0) / history.length : null,
             mostCommonFactors: getMostCommonFactors(history),
             moodFrequency: getMoodFrequency(history),
             streak: await calculateMoodStreak(userId)
@@ -96,9 +98,13 @@ export const getMoodHistory = async (req, res) => {
 function getMostCommonFactors(entries) {
     const factorCounts = {};
     entries.forEach(entry => {
-        entry.factors?.forEach(factor => {
-            factorCounts[factor] = (factorCounts[factor] || 0) + 1;
-        });
+        if (entry.factors) {
+            Object.entries(entry.factors.toJSON ? entry.factors.toJSON() : entry.factors).forEach(([key, value]) => {
+                if (value) {
+                    factorCounts[key] = (factorCounts[key] || 0) + value;
+                }
+            });
+        }
     });
     return Object.entries(factorCounts)
         .sort((a, b) => b[1] - a[1])
@@ -106,16 +112,18 @@ function getMostCommonFactors(entries) {
 }
 
 function getMoodFrequency(entries) {
-    const moodCounts = Array(5).fill(0); // 1-5 scale
+    const moodCounts = Array(10).fill(0); // 1-10 scale
     entries.forEach(entry => {
-        moodCounts[entry.mood - 1]++;
+        if (entry.moodValue >= 1 && entry.moodValue <= 10) {
+            moodCounts[entry.moodValue - 1]++;
+        }
     });
     return moodCounts;
 }
 
 async function calculateMoodStreak(userId) {
     const entries = await MoodEntry.find({ userId })
-        .sort({ date: -1 });
+        .sort({ datetime: -1 });
 
     if (entries.length === 0) return 0;
 
@@ -125,14 +133,14 @@ async function calculateMoodStreak(userId) {
 
     // Check if mood recorded today
     const today = new Date().toDateString();
-    if (entries[0].date.toDateString() === today) {
+    if (entries[0].datetime.toDateString() === today) {
         streak++;
         currentDate = new Date(currentDate.getTime() - oneDay);
     }
 
     // Check consecutive previous days
     for (let i = 0; i < entries.length; i++) {
-        const entryDate = entries[i].date.toDateString();
+        const entryDate = entries[i].datetime.toDateString();
         const expectedDate = currentDate.toDateString();
 
         if (entryDate === expectedDate) {

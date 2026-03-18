@@ -5,6 +5,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
+import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 import { voiceService } from '../services/voiceService.js';
 import { createSerenityAgent } from '../agents/SerenityAgent.js';
@@ -78,7 +79,7 @@ router.post('/upload', upload.single('audio'), async (req, res) => {
 
         // Get or create chat session
         let session;
-        if (sessionId) {
+        if (sessionId && mongoose.Types.ObjectId.isValid(sessionId)) {
             session = await ChatSession.findById(sessionId);
         }
         if (!session) {
@@ -120,7 +121,8 @@ router.post('/upload', upload.single('audio'), async (req, res) => {
         console.error('Voice upload error:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Failed to process voice note'
+            message: 'Failed to process voice note',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });

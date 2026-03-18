@@ -4,6 +4,7 @@
  */
 
 import express from 'express';
+import mongoose from 'mongoose';
 import { createSerenityAgent } from '../agents/SerenityAgent.js';
 import ChatSession from '../models/ChatSession.js';
 import DataPermission from '../models/DataPermission.js';
@@ -35,7 +36,7 @@ router.post('/chat', async (req, res) => {
 
         // Get or create session
         let session;
-        if (sessionId) {
+        if (sessionId && mongoose.Types.ObjectId.isValid(sessionId)) {
             session = await ChatSession.findById(sessionId);
             if (!session || session.userId.toString() !== userId.toString()) {
                 session = null;
@@ -104,6 +105,14 @@ router.get('/sessions', async (req, res) => {
 router.get('/session/:id', async (req, res) => {
     try {
         const userId = req.user._id;
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid session ID format'
+            });
+        }
+
         const session = await ChatSession.findById(req.params.id);
 
         if (!session || session.userId.toString() !== userId.toString()) {
@@ -118,9 +127,11 @@ router.get('/session/:id', async (req, res) => {
             data: session
         });
     } catch (error) {
+        console.error('Get session error:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Failed to get session'
+            message: 'Failed to get session',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });
@@ -147,9 +158,11 @@ router.post('/session', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Create session error:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Failed to create session'
+            message: 'Failed to create session',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });

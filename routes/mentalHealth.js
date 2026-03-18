@@ -1,12 +1,16 @@
 import express from 'express';
 import User from '../models/User.js';
+import authenticate from '../middleware/auth.js';
 
 const router = express.Router();
+
+// All routes require authentication
+router.use(authenticate);
 
 // Get mental health score
 router.get('/score', async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         res.json({ score: user.mentalHealthScore.current });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -17,7 +21,7 @@ router.get('/score', async (req, res) => {
 router.put('/score', async (req, res) => {
     try {
         const { score } = req.body;
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         user.mentalHealthScore.current = score;
         user.mentalHealthScore.history.push({ score, date: new Date() });
         await user.save();
@@ -30,7 +34,7 @@ router.put('/score', async (req, res) => {
 // Get score history
 router.get('/score/history', async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         res.json(user.mentalHealthScore.history);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -40,7 +44,7 @@ router.get('/score/history', async (req, res) => {
 // Get AI suggestions (placeholder)
 router.get('/suggestions', async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user._id);
         const score = user.mentalHealthScore.current || 50;
         const suggestions = score < 50
             ? ['Try deep breathing exercises', 'Consider a short meditation session']

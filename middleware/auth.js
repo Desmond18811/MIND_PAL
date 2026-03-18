@@ -30,9 +30,22 @@ const authenticate = async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Token has expired. Please login again to get a new token.'
+            });
+        }
+        if (err.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Invalid token. If using Swagger UI, ensure you paste only the token value without the "Bearer " prefix.',
+                hint: process.env.NODE_ENV === 'development' ? err.message : undefined
+            });
+        }
         res.status(401).json({
             status: 'error',
-            message: 'Invalid token'
+            message: 'Authentication failed'
         });
     }
 };

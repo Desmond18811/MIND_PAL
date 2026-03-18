@@ -57,7 +57,7 @@ paths:
                 password:
                   type: string
                   example: securePassword123
-                name:
+                username:
                   type: string
                   example: John Doe
       responses:
@@ -136,7 +136,9 @@ paths:
             schema:
               type: object
               properties:
-                token:
+                userId:
+                  type: string
+                otp:
                   type: string
                 newPassword:
                   type: string
@@ -158,7 +160,7 @@ paths:
               properties:
                 userId:
                   type: string
-                code:
+                token:
                   type: string
       responses:
         "200":
@@ -176,26 +178,105 @@ paths:
             schema:
               type: object
               properties:
-                displayName:
-                  type: string
-                dateOfBirth:
-                  type: string
-                  format: date
-                gender:
-                  type: string
-                timezone:
-                  type: string
-                goals:
-                  type: array
-                  items:
-                    type: string
-                notificationPreferences:
+                personalInfo:
                   type: object
                   properties:
-                    dailyReminders:
-                      type: boolean
-                    weeklyReports:
-                      type: boolean
+                    firstName:
+                      type: string
+                      example: John
+                    lastName:
+                      type: string
+                      example: Doe
+                    dateOfBirth:
+                      type: string
+                      format: date
+                      example: "1995-06-15"
+                    gender:
+                      type: string
+                      enum: [male, female, other, prefer-not-to-say]
+                      example: male
+                    profilePicture:
+                      type: string
+                      example: "https://example.com/photo.jpg"
+                contactInfo:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: john@example.com
+                    phone:
+                      type: string
+                      example: "+1234567890"
+                    address:
+                      type: object
+                      properties:
+                        street:
+                          type: string
+                          example: "123 Main St"
+                        city:
+                          type: string
+                          example: "New York"
+                        state:
+                          type: string
+                          example: "NY"
+                        country:
+                          type: string
+                          example: "US"
+                        zipCode:
+                          type: string
+                          example: "10001"
+                preferences:
+                  type: object
+                  properties:
+                    theme:
+                      type: string
+                      enum: [light, dark, system]
+                      example: system
+                    language:
+                      type: string
+                      example: en
+                    notificationPreferences:
+                      type: object
+                      properties:
+                        email:
+                          type: boolean
+                          example: true
+                        push:
+                          type: boolean
+                          example: true
+                        sms:
+                          type: boolean
+                          example: false
+                healthInfo:
+                  type: object
+                  properties:
+                    height:
+                      type: number
+                      description: Height in cm
+                      example: 175
+                    weight:
+                      type: number
+                      description: Weight in kg
+                      example: 70
+                    bloodType:
+                      type: string
+                      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+                      example: "O+"
+                    allergies:
+                      type: array
+                      items:
+                        type: string
+                      example: ["peanuts"]
+                    medications:
+                      type: array
+                      items:
+                        type: string
+                      example: []
+                    conditions:
+                      type: array
+                      items:
+                        type: string
+                      example: []
       responses:
         "201":
           description: Profile created
@@ -216,12 +297,24 @@ paths:
           application/json:
             schema:
               type: object
+              description: Same structure as create profile - all fields are optional for update
               properties:
-                displayName:
-                  type: string
-                avatar:
-                  type: string
-                  description: base64 image data
+                personalInfo:
+                  type: object
+                  properties:
+                    firstName:
+                      type: string
+                      example: Jane
+                    lastName:
+                      type: string
+                      example: Doe
+                preferences:
+                  type: object
+                  properties:
+                    theme:
+                      type: string
+                      enum: [light, dark, system]
+                      example: dark
       responses:
         "200":
           description: Profile updated
@@ -252,11 +345,15 @@ paths:
           application/json:
             schema:
               type: object
+              required: [message]
               properties:
                 message:
                   type: string
+                  example: How can I improve my sleep quality?
                 sessionId:
                   type: string
+                  description: Optional. Pass a valid session ID to continue an existing conversation. Leave empty to start a new session.
+                  example: ""
       responses:
         "200":
           description: AI response
@@ -298,6 +395,8 @@ paths:
           required: true
           schema:
             type: string
+            description: A valid MongoDB ObjectId for the session
+            example: 60d0fe4f5311236168a109ca
       responses:
         "200":
           description: Session details
@@ -306,6 +405,16 @@ paths:
     post:
       tags: [Serenity AI Chat]
       summary: Create new session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [text, voice]
+                  example: text
       responses:
         "201":
           description: Session created
@@ -326,11 +435,16 @@ paths:
         - in: query
           name: mood
           schema:
-            type: string
+            type: integer
+            minimum: 1
+            maximum: 10
+            example: 5
         - in: query
           name: timeOfDay
           schema:
             type: string
+            enum: [morning, afternoon, evening, night]
+            example: afternoon
       responses:
         "200":
           description: Suggestions list
@@ -357,10 +471,13 @@ paths:
                   properties:
                     analyzeMood:
                       type: boolean
+                      example: true
                     analyzeSleepData:
                       type: boolean
+                      example: true
                     analyzeJournals:
                       type: boolean
+                      example: true
       responses:
         "200":
           description: Permissions updated
@@ -391,16 +508,25 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              required: [audio]
               properties:
                 audio:
                   type: string
                   format: binary
+                  description: Audio file (wav, webm, mp3, ogg, m4a)
                 sessionId:
                   type: string
+                  description: Optional. Valid MongoDB ObjectId of an existing chat session.
+                  example: ""
                 language:
                   type: string
+                  description: Language code for transcription
+                  example: en-US
                 generateAudio:
                   type: string
+                  description: Set to "true" to generate TTS audio response
+                  enum: ["true", "false"]
+                  example: "false"
       responses:
         "200":
           description: Transcription successful
@@ -409,6 +535,21 @@ paths:
     post:
       tags: [Voice]
       summary: Transcribe audio only
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [audio]
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: Audio file (wav, webm, mp3, ogg, m4a)
+                language:
+                  type: string
+                  description: Language code for transcription
+                  example: en-US
       responses:
         "200":
           description: Transcription result
@@ -422,13 +563,19 @@ paths:
           application/json:
             schema:
               type: object
+              required: [text]
               properties:
                 text:
                   type: string
+                  example: Hello, how are you feeling today?
                 voice:
                   type: string
+                  description: Voice ID (ElevenLabs or Google voice name)
+                  example: en-US-Neural2-F
                 speed:
                   type: number
+                  description: Speaking rate (0.5 to 2.0)
+                  example: 1.0
       responses:
         "200":
           description: Audio content
@@ -443,6 +590,8 @@ paths:
           required: true
           schema:
             type: string
+            description: A valid MongoDB ObjectId for the session
+            example: 60d0fe4f5311236168a109ca
       responses:
         "200":
           description: Analysis result
@@ -460,14 +609,69 @@ paths:
               properties:
                 moodValue:
                   type: integer
+                  minimum: 1
+                  maximum: 10
+                  description: "1-10 scale where 10 is best mood"
+                  example: 7
                 moodLabel:
                   type: string
+                  enum:
+                    [
+                      depressed,
+                      sad,
+                      neutral,
+                      content,
+                      happy,
+                      excited,
+                      anxious,
+                      angry,
+                      stressed,
+                    ]
+                  example: content
                 factors:
+                  type: object
+                  properties:
+                    sleepQuality:
+                      type: integer
+                      minimum: 1
+                      maximum: 5
+                      example: 4
+                    stressLevel:
+                      type: integer
+                      minimum: 1
+                      maximum: 5
+                      example: 2
+                    energyLevel:
+                      type: integer
+                      minimum: 1
+                      maximum: 5
+                      example: 4
+                    socialInteraction:
+                      type: integer
+                      minimum: 1
+                      maximum: 5
+                      example: 3
+                activities:
                   type: array
                   items:
                     type: string
+                    enum:
+                      [
+                        meditation,
+                        exercise,
+                        work,
+                        social,
+                        creative,
+                        rest,
+                        journaling,
+                        music,
+                        nature,
+                      ]
+                  example: ["exercise", "social"]
                 notes:
                   type: string
+                  maxLength: 500
+                  example: Feeling good after a morning run
       responses:
         "201":
           description: Mood recorded
@@ -506,14 +710,56 @@ paths:
             schema:
               type: object
               properties:
+                title:
+                  type: string
+                  example: Morning Reflection
                 content:
                   type: string
+                  example: Today I woke up feeling refreshed and ready for the day.
                 moodBefore:
                   type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 3
                 moodAfter:
                   type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 4
                 tags:
-                  type: string
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      [
+                        reflection,
+                        gratitude,
+                        stress,
+                        anxiety,
+                        happiness,
+                        goal,
+                        dream,
+                      ]
+                  example: ["reflection", "gratitude"]
+                musicPlayed:
+                  type: object
+                  properties:
+                    trackId:
+                      type: string
+                    name:
+                      type: string
+                      example: Calm Waters
+                    artist:
+                      type: string
+                      example: Relaxation Music
+                    duration:
+                      type: number
+                    mood:
+                      type: string
+                images:
+                  type: array
+                  items:
+                    type: string
                 audio:
                   type: string
                   format: binary
@@ -568,16 +814,18 @@ paths:
             schema:
               type: object
               properties:
-                startTime:
-                  type: string
-                  format: date-time
-                environment:
+                environmentalFactors:
                   type: object
                   properties:
-                    temperature:
-                      type: integer
-                    noise:
-                      type: string
+                    noiseLevel:
+                      type: number
+                      example: 2
+                    roomTemperature:
+                      type: number
+                      example: 22
+                    lightLevel:
+                      type: number
+                      example: 1
       responses:
         "200":
           description: Session started
@@ -594,17 +842,38 @@ paths:
               properties:
                 sessionId:
                   type: string
-                endTime:
+                qualityScore:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  example: 7
+                notes:
                   type: string
-                  format: date-time
-                qualityRating:
-                  type: integer
-                dreams:
-                  type: array
-                  items:
-                    type: string
-                interruptions:
-                  type: integer
+                  example: Slept well, woke up once
+                deviceData:
+                  type: object
+                  description: Optional wearable data
+                  properties:
+                    movement:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          time:
+                            type: string
+                            format: date-time
+                          intensity:
+                            type: number
+                    heartRate:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          time:
+                            type: string
+                            format: date-time
+                          bpm:
+                            type: number
       responses:
         "200":
           description: Session ended
@@ -621,6 +890,21 @@ paths:
     put:
       tags: [Sleep]
       summary: Set sleep schedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetBedtime, targetWakeTime]
+              properties:
+                targetBedtime:
+                  type: string
+                  description: "HH:MM format"
+                  example: "22:30"
+                targetWakeTime:
+                  type: string
+                  description: "HH:MM format"
+                  example: "06:30"
       responses:
         "200":
           description: Schedule updated
@@ -650,17 +934,40 @@ paths:
               properties:
                 title:
                   type: string
+                  example: Exercise daily for 30 minutes
                 description:
                   type: string
+                  example: Build a consistent exercise habit
                 category:
                   type: string
+                  enum:
+                    [
+                      mental-health,
+                      productivity,
+                      relationships,
+                      fitness,
+                      learning,
+                      other,
+                    ]
+                  example: fitness
+                difficulty:
+                  type: string
+                  enum: [easy, medium, hard]
+                  example: medium
                 targetDate:
                   type: string
                   format: date
+                  example: "2026-06-01"
                 milestones:
                   type: array
                   items:
                     type: object
+                    properties:
+                      description:
+                        type: string
+                  example:
+                    - description: "Complete first week"
+                    - description: "Complete first month"
       responses:
         "201":
           description: Goal created
@@ -1042,12 +1349,15 @@ paths:
             schema:
               type: object
               properties:
-                assessmentType:
-                  type: string
                 responses:
                   type: array
                   items:
                     type: object
+                    properties:
+                      questionId:
+                        type: string
+                      answer:
+                        type: string
       responses:
         "200":
           description: Assessment submitted
